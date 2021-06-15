@@ -15,7 +15,7 @@ import MusoraForum from "react-native-musora-forum";
 
 // ...
 
-const result = await MusoraForum.multiply(3, 7);
+
 ```
 
 ## Contributing
