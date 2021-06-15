@@ -5,30 +5,30 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createStore, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 
-import CRUD from './src/components/CRUD';
-import Threads from './src/components/Threads';
-import Thread from './src/components/Thread';
-import Forums from './src/components/Forums';
-import Search from './src/commons/Search.js';
+import CRUD from './components/CRUD';
+import Threads from './components/Threads';
+import Thread from './components/Thread';
+import Forums from './components/Forums';
+import Search from './commons/Search.js';
 
-import NavigationHeader from './src/commons/NavigationHeader';
+import NavigationHeader from './commons/NavigationHeader';
 
-import { setForumService } from './src/services/forum.service';
+import { setForumService } from './services/forum.service';
 
-import threadsReducer from './src/redux/ThreadReducer';
+import threadsReducer from './redux/ThreadReducer';
 
 const store = createStore(combineReducers({ ...threadsReducer }));
 const Stack = createStackNavigator();
 const timingAnim = {
   animation: 'timing',
-  config: { duration: 250, easing: Easing.out(Easing.circle) }
+  config: { duration: 250, easing: Easing.out(Easing.circle) },
 };
 
 export default ({
   route: {
     params,
-    params: { tryCall, rootUrl, NetworkContext, isDark }
-  }
+    params: { tryCall, rootUrl, NetworkContext, isDark },
+  },
 }) => {
   const networkContext = useContext(NetworkContext);
   setForumService({ tryCall, rootUrl, networkContext, NetworkContext });
@@ -42,45 +42,45 @@ export default ({
           headerMode={'screen'}
           screenOptions={{
             gestureEnabled: false,
-            transitionSpec: { open: timingAnim, close: timingAnim }
+            transitionSpec: { open: timingAnim, close: timingAnim },
           }}
         >
           <Stack.Screen
-            name='Forums'
+            name="Forums"
             component={Forums}
-            options={props => ({
-              header: () => <NavigationHeader {...props} title={'Forums'} />
+            options={(props) => ({
+              header: () => <NavigationHeader {...props} title={'Forums'} />,
             })}
             initialParams={params}
           />
           <Stack.Screen
-            name='Threads'
+            name="Threads"
             component={Threads}
-            options={props => ({
+            options={(props) => ({
               header: () => (
                 <NavigationHeader {...props} title={props.route.params.title} />
-              )
+              ),
             })}
             initialParams={params}
           />
           <Stack.Screen
-            name='CRUD'
+            name="CRUD"
             component={CRUD}
             initialParams={params}
             options={{ headerShown: false }}
           />
           <Stack.Screen
-            name='Thread'
+            name="Thread"
             component={Thread}
             initialParams={params}
-            options={props => ({
+            options={(props) => ({
               header: () => (
                 <NavigationHeader {...props} title={props.route.params.title} />
-              )
+              ),
             })}
           />
           <Stack.Screen
-            name='Search'
+            name="Search"
             component={Search}
             initialParams={params}
           />
