@@ -65,9 +65,9 @@ export default class UserInfo extends React.Component {
                   'Total post likes'
                 ]
               ].map((array, i) => (
-                <View style={i ? { flex: 1 } : {}}>
-                  {array.map(a => (
-                    <View style={styles.tableRow}>
+                <View style={i ? { flex: 1 } : {}} key={`${i}`}>
+                  {array.map((a, j) => (
+                    <View style={styles.tableRow} key={`${i}${j}`}>
                       <Text
                         style={{
                           paddingVertical: 10,
