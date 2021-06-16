@@ -36,13 +36,8 @@ class Forums extends React.Component {
   };
   constructor(props) {
     super(props);
-    let {
-      isDark,
-      appColor,
-      thread,
-      postId,
-      mobile_app_url
-    } = props.route.params;
+    let { isDark, appColor, thread, postId, mobile_app_url } =
+      props.route.params;
     styles = setStyles(isDark, appColor);
     if (thread) {
       this.navigate('Thread', {
@@ -141,7 +136,7 @@ class Forums extends React.Component {
 
   render() {
     let { loadingMore, loading, refreshing } = this.state;
-    let { appColor, BottomNavigator, isDark } = this.props.route.params;
+    let { appColor, isDark } = this.props.route.params;
     return (
       <>
         {loading ? (
@@ -207,7 +202,6 @@ class Forums extends React.Component {
             }
           />
         )}
-        <BottomNavigator currentPage={'FORUM'} />
       </>
     );
   }
