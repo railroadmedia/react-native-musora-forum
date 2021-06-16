@@ -36,8 +36,13 @@ class Forums extends React.Component {
   };
   constructor(props) {
     super(props);
-    let { isDark, appColor, thread, postId, mobile_app_url } =
-      props.route.params;
+    let {
+      isDark,
+      appColor,
+      route: {
+        params: { thread, postId, mobile_app_url }
+      }
+    } = props;
     styles = setStyles(isDark, appColor);
     if (thread) {
       this.navigate('Thread', {
@@ -84,8 +89,8 @@ class Forums extends React.Component {
   renderFLItem = ({ item: id }) => (
     <ThreadCard
       onNavigate={() => this.navigate('Thread', { threadId: id })}
-      appColor={this.props.route.params.appColor}
-      isDark={this.props.route.params.isDark}
+      appColor={this.props.appColor}
+      isDark={this.props.isDark}
       id={id}
       reduxKey={'forums'}
     />
@@ -95,8 +100,8 @@ class Forums extends React.Component {
     <ForumCard
       key={item.id}
       data={item}
-      appColor={this.props.route.params.appColor}
-      isDark={this.props.route.params.isDark}
+      appColor={this.props.appColor}
+      isDark={this.props.isDark}
       onNavigate={() =>
         this.navigate('Threads', { title: item.title, forumId: item.id })
       }
@@ -136,7 +141,7 @@ class Forums extends React.Component {
 
   render() {
     let { loadingMore, loading, refreshing } = this.state;
-    let { appColor, isDark } = this.props.route.params;
+    let { appColor, isDark } = this.props;
     return (
       <>
         {loading ? (
@@ -207,8 +212,9 @@ class Forums extends React.Component {
   }
 }
 
-let setStyles = (isDark, appColor) =>
-  StyleSheet.create({
+let setStyles = (isDark, appColor) => {
+  setStyles.isDark = isDark;
+  return StyleSheet.create({
     fList: {
       flex: 1,
       backgroundColor: isDark ? '#00101D' : 'white'
@@ -242,7 +248,20 @@ let setStyles = (isDark, appColor) =>
       marginLeft: 15
     }
   });
+};
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ setForumsThreads }, dispatch);
+const mapStateToProps = (
+  { themeState },
+  {
+    route: {
+      params: { isDark, appColor }
+    }
+  }
+) => {
+  isDark = themeState ? themeState.theme === 'dark' : isDark;
+  if (setStyles.isDark !== isDark) styles = setStyles(isDark, appColor);
+  return { appColor, isDark };
+};
 
-export default connect(null, mapDispatchToProps)(Forums);
+export default connect(mapStateToProps, mapDispatchToProps)(Forums);

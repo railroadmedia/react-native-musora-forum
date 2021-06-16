@@ -1,10 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
+import { connect } from 'react-redux';
+
 import { arrowRight, drum } from '../assets/svgs';
 
 let styles;
-export default class ForumCard extends React.Component {
+class ForumCard extends React.Component {
   constructor(props) {
     super(props);
     let { isDark } = props;
@@ -14,7 +16,7 @@ export default class ForumCard extends React.Component {
   render() {
     let {
       appColor,
-      data: { title, icon, post_count, description, latest_post }
+      data: { title, post_count, description, latest_post }
     } = this.props;
 
     return (
@@ -46,8 +48,9 @@ export default class ForumCard extends React.Component {
     );
   }
 }
-let setStyles = isDark =>
-  StyleSheet.create({
+let setStyles = isDark => {
+  setStyles.isDark = isDark;
+  return StyleSheet.create({
     container: {
       backgroundColor: isDark ? '#081825' : '#F7F9FC',
       padding: 10,
@@ -93,3 +96,11 @@ let setStyles = isDark =>
       padding: 5
     }
   });
+};
+const mapStateToProps = ({ themeState }, { isDark }) => {
+  isDark = themeState ? themeState.theme === 'dark' : isDark;
+  if (setStyles.isDark !== isDark) styles = setStyles(isDark);
+  return { isDark };
+};
+
+export default connect(mapStateToProps, null)(ForumCard);

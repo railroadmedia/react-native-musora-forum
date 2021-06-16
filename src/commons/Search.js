@@ -215,8 +215,9 @@ class Search extends React.Component {
   }
 }
 
-let setStyles = isDark =>
-  StyleSheet.create({
+let setStyles = isDark => {
+  setStyles.isDark = isDark;
+  return StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: isDark ? '#00101D' : 'white' },
     navHeader: {
       paddingHorizontal: 15,
@@ -270,9 +271,15 @@ let setStyles = isDark =>
       marginBottom: 10
     }
   });
+};
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ setSearchThreads }, dispatch);
+const mapStateToProps = ({ themeState }, { isDark }) => {
+  isDark = themeState ? themeState.theme === 'dark' : isDark;
+  if (setStyles.isDark !== isDark) styles = setStyles(isDark);
+  return { isDark };
+};
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(props => <Search {...props} navigation={useNavigation()} />);

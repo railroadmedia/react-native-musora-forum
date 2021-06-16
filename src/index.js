@@ -17,21 +17,25 @@ import { setForumService } from './services/forum.service';
 
 import threadsReducer from './redux/ThreadReducer';
 
-const store = createStore(combineReducers({ ...threadsReducer }));
+let store;
 const Stack = createStackNavigator();
 const timingAnim = {
   animation: 'timing',
-  config: { duration: 250, easing: Easing.out(Easing.circle) },
+  config: { duration: 250, easing: Easing.out(Easing.circle) }
 };
 
 export default ({
   route: {
     params,
-    params: { tryCall, rootUrl, NetworkContext, isDark },
-  },
+    params: { tryCall, rootUrl, NetworkContext, isDark, reduxStore }
+  }
 }) => {
   const networkContext = useContext(NetworkContext);
   setForumService({ tryCall, rootUrl, networkContext, NetworkContext });
+  if (!store)
+    store =
+      reduxStore?.injectReducer('threads', threadsReducer.threads) ||
+      createStore(combineReducers({ ...threadsReducer }));
   return (
     <Provider store={store}>
       <KeyboardAvoidingView
@@ -42,45 +46,45 @@ export default ({
           headerMode={'screen'}
           screenOptions={{
             gestureEnabled: false,
-            transitionSpec: { open: timingAnim, close: timingAnim },
+            transitionSpec: { open: timingAnim, close: timingAnim }
           }}
         >
           <Stack.Screen
-            name="Forums"
+            name='Forums'
             component={Forums}
-            options={(props) => ({
-              header: () => <NavigationHeader {...props} title={'Forums'} />,
+            options={props => ({
+              header: () => <NavigationHeader {...props} title={'Forums'} />
             })}
             initialParams={params}
           />
           <Stack.Screen
-            name="Threads"
+            name='Threads'
             component={Threads}
-            options={(props) => ({
+            options={props => ({
               header: () => (
                 <NavigationHeader {...props} title={props.route.params.title} />
-              ),
+              )
             })}
             initialParams={params}
           />
           <Stack.Screen
-            name="CRUD"
+            name='CRUD'
             component={CRUD}
             initialParams={params}
             options={{ headerShown: false }}
           />
           <Stack.Screen
-            name="Thread"
+            name='Thread'
             component={Thread}
             initialParams={params}
-            options={(props) => ({
+            options={props => ({
               header: () => (
                 <NavigationHeader {...props} title={props.route.params.title} />
-              ),
+              )
             })}
           />
           <Stack.Screen
-            name="Search"
+            name='Search'
             component={Search}
             initialParams={params}
           />

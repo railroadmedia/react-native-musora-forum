@@ -23,8 +23,8 @@ class NavigationHeader extends React.Component {
   state = { showOptions: false };
   constructor(props) {
     super(props);
-    let { isDark, appColor } = this.props.route.params;
-    styles = setStyles(isDark, appColor);
+    let { isDark } = this.props;
+    styles = setStyles(isDark);
   }
 
   componentDidMount() {
@@ -133,10 +133,8 @@ class NavigationHeader extends React.Component {
     let {
       navigation,
       title,
-      route: {
-        name,
-        params: { isDark }
-      },
+      route: { name },
+      isDark,
       thread: { locked, pinned } = {}
     } = this.props;
     let { showOptions } = this.state;
@@ -202,8 +200,9 @@ class NavigationHeader extends React.Component {
     );
   }
 }
-let setStyles = (isDark, appColor) =>
-  StyleSheet.create({
+let setStyles = isDark => {
+  setStyles.isDark = isDark;
+  return StyleSheet.create({
     container: {
       backgroundColor: isDark ? '#00101d' : 'white',
       paddingVertical: 10
@@ -253,16 +252,19 @@ let setStyles = (isDark, appColor) =>
       fontFamily: 'OpenSans'
     }
   });
+};
 const mapStateToProps = (
-  { threads },
+  { threads, themeState },
   {
     title,
     route: {
       name,
-      params: { threadId }
+      params: { threadId, isDark }
     }
   }
 ) => {
+  isDark = themeState ? themeState.theme === 'dark' : isDark;
+  if (setStyles.isDark !== isDark) styles = setStyles(isDark);
   let thread;
   if (name.match(/^(Thread)$/))
     thread =
@@ -274,6 +276,7 @@ const mapStateToProps = (
   return {
     thread,
     threadId,
+    isDark,
     signShown: name.match(/^(Thread)$/) ? threads.signShown : undefined,
     title: thread?.title || title
   };

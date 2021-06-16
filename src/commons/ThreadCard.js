@@ -68,8 +68,9 @@ class ThreadCard extends React.Component {
     );
   }
 }
-let setStyles = isDark =>
-  StyleSheet.create({
+let setStyles = isDark => {
+  setStyles.isDark = isDark;
+  return StyleSheet.create({
     container: {
       flexDirection: 'row',
       backgroundColor: isDark ? '#081825' : 'white',
@@ -103,8 +104,13 @@ let setStyles = isDark =>
       fontWeight: '100'
     }
   });
+};
 
-const mapStateToProps = ({ threads }, props) => ({
-  thread: threads[props.reduxKey]?.[props.id]
-});
+const mapStateToProps = ({ threads, themeState }, { reduxKey, id, isDark }) => {
+  isDark = themeState ? themeState.theme === 'dark' : isDark;
+  if (setStyles.isDark !== isDark) styles = setStyles(isDark);
+  return {
+    thread: threads[reduxKey]?.[id]
+  };
+};
 export default connect(mapStateToProps)(ThreadCard);
