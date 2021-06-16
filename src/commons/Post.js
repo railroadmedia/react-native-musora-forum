@@ -127,13 +127,15 @@ class Post extends React.Component {
       reportModalVisible
     } = this.state;
     let { post, appColor, index, isDark, signShown } = this.props;
+    let selectedColor = isDark ? '#002039' : '#E1E6EB';
+    let baseColor = isDark ? '#081825' : '#FFFFFF';
     return (
       <>
         <TouchableOpacity
           activeOpacity={1}
           style={{
             marginBottom: 20,
-            backgroundColor: selected ? '#002039' : '#081825'
+            backgroundColor: selected ? selectedColor : baseColor
           }}
           onPress={multiQuotes.length ? this.multiQuote : this.toggleMenu}
         >
