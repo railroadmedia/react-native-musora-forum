@@ -168,10 +168,10 @@ class Post extends React.Component {
               ulItemStyle={{ color: isDark ? 'white' : '#00101D' }}
               classesStyles={{
                 'blockquote-even': {
-                  backgroundColor: isDark ? '#081825' : '#00101D'
+                  backgroundColor: isDark ? '#081825' : 'white'
                 },
                 'blockquote-odd': {
-                  backgroundColor: isDark ? '#002039' : '#00101D'
+                  backgroundColor: isDark ? '#002039' : '#E1E6EB'
                 },
                 shadow: {
                   elevation: 5,
