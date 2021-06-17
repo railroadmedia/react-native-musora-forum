@@ -73,13 +73,13 @@ let setStyles = isDark => {
   return StyleSheet.create({
     container: {
       flexDirection: 'row',
-      backgroundColor: isDark ? '#081825' : 'white',
+      backgroundColor: isDark ? '#081825' : '#F7F9FC',
       alignItems: 'center',
       padding: 10,
       marginBottom: 15,
       borderRadius: 5,
       elevation: 5,
-      shadowColor: 'black',
+      shadowColor: isDark ? 'black' : 'lightgrey',
       shadowOffset: { width: 3, height: 4 },
       shadowOpacity: 1,
       shadowRadius: 4

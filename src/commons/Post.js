@@ -119,16 +119,11 @@ class Post extends React.Component {
   };
 
   render() {
-    let {
-      isLiked,
-      likeCount,
-      selected,
-      menuTop,
-      reportModalVisible
-    } = this.state;
+    let { isLiked, likeCount, selected, menuTop, reportModalVisible } =
+      this.state;
     let { post, appColor, index, isDark, signShown } = this.props;
     let selectedColor = isDark ? '#002039' : '#E1E6EB';
-    let baseColor = isDark ? '#081825' : '#FFFFFF';
+    let baseColor = isDark ? '#081825' : '#E1E6EB4D';
     return (
       <>
         <TouchableOpacity
@@ -357,8 +352,9 @@ let setStyles = (isDark, appColor) =>
       fontFamily: 'RobotoCondensed-Bold'
     },
     signatureContainer: {
-      borderTopColor: isDark ? '#445F74' : '#00101D',
+      borderTopColor: isDark ? '#445F74' : 'lightgrey',
       borderTopWidth: 1,
+      padding: 15,
       paddingVertical: 5
     },
     signature: {

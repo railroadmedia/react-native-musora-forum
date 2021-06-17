@@ -178,7 +178,7 @@ class Forums extends React.Component {
               <View
                 style={{
                   borderTopWidth: 1,
-                  borderColor: '#445F74',
+                  borderColor: isDark ? '#445F74' : 'lightgrey',
                   marginHorizontal: 15,
                   marginBottom: 10
                 }}

@@ -105,7 +105,7 @@ class Thread extends React.Component {
         style={{
           borderTopWidth,
           borderBottomWidth,
-          borderColor: '#445F74',
+          borderColor: isDark ? '#445F74' : 'lightgrey',
           marginHorizontal: 15,
           marginBottom
         }}

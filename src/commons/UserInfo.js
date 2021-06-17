@@ -146,6 +146,6 @@ let setStyles = (isDark, appColor) =>
     },
     tableRow: {
       borderBottomWidth: 1,
-      borderBottomColor: '#002039'
+      borderBottomColor: isDark ? '#002039' : 'lightgrey'
     }
   });

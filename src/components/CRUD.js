@@ -93,14 +93,8 @@ class CRUD extends React.Component {
     Keyboard.dismiss();
     this.richText?.blurContentEditor();
     this.setState({ loading: true });
-    const {
-      action,
-      type,
-      forumId,
-      threadId,
-      postId,
-      quotes
-    } = this.props.route.params;
+    const { action, type, forumId, threadId, postId, quotes } =
+      this.props.route.params;
     if (type === 'thread') {
       if (action === 'create') {
         await createThread(this.title, this.richHTML, forumId);
@@ -184,7 +178,7 @@ class CRUD extends React.Component {
         </View>
         <View style={{ flex: 1 }}>
           <ScrollView
-            style={{ flex: 1, margin: 15 }}
+            style={{ flex: 1, padding: 15 }}
             keyboardShouldPersistTaps='handled'
             contentInsetAdjustmentBehavior='never'
             showsVerticalScrollIndicator={false}
@@ -202,10 +196,10 @@ class CRUD extends React.Component {
                   ulItemStyle={{ color: isDark ? 'white' : '#00101D' }}
                   classesStyles={{
                     'blockquote-even': {
-                      backgroundColor: isDark ? '#081825' : '#00101D'
+                      backgroundColor: isDark ? '#081825' : 'white'
                     },
                     'blockquote-odd': {
-                      backgroundColor: isDark ? '#002039' : '#00101D'
+                      backgroundColor: isDark ? '#002039' : '#E1E6EB'
                     },
                     shadow: {
                       elevation: 5,
@@ -222,7 +216,7 @@ class CRUD extends React.Component {
             {type === 'thread' && (
               <TextInput
                 style={styles.titleInput}
-                placeholderTextColor={isDark ? '#445F74' : '#00101D'}
+                placeholderTextColor={isDark ? '#445F74' : 'grey'}
                 placeholder='Title'
                 defaultValue={thread?.title || ''}
                 onChangeText={txt => (this.title = txt)}
@@ -316,7 +310,7 @@ let setStyles = (isDark, appColor) =>
       textTransform: 'capitalize',
       fontFamily: 'OpenSans-Bold',
       fontSize: 16,
-      color: isDark ? '#FFFFFF' : '#000000'
+      color: isDark ? 'white' : '#000000'
     },
     container: {
       flex: 1,
@@ -329,7 +323,7 @@ let setStyles = (isDark, appColor) =>
     },
     editorStyle: {
       backgroundColor: isDark ? '#002039' : '#E1E6EB',
-      color: 'white'
+      color: isDark ? 'white' : 'black'
     },
     deleteBtn: {
       backgroundColor: appColor,
@@ -344,14 +338,14 @@ let setStyles = (isDark, appColor) =>
       textAlign: 'center',
       fontFamily: 'RobotoCondensed-Bold',
       fontSize: 15,
-      color: '#FFFFFF',
+      color: 'white',
       textTransform: 'uppercase'
     },
     titleInput: {
       marginBottom: 15,
       backgroundColor: isDark ? '#002039' : '#E1E6EB',
       borderRadius: 5,
-      color: '#FFFFFF',
+      color: isDark ? 'white' : 'black',
       padding: 15,
       paddingHorizontal: 10
     }
