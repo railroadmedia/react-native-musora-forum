@@ -128,7 +128,7 @@ class Forums extends React.Component {
     if (!connection()) return;
     this.page = page;
     this.setState({ loadingMore: true }, () =>
-      getFollowedThreads(page).then(r => {
+      getFollowedThreads(undefined, page).then(r => {
         this.followedThreads = r.results.map(r => r.id);
         this.flatListRef.scrollToOffset({ offset: 0, animated: false });
         batch(() => {

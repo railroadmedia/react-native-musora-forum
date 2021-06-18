@@ -16,11 +16,18 @@ import {
   updateThread
 } from '../services/forum.service';
 
-import { arrowLeft, lock, moderate, pin } from '../assets/svgs';
+import {
+  arrowLeft,
+  lock,
+  moderate,
+  pin,
+  check,
+  unfollow
+} from '../assets/svgs';
 
 let styles;
 class NavigationHeader extends React.Component {
-  state = { showOptions: false };
+  state = { optionsVisible: false, followStateVisible: false };
   constructor(props) {
     super(props);
     let { isDark } = this.props;
@@ -67,8 +74,12 @@ class NavigationHeader extends React.Component {
     options.forumRules = {
       text: 'Forum Rules',
       action: () =>
-        this.setState({ showOptions: false }, () =>
-          this.navigate('Thread', { forumRules: true, title: 'Forum Rules' })
+        this.setState({ optionsVisible: false }, () =>
+          this.navigate('Thread', {
+            threadId: 1,
+            title: 'Forum Rules',
+            isForumRules: true
+          })
         )
     };
     return options;
@@ -77,14 +88,10 @@ class NavigationHeader extends React.Component {
   navigate = (route, params) =>
     connection(true) && this.props.navigation.navigate(route, params);
 
-  toggleModal = () =>
-    connection(true) &&
-    this.setState(({ showOptions }) => ({ showOptions: !showOptions }));
-
   toggleSign = () =>
     batch(() => {
       this.props.toggleSignShown();
-      this.setState({ showOptions: false });
+      this.setState({ optionsVisible: false });
     });
 
   toggleLock = () => {
@@ -93,7 +100,7 @@ class NavigationHeader extends React.Component {
     updateThread(thread.id, { locked: !thread.locked });
     batch(() => {
       this.props.updateThreads({ ...thread, locked: !thread.locked });
-      this.setState({ showOptions: false });
+      this.setState({ optionsVisible: false });
     });
   };
 
@@ -103,7 +110,7 @@ class NavigationHeader extends React.Component {
     updateThread(thread.id, { pinned: !thread.pinned });
     batch(() => {
       this.props.updateThreads({ ...thread, pinned: !thread.pinned });
-      this.setState({ showOptions: false });
+      this.setState({ optionsVisible: false });
     });
   };
 
@@ -113,14 +120,18 @@ class NavigationHeader extends React.Component {
     (thread.is_followed ? unfollowThread : followThread)(thread.id);
     batch(() => {
       this.props.updateThreads({ ...thread, is_followed: !thread.is_followed });
-      this.setState({ showOptions: false });
+      this.setState({ optionsVisible: false }, () =>
+        this.setState({ followStateVisible: true }, () =>
+          setTimeout(() => this.setState({ followStateVisible: false }), 3000)
+        )
+      );
     });
   };
 
   onEdit = () =>
     connection(true) &&
     this.setState(
-      () => ({ showOptions: false }),
+      () => ({ optionsVisible: false }),
       () =>
         this.navigate('CRUD', {
           type: 'thread',
@@ -133,11 +144,14 @@ class NavigationHeader extends React.Component {
     let {
       navigation,
       title,
-      route: { name },
+      route: {
+        name,
+        params: { isForumRules }
+      },
       isDark,
-      thread: { locked, pinned } = {}
+      thread: { locked, pinned, is_followed } = {}
     } = this.props;
-    let { showOptions } = this.state;
+    let { optionsVisible, followStateVisible } = this.state;
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.subContainer}>
@@ -163,34 +177,59 @@ class NavigationHeader extends React.Component {
               fill: isDark ? 'white' : 'black'
             })}
           </TouchableOpacity>
-          {name.match(/^(Forums|Threads|Thread)$/) && (
+          {name.match(/^(Forums|Threads|Thread)$/) && !isForumRules && (
             <>
               <TouchableOpacity
                 style={{ padding: 15 }}
-                onPress={this.toggleModal}
+                onPress={() => this.setState({ optionsVisible: true })}
               >
                 {moderate({ width: 20, fill: isDark ? 'white' : 'black' })}
               </TouchableOpacity>
               <Modal
                 animationType={'slide'}
-                onRequestClose={() => this.toggleModal()}
+                onRequestClose={() => this.setState({ optionsVisible: false })}
                 supportedOrientations={['portrait', 'landscape']}
                 transparent={true}
-                visible={showOptions}
+                visible={optionsVisible || followStateVisible}
               >
                 <TouchableOpacity
                   activeOpacity={1}
                   style={styles.optionsContainer}
-                  onPress={this.toggleModal}
+                  onPress={() => this.setState({ optionsVisible: false })}
                 >
-                  <SafeAreaView style={styles.options}>
-                    <View style={styles.pill} />
-                    {Object.values(this.options).map(({ text, action }) => (
-                      <TouchableOpacity key={text} onPress={action}>
-                        <Text style={styles.optionText}>{text}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </SafeAreaView>
+                  {followStateVisible ? (
+                    <View
+                      style={{
+                        ...styles.followStateContainer,
+                        borderTopColor: is_followed ? '#34D399' : '#FFAE00'
+                      }}
+                    >
+                      {(is_followed ? check : unfollow)({
+                        height: 25,
+                        width: 25,
+                        fill: is_followed ? '#34D399' : '#FFAE00'
+                      })}
+                      <Text style={styles.followStateTitle}>
+                        {is_followed ? 'Follow' : 'Unfollow'} Thread{'\n'}
+                        <Text
+                          style={{ color: 'white', fontFamily: 'OpenSans' }}
+                        >
+                          You've{' '}
+                          {is_followed ? 'started following' : 'unfollowed'}{' '}
+                          this thread.
+                        </Text>
+                      </Text>
+                    </View>
+                  ) : (
+                    <SafeAreaView style={styles.options}>
+                      <View style={styles.pill} />
+                      {Object.values(this.options).map(({ text, action }) => (
+                        <TouchableOpacity key={text} onPress={action}>
+                          <Text style={styles.optionText}>{text}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </SafeAreaView>
+                  )}
                 </TouchableOpacity>
               </Modal>
             </>
@@ -249,6 +288,19 @@ let setStyles = isDark => {
       paddingVertical: 10,
       color: 'white',
       fontFamily: 'OpenSans'
+    },
+    followStateContainer: {
+      backgroundColor: '#081825',
+      margin: 5,
+      padding: 15,
+      borderTopWidth: 6,
+      borderRadius: 8,
+      flexDirection: 'row'
+    },
+    followStateTitle: {
+      paddingLeft: 15,
+      color: 'white',
+      fontFamily: 'OpenSans-Bold'
     }
   });
 };

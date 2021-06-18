@@ -351,3 +351,24 @@ export const x = props => (
     />
   </Svg>
 );
+export const check = props => (
+  <Svg viewBox='0 0 28 28' style={{ height: props.height, width: props.width }}>
+    <Path
+      d='M9.66667,14 L12.5556,16.8889 L18.3333,11.1111 M27,14 C27,21.1797 21.1797,27 14,27 C6.8203,27 1,21.1797 1,14 C1,6.8203 6.8203,1 14,1 C21.1797,1 27,6.8203 27,14 z'
+      stroke={props.fill}
+      stroke-width='4'
+      stroke-linecap='round'
+      stroke-linejoin='round'
+      id='svg_1'
+      class=''
+    />
+  </Svg>
+);
+export const unfollow = props => (
+  <Svg viewBox='0 0 26 26' style={{ height: props.height, width: props.width }}>
+    <Path
+      fill={props.fill}
+      d='M13 0C5.81855 0 0 5.81855 0 13C0 20.1815 5.81855 26 13 26C20.1815 26 26 20.1815 26 13C26 5.81855 20.1815 0 13 0ZM6.08065 15.0968C5.73468 15.0968 5.45161 14.8137 5.45161 14.4677V11.5323C5.45161 11.1863 5.73468 10.9032 6.08065 10.9032H19.9194C20.2653 10.9032 20.5484 11.1863 20.5484 11.5323V14.4677C20.5484 14.8137 20.2653 15.0968 19.9194 15.0968H6.08065Z'
+    />
+  </Svg>
+);

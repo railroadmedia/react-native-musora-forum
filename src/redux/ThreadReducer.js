@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 const threadsReducer = (
   state = { signShown: false },
-  { type, threads, thread, posts, post }
+  { type, threads, thread, posts, post, forumRules }
 ) => {
   switch (type) {
     case 'SETFORUMS':
@@ -10,6 +10,8 @@ const threadsReducer = (
         ...state,
         forums: Object.assign({}, ...threads.map(t => ({ [t.id]: t })))
       };
+    case 'SETFORUMRULES':
+      return { ...state, forumRules };
     case 'SETALL':
       return {
         ...state,

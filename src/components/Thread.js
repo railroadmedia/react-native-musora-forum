@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Text,
   ActivityIndicator,
-  View
+  View,
+  Modal
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,9 +20,9 @@ import Post from '../commons/Post';
 
 import { connection, getThread } from '../services/forum.service';
 
-import { post, multiQuote } from '../assets/svgs';
+import { post, multiQuote, lock } from '../assets/svgs';
 
-import { setPosts } from '../redux/ThreadActions';
+import { setPosts, setForumRules } from '../redux/ThreadActions';
 
 let styles;
 class Thread extends React.Component {
@@ -31,7 +32,8 @@ class Thread extends React.Component {
     postHeight: 0,
     loadingMore: false,
     refreshing: false,
-    multiQuoting: false
+    multiQuoting: false,
+    lockedModalVisible: false
   };
 
   constructor(props) {
@@ -48,12 +50,13 @@ class Thread extends React.Component {
       'focus',
       () => (reFocused ? this.refresh?.() : (reFocused = true))
     );
-    const { threadId, postId } = this.props.route.params;
+    const { threadId, postId, isForumRules } = this.props.route.params;
     getThread(threadId, this.page, postId).then(thread => {
       this.page = parseInt(thread.page);
       this.post_count = thread.post_count;
       this.posts = thread.posts.map(p => p.id);
       batch(() => {
+        if (isForumRules) this.props.setForumRules(thread);
         this.props.setPosts(thread.posts);
         this.setState({ loading: false });
       });
@@ -163,9 +166,19 @@ class Thread extends React.Component {
     );
   };
 
+  toggleLockedModal = () =>
+    this.setState(
+      ({ lockedModalVisible }) => ({ lockedModalVisible: !lockedModalVisible }),
+      () =>
+        this.state.lockedModalVisible &&
+        setTimeout(() => this.setState({ lockedModalVisible: false }), 3000)
+    );
+
   render() {
-    let { loading, refreshing, postHeight, multiQuoting } = this.state;
-    let { isDark, appColor, threadId, postId } = this.props.route.params;
+    let { locked } = this.props;
+    let { loading, refreshing, postHeight, multiQuoting, lockedModalVisible } =
+      this.state;
+    let { isDark, appColor, threadId } = this.props.route.params;
     return loading ? (
       <ActivityIndicator
         size='large'
@@ -207,20 +220,23 @@ class Thread extends React.Component {
               !this.state.postHeight &&
               this.setState({ postHeight: layout.height + 15 })
             }
-            onPress={() =>
-              this.navigate('CRUD', {
-                type: 'post',
-                action: 'create',
-                threadId,
-                quotes: Post.multiQuotes.map(({ props: { post } }) => ({
-                  ...post,
-                  content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`
-                }))
-              })
+            onPress={
+              locked
+                ? this.toggleLockedModal
+                : () =>
+                    this.navigate('CRUD', {
+                      type: 'post',
+                      action: 'create',
+                      threadId,
+                      quotes: Post.multiQuotes.map(({ props: { post } }) => ({
+                        ...post,
+                        content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`
+                      }))
+                    })
             }
-            style={{ ...styles.bottomTOpacity, backgroundColor: appColor }}
+            style={styles.bottomTOpacity}
           >
-            {(multiQuoting ? multiQuote : post)({
+            {(locked ? lock : multiQuoting ? multiQuote : post)({
               height: 25,
               width: 25,
               fill: 'white'
@@ -234,11 +250,34 @@ class Thread extends React.Component {
             )}
           </TouchableOpacity>
         </SafeAreaView>
+        <Modal
+          animationType={'fade'}
+          onRequestClose={this.toggleLockedModal}
+          supportedOrientations={['portrait', 'landscape']}
+          transparent={true}
+          visible={lockedModalVisible}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={this.toggleLockedModal}
+            style={styles.lockedModalBackground}
+          >
+            <View style={styles.lockedModalMsgContainer}>
+              {lock({ height: 15, width: 15, fill: '#FFAE00' })}
+              <Text style={styles.lockedTitle}>
+                Locked{'\n'}
+                <Text style={{ color: 'white', fontFamily: 'OpenSans' }}>
+                  This thread is locked.
+                </Text>
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </Modal>
       </>
     );
   }
 }
-let setStyles = isDark =>
+let setStyles = (isDark, appColor) =>
   StyleSheet.create({
     fList: {
       flex: 1,
@@ -257,7 +296,8 @@ let setStyles = isDark =>
     bottomTOpacity: {
       padding: 15,
       margin: 15,
-      borderRadius: 99
+      borderRadius: 99,
+      backgroundColor: appColor
     },
     bottomTOpacitySafeArea: {
       position: 'absolute',
@@ -274,10 +314,46 @@ let setStyles = isDark =>
       position: 'absolute',
       padding: 4,
       bottom: 0
+    },
+    lockedModalBackground: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,.5)',
+      justifyContent: 'flex-end'
+    },
+    lockedModalMsgContainer: {
+      backgroundColor: '#081825',
+      margin: 5,
+      padding: 15,
+      borderTopWidth: 6,
+      borderTopColor: '#FFAE00',
+      borderRadius: 8,
+      flexDirection: 'row'
+    },
+    lockedTitle: {
+      paddingLeft: 15,
+      color: 'white',
+      fontFamily: 'OpenSans-Bold'
     }
   });
 
 const mapDispatchToProps = dispatch =>
-  bindActionCreators({ setPosts }, dispatch);
+  bindActionCreators({ setPosts, setForumRules }, dispatch);
+const mapStateToProps = (
+  { threads },
+  {
+    route: {
+      params: { threadId }
+    }
+  }
+) => ({
+  locked: !!(
+    threads?.forums?.[threadId] ||
+    threads?.all?.[threadId] ||
+    threads?.followed?.[threadId] ||
+    threads?.search?.[threadId] ||
+    threads.forumRules ||
+    {}
+  ).locked
+});
 
-export default connect(null, mapDispatchToProps)(Thread);
+export default connect(mapStateToProps, mapDispatchToProps)(Thread);
