@@ -71,6 +71,7 @@ class Thread extends React.Component {
     connection(true) && this.props.navigation.navigate(route, params);
 
   renderFLItem = ({ item: id, index }) => {
+    let { locked } = this.props;
     let { isDark, appColor, user, postId } = this.props.route.params;
     return (
       <View
@@ -88,6 +89,7 @@ class Thread extends React.Component {
         }}
       >
         <Post
+          locked={locked}
           user={user}
           id={id}
           index={index + 1 + 10 * (this.page - 1)}

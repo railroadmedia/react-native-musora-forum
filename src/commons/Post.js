@@ -121,12 +121,13 @@ class Post extends React.Component {
   render() {
     let { isLiked, likeCount, selected, menuTop, reportModalVisible } =
       this.state;
-    let { post, appColor, index, isDark, signShown } = this.props;
+    let { post, appColor, index, isDark, signShown, locked } = this.props;
     let selectedColor = isDark ? '#002039' : '#E1E6EB';
     let baseColor = isDark ? '#081825' : '#E1E6EB4D';
     return (
       <>
         <TouchableOpacity
+          disabled={!!locked}
           activeOpacity={1}
           style={{
             marginBottom: 20,
