@@ -74,8 +74,7 @@ export default class UserInfo extends React.Component {
                           paddingLeft: i ? 10 : 15,
                           color: i ? (isDark ? '#445f73' : 'black') : appColor,
                           fontSize: 18,
-                          fontFamily: 'OpenSans',
-                          fontWeight: i ? '400' : '700'
+                          fontFamily: i ? 'OpenSans' : 'OpenSans-Bold'
                         }}
                       >
                         {a}
@@ -116,9 +115,8 @@ let setStyles = (isDark, appColor) =>
       marginBottom: 30
     },
     name: {
-      fontFamily: 'OpenSans',
+      fontFamily: 'OpenSans-ExtraBold',
       color: isDark ? 'white' : 'black',
-      fontWeight: '800',
       fontSize: 20,
       position: 'absolute',
       textAlign: 'center',
@@ -130,18 +128,17 @@ let setStyles = (isDark, appColor) =>
       marginTop: 5,
       fontSize: 20,
       color: appColor,
-      fontFamily: 'RobotoCondensed-Regular',
-      fontWeight: '700'
+      fontFamily: 'RobotoCondensed-Bold'
     },
     level: {
       color: isDark ? 'white' : 'black',
-      fontWeight: '400',
-      fontSize: 16
+      fontSize: 16,
+      fontFamily: 'OpenSans-Bold'
     },
     yearSince: {
       color: isDark ? '#445f73' : 'black',
       fontSize: 18,
-      fontWeight: '400',
+      fontFamily: 'OpenSans-Bold',
       marginTop: 20
     },
     tableRow: {

@@ -81,15 +81,13 @@ let setStyles = isDark =>
     },
     title: {
       flex: 1,
-      fontFamily: 'OpenSans',
+      fontFamily: 'OpenSans-Bold',
       color: isDark ? 'white' : 'black',
       fontSize: 20,
-      fontWeight: '700',
       paddingHorizontal: 10
     },
     text: {
       fontFamily: 'OpenSans',
-      fontWeight: '100',
       color: '#445F74',
       fontSize: 14
     },
