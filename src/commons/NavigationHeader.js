@@ -221,9 +221,8 @@ let setStyles = isDark => {
       right: 50
     },
     titleText: {
-      fontFamily: 'OpenSans',
+      fontFamily: 'OpenSans-ExtraBold',
       fontSize: 20,
-      fontWeight: '900',
       color: isDark ? 'white' : 'black',
       textAlign: 'center',
       textTransform: 'capitalize'

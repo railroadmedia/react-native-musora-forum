@@ -55,8 +55,13 @@ class ThreadCard extends React.Component {
           </View>
           <Text style={styles.lastPost}>
             Started On{' '}
-            <Text style={{ fontWeight: '700' }}>{published_on_formatted}</Text>{' '}
-            By <Text style={{ fontWeight: '700' }}>{author_display_name}</Text>
+            <Text style={{ fontFamily: 'OpenSans-Bold' }}>
+              {published_on_formatted}
+            </Text>{' '}
+            By{' '}
+            <Text style={{ fontFamily: 'OpenSans-Bold' }}>
+              {author_display_name}
+            </Text>
           </Text>
           <Text style={styles.topicName}>
             {`${post_count} Replies`} · {latest_post.created_at_diff} · By{' '}
@@ -85,14 +90,12 @@ let setStyles = isDark => {
       shadowRadius: 4
     },
     title: {
-      fontFamily: 'OpenSans',
+      fontFamily: 'OpenSans-Bold',
       color: isDark ? 'white' : 'black',
-      fontSize: 20,
-      fontWeight: '700'
+      fontSize: 20
     },
     lastPost: {
       fontFamily: 'OpenSans',
-      fontWeight: '100',
       color: '#445F74',
       fontSize: 14,
       paddingVertical: 5
@@ -100,8 +103,7 @@ let setStyles = isDark => {
     topicName: {
       fontFamily: 'OpenSans',
       color: '#445F74',
-      fontSize: 14,
-      fontWeight: '100'
+      fontSize: 14
     }
   });
 };

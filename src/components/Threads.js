@@ -273,9 +273,8 @@ let setStyles = isDark =>
       borderColor: isDark ? '#00101D' : 'white'
     },
     headerText: {
-      fontFamily: 'OpenSans',
+      fontFamily: 'OpenSans-Bold',
       fontSize: 20,
-      fontWeight: '700',
       color: '#445F74'
     },
     fList: {

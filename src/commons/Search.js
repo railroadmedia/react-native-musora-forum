@@ -225,9 +225,8 @@ let setStyles = isDark => {
       justifyContent: 'center'
     },
     navHeaderTitle: {
-      fontFamily: 'OpenSans',
+      fontFamily: 'OpenSans-ExtraBold',
       fontSize: 20,
-      fontWeight: '900',
       color: isDark ? 'white' : 'black',
       textAlign: 'center',
       position: 'absolute',
