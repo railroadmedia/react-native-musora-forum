@@ -188,15 +188,6 @@ class CRUD extends React.Component {
         </View>
         <View style={{ flex: 1 }}>
           <ScrollView
-            onContentSizeChange={(_, contentHeight) => {
-              this.scrollRef.scrollTo({ y: (this.swp || contentHeight) + 30 });
-              this.swp = contentHeight;
-            }}
-            onScroll={({
-              nativeEvent: {
-                contentOffset: { y }
-              }
-            }) => (this.swp = y)}
             ref={r => (this.scrollRef = r)}
             style={{ flex: 1, margin: 15 }}
             keyboardShouldPersistTaps='handled'
@@ -243,42 +234,43 @@ class CRUD extends React.Component {
               />
             )}
             {!(type === 'thread' && action === 'edit') && (
-              <>
-                <RichToolbar
-                  getEditor={() => this.richTextRef}
-                  style={styles.richBar}
-                  flatContainerStyle={{ paddingHorizontal: 12 }}
-                  selectedIconTint={'#2095F2'}
-                  disabledIconTint={'#bfbfbf'}
-                  onPressAddImage={() => this.onInsertLink('Image')}
-                  onInsertLink={() => this.onInsertLink('Link')}
-                  insertVideo={() => this.onInsertLink('Video')}
-                  actions={[
-                    actions.setBold,
-                    actions.setItalic,
-                    actions.setUnderline,
-                    actions.insertBulletsList,
-                    actions.insertOrderedList,
-                    actions.insertLink,
-                    actions.insertImage,
-                    actions.insertVideo
-                  ]}
-                />
-                <RichEditor
-                  pasteAsPlainText={true}
-                  usecontainer={false}
-                  editorStyle={styles.editorStyle}
-                  ref={r => (this.richTextRef = r)}
-                  style={{
-                    borderBottomLeftRadius: 6,
-                    borderBottomRightRadius: 6
-                  }}
-                  placeholder={'Write something'}
-                  initialContentHTML={post?.content}
-                  onChange={html => (this.richHTML = html)}
-                  onFocus={() => this.scrollRef.scrollToEnd()}
-                />
-              </>
+              <RichToolbar
+                getEditor={() => this.richTextRef}
+                style={styles.richBar}
+                flatContainerStyle={{ paddingHorizontal: 12 }}
+                selectedIconTint={'#2095F2'}
+                disabledIconTint={'#bfbfbf'}
+                onPressAddImage={() => this.onInsertLink('Image')}
+                onInsertLink={() => this.onInsertLink('Link')}
+                insertVideo={() => this.onInsertLink('Video')}
+                actions={[
+                  actions.setBold,
+                  actions.setItalic,
+                  actions.setUnderline,
+                  actions.insertBulletsList,
+                  actions.insertOrderedList,
+                  actions.insertLink,
+                  actions.insertImage,
+                  actions.insertVideo
+                ]}
+              />
+            )}
+            {!(type === 'thread' && action === 'edit') && (
+              <RichEditor
+                pasteAsPlainText={true}
+                useContainer={false}
+                editorStyle={styles.editorStyle}
+                ref={r => (this.richTextRef = r)}
+                style={{
+                  borderBottomLeftRadius: 6,
+                  borderBottomRightRadius: 6,
+                  height: 200
+                }}
+                placeholder={'Write something'}
+                initialContentHTML={post?.content}
+                onChange={html => (this.richHTML = html)}
+                onFocus={() => this.scrollRef.scrollToEnd()}
+              />
             )}
           </ScrollView>
           {action === 'edit' && (
