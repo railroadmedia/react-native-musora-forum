@@ -61,27 +61,27 @@ class CRUD extends React.Component {
   onLinkDone = (title, url, type) => {
     if (url) {
       if (type === 'Link') {
-        this.richText?.insertLink(title, url);
+        this.richTextRef?.insertLink(title, url);
       } else if (type === 'Image') {
-        this.richText?.insertImage(url);
+        this.richTextRef?.insertImage(url);
       } else {
-        if (url.includes('<iframe')) this.richText?.insertHTML(url);
+        if (url.includes('<iframe')) this.richTextRef?.insertHTML(url);
         else if (url.includes('youtube.com'))
-          this.richText?.insertHTML(
+          this.richTextRef?.insertHTML(
             `<p><iframe src="https://www.youtube.com/embed/${url.slice(
               url.indexOf('watch?v=') + 8,
               url.length
             )}" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p>`
           );
         else if (url.includes('vimeo.com'))
-          this.richText?.insertHTML(
+          this.richTextRef?.insertHTML(
             `<p><iframe src="https://player.vimeo.com/video/${url.slice(
               url.indexOf('.com/') + 5,
               url.length
             )}" width="425" height="350" allowfullscreen="allowfullscreen"></iframe></p>`
           );
         else
-          this.richText?.insertHTML(
+          this.richTextRef?.insertHTML(
             `<video controls="controls" width="300" height="150"><source src=${url} /></video>`
           );
       }
@@ -91,7 +91,7 @@ class CRUD extends React.Component {
   save = async () => {
     if (!connection(true)) return;
     Keyboard.dismiss();
-    this.richText?.blurContentEditor();
+    this.richTextRef?.blurContentEditor();
     this.setState({ loading: true });
     const { action, type, forumId, threadId, postId, quotes } =
       this.props.route.params;
@@ -178,7 +178,17 @@ class CRUD extends React.Component {
         </View>
         <View style={{ flex: 1 }}>
           <ScrollView
-            style={{ flex: 1, padding: 15 }}
+            onContentSizeChange={(_, contentHeight) => {
+              this.scrollRef.scrollTo({ y: (this.swp || contentHeight) + 30 });
+              this.swp = contentHeight;
+            }}
+            onScroll={({
+              nativeEvent: {
+                contentOffset: { y }
+              }
+            }) => (this.swp = y)}
+            ref={r => (this.scrollRef = r)}
+            style={{ flex: 1, margin: 15 }}
             keyboardShouldPersistTaps='handled'
             contentInsetAdjustmentBehavior='never'
             showsVerticalScrollIndicator={false}
@@ -223,9 +233,9 @@ class CRUD extends React.Component {
               />
             )}
             {!(type === 'thread' && action === 'edit') && (
-              <View style={{ borderRadius: 6, overflow: 'hidden' }}>
+              <>
                 <RichToolbar
-                  getEditor={() => this.richText}
+                  getEditor={() => this.richTextRef}
                   style={styles.richBar}
                   flatContainerStyle={{ paddingHorizontal: 12 }}
                   selectedIconTint={'#2095F2'}
@@ -245,14 +255,20 @@ class CRUD extends React.Component {
                   ]}
                 />
                 <RichEditor
+                  pasteAsPlainText={true}
+                  usecontainer={false}
                   editorStyle={styles.editorStyle}
-                  ref={r => (this.richText = r)}
-                  style={{ minHeight: 300 }}
+                  ref={r => (this.richTextRef = r)}
+                  style={{
+                    borderBottomLeftRadius: 6,
+                    borderBottomRightRadius: 6
+                  }}
                   placeholder={'Write something'}
                   initialContentHTML={post?.content}
                   onChange={html => (this.richHTML = html)}
+                  onFocus={() => this.scrollRef.scrollToEnd()}
                 />
-              </View>
+              </>
             )}
           </ScrollView>
           {action === 'edit' && (
@@ -319,7 +335,9 @@ let setStyles = (isDark, appColor) =>
     richBar: {
       backgroundColor: '#001424',
       borderColor: isDark ? '#002039' : '#E1E6EB',
-      borderWidth: 4
+      borderWidth: 4,
+      borderTopLeftRadius: 6,
+      borderTopRightRadius: 6
     },
     editorStyle: {
       backgroundColor: isDark ? '#002039' : '#E1E6EB',
