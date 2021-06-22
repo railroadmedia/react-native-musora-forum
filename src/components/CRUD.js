@@ -44,6 +44,7 @@ import {
 } from '../services/forum.service';
 
 import { updateThreads, updatePosts } from '../redux/ThreadActions';
+import CustomModal from '../../../../src/modals/CustomModal';
 
 let styles;
 
@@ -95,16 +96,17 @@ class CRUD extends React.Component {
     this.setState({ loading: true });
     const { action, type, forumId, threadId, postId, quotes } =
       this.props.route.params;
+    let response;
     if (type === 'thread') {
       if (action === 'create') {
-        await createThread(this.title, this.richHTML, forumId);
+        response = await createThread(this.title, this.richHTML, forumId);
       } else {
         this.props.updateThreads({ ...this.props.thread, title: this.title });
-        await updateThread(threadId, { title: this.title });
+        response = await updateThread(threadId, { title: this.title });
       }
     } else {
       if (action === 'create') {
-        await createPost({
+        response = await createPost({
           content: `${quotes
             ?.map(({ content }) => content)
             .join('<br>')
@@ -120,7 +122,7 @@ class CRUD extends React.Component {
             .join('<br>')
             .concat('<br>')}${this.richHTML}`
         });
-        await editPost(
+        response = await editPost(
           postId,
           `${quotes
             ?.map(({ content }) => content)
@@ -129,7 +131,15 @@ class CRUD extends React.Component {
         );
       }
     }
-    this.props.navigation.goBack();
+    if (response.errors) {
+      this.customModal.toggle(
+        'Something went wrong',
+        response.errors.map(m => m.detail).join(' ')
+      );
+      this.setState({ loading: false });
+    } else {
+      this.props.navigation.goBack();
+    }
   };
 
   onDelete = async () => {
@@ -281,6 +291,11 @@ class CRUD extends React.Component {
           isDark={isDark}
           onClose={this.onLinkDone}
           ref={ref => (this.linkModal = ref)}
+        />
+        <CustomModal
+          ref={ref => (this.customModal = ref)}
+          isDark={isDark}
+          appColor={appColor}
         />
       </SafeAreaView>
     );
