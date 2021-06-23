@@ -49,8 +49,8 @@ class Threads extends React.Component {
 
   constructor(props) {
     super(props);
-    let { isDark } = props.route.params;
-    styles = setStyles(isDark);
+    let { isDark, appColor } = props.route.params;
+    styles = setStyles(isDark, appColor);
   }
 
   componentDidMount() {
@@ -236,7 +236,7 @@ class Threads extends React.Component {
             />
           }
         />
-        <SafeAreaView style={styles.bottomTOpacitySafeArea}>
+        <SafeAreaView style={styles.bottomTOpacitySafeArea} mode='margin'>
           <TouchableOpacity
             onLayout={({ nativeEvent: { layout } }) =>
               !this.state.createForumHeight &&
@@ -249,7 +249,7 @@ class Threads extends React.Component {
                 forumId
               })
             }
-            style={{ ...styles.bottomTOpacity, backgroundColor: appColor }}
+            style={styles.bottomTOpacity}
           >
             {addThread({ height: 25, width: 25, fill: 'white' })}
           </TouchableOpacity>
@@ -258,7 +258,7 @@ class Threads extends React.Component {
     );
   }
 }
-let setStyles = isDark =>
+let setStyles = (isDark, appColor) =>
   StyleSheet.create({
     headerContainer: {
       paddingHorizontal: 15,
@@ -293,8 +293,10 @@ let setStyles = isDark =>
     },
     bottomTOpacity: {
       padding: 15,
-      margin: 15,
-      borderRadius: 99
+      marginBottom: 15,
+      marginRight: 15,
+      borderRadius: 99,
+      backgroundColor: appColor
     },
     bottomTOpacitySafeArea: {
       position: 'absolute',

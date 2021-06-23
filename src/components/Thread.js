@@ -244,7 +244,7 @@ class Thread extends React.Component {
             />
           }
         />
-        <SafeAreaView style={styles.bottomTOpacitySafeArea}>
+        <SafeAreaView style={styles.bottomTOpacitySafeArea} mode='margin'>
           <TouchableOpacity
             onLayout={({ nativeEvent: { layout } }) =>
               !this.state.postHeight &&
@@ -331,7 +331,8 @@ let setStyles = (isDark, appColor) =>
     },
     bottomTOpacity: {
       padding: 15,
-      margin: 15,
+      marginBottom: 15,
+      marginRight: 15,
       borderRadius: 99,
       backgroundColor: appColor
     },

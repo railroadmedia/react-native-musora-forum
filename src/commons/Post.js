@@ -47,19 +47,17 @@ class Post extends React.Component {
 
   toggleLike = () => {
     if (!connection(true)) return;
-    if (this.props.user.id !== this.props.post.author_id) {
-      let { id } = this.props.post;
-      this.setState(({ isLiked, likeCount }) => {
-        if (isLiked) {
-          likeCount--;
-          disLikePost(id);
-        } else {
-          likeCount++;
-          likePost(id);
-        }
-        return { likeCount, isLiked: !isLiked };
-      });
-    }
+    let { id } = this.props.post;
+    this.setState(({ isLiked, likeCount }) => {
+      if (isLiked) {
+        likeCount--;
+        disLikePost(id);
+      } else {
+        likeCount++;
+        likePost(id);
+      }
+      return { likeCount, isLiked: !isLiked };
+    });
   };
 
   toggleMenu = () =>
@@ -123,7 +121,7 @@ class Post extends React.Component {
   render() {
     let { isLiked, likeCount, selected, menuTop, reportModalVisible } =
       this.state;
-    let { post, appColor, index, isDark, signShown, locked } = this.props;
+    let { post, appColor, index, isDark, signShown, locked, user } = this.props;
     let selectedColor = isDark ? '#002039' : '#E1E6EB';
     let baseColor = isDark ? '#081825' : '#E1E6EB4D';
     return (
@@ -164,11 +162,24 @@ class Post extends React.Component {
               appColor={appColor}
               html={post.content}
               tagsStyles={{
-                div: { color: isDark ? 'white' : '#00101D' },
-                blockquote: { padding: 10, borderRadius: 5 }
+                div: {
+                  color: isDark ? 'white' : '#00101D',
+                  fontFamily: 'OpenSans'
+                },
+                blockquote: {
+                  padding: 10,
+                  borderRadius: 5,
+                  fontFamily: 'OpenSans'
+                }
               }}
-              olItemStyle={{ color: isDark ? 'white' : '#00101D' }}
-              ulItemStyle={{ color: isDark ? 'white' : '#00101D' }}
+              olItemStyle={{
+                color: isDark ? 'white' : '#00101D',
+                fontFamily: 'OpenSans'
+              }}
+              ulItemStyle={{
+                color: isDark ? 'white' : '#00101D',
+                fontFamily: 'OpenSans'
+              }}
               classesStyles={{
                 'blockquote-even': {
                   backgroundColor: isDark ? '#081825' : 'white'
@@ -189,6 +200,7 @@ class Post extends React.Component {
           </View>
           <View style={styles.likeContainer}>
             <TouchableOpacity
+              disabled={user.id === post.author_id}
               onPress={this.toggleLike}
               disallowInterruption={true}
               style={{

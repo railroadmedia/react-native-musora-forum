@@ -133,7 +133,15 @@ export default class HTMLRenderer extends React.Component {
               convertedCSSStyles,
               passProps
             );
-          }
+          },
+          a: ({ href }, children, _, { onLinkPress }) => (
+            <TouchableOpacity
+              style={{ padding: 5 }}
+              onPress={() => onLinkPress(null, href)}
+            >
+              {children}
+            </TouchableOpacity>
+          )
         }}
       />
     );
