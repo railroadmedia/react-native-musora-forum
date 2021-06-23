@@ -166,7 +166,13 @@ class NavigationHeader extends React.Component {
                 {pin({ width: 10, fill: isDark ? 'white' : 'black' })}
               </View>
             )}
-            <Text style={styles.titleText}>{title}</Text>
+            <Text
+              style={styles.titleText}
+              numberOfLines={2}
+              ellipsizeMode='tail'
+            >
+              {title}
+            </Text>
           </View>
           <TouchableOpacity
             style={{ paddingHorizontal: 15 }}
@@ -264,7 +270,8 @@ let setStyles = isDark => {
       fontSize: 20,
       color: isDark ? 'white' : 'black',
       textAlign: 'center',
-      textTransform: 'capitalize'
+      textTransform: 'capitalize',
+      width: '85%'
     },
     optionsContainer: {
       flex: 1,
