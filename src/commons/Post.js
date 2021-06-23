@@ -72,11 +72,12 @@ class Post extends React.Component {
 
   edit = () => {
     closeMenus();
-    let { post } = this.props;
+    let { post, onDelete } = this.props;
     this.props.navigation.navigate('CRUD', {
       type: 'post',
       action: 'edit',
       postId: post.id,
+      onDelete,
       quotes: [
         {
           content:
@@ -104,11 +105,12 @@ class Post extends React.Component {
 
   reply = () => {
     closeMenus();
-    let { post } = this.props;
+    let { post, onPostCreated } = this.props;
     this.props.navigation.navigate('CRUD', {
       type: 'post',
       action: 'create',
       threadId: post.thread_id,
+      onPostCreated,
       quotes: [
         {
           ...post,

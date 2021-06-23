@@ -32,6 +32,7 @@ import {
 
 import { InsertLinkModal } from '../commons/InsertLinkModal';
 import HTMLRenderer from '../commons/HTMLRenderer';
+import CustomModal from '../commons/CustomModal';
 
 import {
   connection,
@@ -44,7 +45,6 @@ import {
 } from '../services/forum.service';
 
 import { updateThreads, updatePosts } from '../redux/ThreadActions';
-import CustomModal from '../commons/CustomModal';
 
 let styles;
 
@@ -94,7 +94,7 @@ class CRUD extends React.Component {
     Keyboard.dismiss();
     this.richTextRef?.blurContentEditor();
     this.setState({ loading: true });
-    const { action, type, forumId, threadId, postId, quotes } =
+    const { action, type, forumId, threadId, postId, quotes, onPostCreated } =
       this.props.route.params;
     let response;
     if (type === 'thread') {
@@ -138,6 +138,7 @@ class CRUD extends React.Component {
       );
       this.setState({ loading: false });
     } else {
+      onPostCreated?.(response.id);
       this.props.navigation.goBack();
     }
   };
@@ -146,9 +147,10 @@ class CRUD extends React.Component {
     if (!connection(true)) return;
     Keyboard.dismiss();
     this.setState({ loading: true });
-    const { type, threadId, postId } = this.props.route.params;
+    const { type, threadId, postId, onDelete } = this.props.route.params;
     if (type === 'thread') await deleteThread(threadId);
     else await deletePost(postId);
+    onDelete?.(postId);
     this.props.navigation.goBack();
   };
 

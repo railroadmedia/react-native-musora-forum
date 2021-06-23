@@ -27,6 +27,8 @@ import { setPosts, setForumRules } from '../redux/ThreadActions';
 let styles;
 class Thread extends React.Component {
   page = 1;
+  postLayouts = {};
+  flHeaderHeight = 0;
   state = {
     loading: true,
     postHeight: 0,
@@ -38,10 +40,10 @@ class Thread extends React.Component {
 
   constructor(props) {
     super(props);
-    let { isDark, appColor, page } = props.route.params;
+    let { isDark, appColor, page, postId } = props.route.params;
+    this.postId = postId;
     styles = setStyles(isDark, appColor);
     this.page = page || 1;
-    this.itemsDisplayed = new Set();
   }
 
   componentDidMount() {
@@ -50,8 +52,8 @@ class Thread extends React.Component {
       'focus',
       () => (reFocused ? this.refresh?.() : (reFocused = true))
     );
-    const { threadId, postId, isForumRules } = this.props.route.params;
-    getThread(threadId, this.page, postId).then(thread => {
+    const { threadId, isForumRules } = this.props.route.params;
+    getThread(threadId, this.page, this.postId).then(thread => {
       this.page = parseInt(thread.page);
       this.post_count = thread.post_count;
       this.posts = thread.posts.map(p => p.id);
@@ -70,23 +72,38 @@ class Thread extends React.Component {
   navigate = (route, params) =>
     connection(true) && this.props.navigation.navigate(route, params);
 
+  handleAutoScroll = (id, height) => {
+    this.postLayouts[id] = height;
+    let { postId } = this;
+    if (
+      postId &&
+      this.posts.every(p => Object.keys(this.postLayouts).includes(`${p}`))
+    ) {
+      let scrollPos = this.flHeaderHeight;
+      this.posts
+        .slice(
+          0,
+          this.posts.findIndex(p => p === postId)
+        )
+        .map(pId => (scrollPos += this.postLayouts[pId]));
+      this.flatListRef?.scrollToOffset({
+        offset: scrollPos,
+        animated: false
+      });
+      delete this.postId;
+    }
+  };
+
   renderFLItem = ({ item: id, index }) => {
     let { locked } = this.props;
-    let { isDark, appColor, user, postId } = this.props.route.params;
+    let { isDark, appColor, user } = this.props.route.params;
     return (
       <View
-        onLayout={() => {
-          this.itemsDisplayed?.add(id);
-          // if a notification is opened scroll to the given post
-          if (postId && this.itemsDisplayed?.size === this.posts.length)
-            try {
-              this.flatListRef?.scrollToIndex({
-                animated: false,
-                index: this.posts.findIndex(p => p === postId)
-              });
-              delete this.itemsDisplayed;
-            } catch (_) {}
-        }}
+        onLayout={({
+          nativeEvent: {
+            layout: { height }
+          }
+        }) => this.handleAutoScroll(id, height)}
       >
         <Post
           locked={locked}
@@ -98,6 +115,10 @@ class Thread extends React.Component {
           onMultiQuote={() =>
             this.setState({ multiQuoting: !!Post.multiQuotes.length })
           }
+          onPostCreated={postId => (this.postId = postId)}
+          onDelete={postId =>
+            (this.posts = this.posts.filter(p => p !== postId))
+          }
         />
       </View>
     );
@@ -107,6 +128,11 @@ class Thread extends React.Component {
     let { isDark, appColor } = this.props.route.params;
     return (
       <View
+        onLayout={({
+          nativeEvent: {
+            layout: { height }
+          }
+        }) => (this.flHeaderHeight = height)}
         style={{
           borderTopWidth,
           borderBottomWidth,
@@ -137,13 +163,15 @@ class Thread extends React.Component {
 
   refresh = () => {
     if (!connection()) return;
-    let { threadId } = this.props.route.params;
+    let { threadId, isForumRules } = this.props.route.params;
     Post.clearQuoting();
     this.setState({ refreshing: true, multiQuoting: false }, () =>
-      getThread(threadId, this.page).then(thread => {
+      getThread(threadId, this.page, this.postId).then(thread => {
+        this.page = parseInt(thread.page);
         this.post_count = thread.post_count;
         this.posts = thread.posts.map(p => p.id);
         batch(() => {
+          if (isForumRules) this.props.setForumRules(thread);
           this.props.setPosts(thread.posts);
           this.setState({ refreshing: false });
         });
@@ -229,6 +257,7 @@ class Thread extends React.Component {
                     this.navigate('CRUD', {
                       type: 'post',
                       action: 'create',
+                      onPostCreated: postId => (this.postId = postId),
                       threadId,
                       quotes: Post.multiQuotes.map(({ props: { post } }) => ({
                         ...post,
