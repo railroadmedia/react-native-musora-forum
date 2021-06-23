@@ -5,7 +5,9 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Modal
+  Modal,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 
 export class InsertLinkModal extends React.PureComponent {
@@ -23,7 +25,19 @@ export class InsertLinkModal extends React.PureComponent {
   toggle = type => {
     if (this.state.visible)
       this.props.onClose?.(this.title, this.url, this.state.type);
-    this.setState(state => ({ visible: !state.visible, type }));
+    this.setState(
+      ({ visible }) => ({ visible: !visible, type }),
+      () => {
+        if (this.state.visible)
+          setTimeout(
+            () =>
+              this[
+                type === 'Link' ? 'titleTInputRef' : 'urlTInputRef'
+              ]?.focus(),
+            500
+          );
+      }
+    );
   };
 
   render() {
@@ -32,42 +46,54 @@ export class InsertLinkModal extends React.PureComponent {
 
     return (
       <Modal
+        animationType={'fade'}
         transparent={true}
         visible={visible}
         supportedOrientations={['portrait', 'landscape']}
-        onBackdropPress={this.toggle}
+        onRequestClose={this.toggle}
       >
-        <TouchableOpacity style={styles.modalBackground} onPress={this.toggle}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.text}>Insert {type} Url</Text>
-            {type === 'Link' && (
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+        >
+          <TouchableOpacity
+            style={styles.modalBackground}
+            onPress={this.toggle}
+          >
+            <View style={styles.modalContainer}>
+              <Text style={styles.text}>Insert {type} Url</Text>
+              {type === 'Link' && (
+                <View style={styles.item}>
+                  <TextInput
+                    style={styles.input}
+                    placeholderTextColor={isDark ? '#EDEEEF' : '#00101D'}
+                    placeholder={'title'}
+                    onChangeText={text => {
+                      this.title = text;
+                    }}
+                    ref={r => (this.titleTInputRef = r)}
+                  />
+                </View>
+              )}
               <View style={styles.item}>
                 <TextInput
                   style={styles.input}
                   placeholderTextColor={isDark ? '#EDEEEF' : '#00101D'}
-                  placeholder={'title'}
-                  onChangeText={text => {
-                    this.title = text;
-                  }}
+                  placeholder='http(s)://'
+                  onChangeText={text => (this.url = text)}
+                  ref={r => (this.urlTInputRef = r)}
                 />
               </View>
-            )}
-            <View style={styles.item}>
-              <TextInput
-                style={styles.input}
-                placeholderTextColor={isDark ? '#EDEEEF' : '#00101D'}
-                placeholder='http(s)://'
-                onChangeText={text => {
-                  this.url = text;
-                }}
-              />
-            </View>
 
-            <TouchableOpacity style={styles.btn} onPress={() => this.toggle()}>
-              <Text style={styles.text}>OK</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.btn}
+                onPress={() => this.toggle()}
+              >
+                <Text style={styles.text}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Modal>
     );
   }
