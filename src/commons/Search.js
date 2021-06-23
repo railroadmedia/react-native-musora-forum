@@ -248,7 +248,6 @@ let setStyles = isDark => {
     },
     searchIcon: { position: 'absolute', left: 15, zIndex: 2 },
     searchInput: {
-      color: '#000000',
       fontSize: 12,
       fontFamily: 'OpenSans',
       flex: 1,

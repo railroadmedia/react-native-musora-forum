@@ -268,7 +268,12 @@ class Thread extends React.Component {
               {lock({ height: 15, width: 15, fill: '#FFAE00' })}
               <Text style={styles.lockedTitle}>
                 Locked{'\n'}
-                <Text style={{ color: 'white', fontFamily: 'OpenSans' }}>
+                <Text
+                  style={{
+                    color: isDark ? 'white' : '#000000',
+                    fontFamily: 'OpenSans'
+                  }}
+                >
                   This thread is locked.
                 </Text>
               </Text>
@@ -323,7 +328,7 @@ let setStyles = (isDark, appColor) =>
       justifyContent: 'flex-end'
     },
     lockedModalMsgContainer: {
-      backgroundColor: '#081825',
+      backgroundColor: isDark ? '#081825' : '#F7F9FC',
       margin: 5,
       padding: 15,
       borderTopWidth: 6,
@@ -333,7 +338,7 @@ let setStyles = (isDark, appColor) =>
     },
     lockedTitle: {
       paddingLeft: 15,
-      color: 'white',
+      color: isDark ? 'white' : '#000000',
       fontFamily: 'OpenSans-Bold'
     }
   });

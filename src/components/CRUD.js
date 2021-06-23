@@ -44,7 +44,7 @@ import {
 } from '../services/forum.service';
 
 import { updateThreads, updatePosts } from '../redux/ThreadActions';
-import CustomModal from '../../../../src/modals/CustomModal';
+import CustomModal from '../commons/CustomModal';
 
 let styles;
 

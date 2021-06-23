@@ -218,7 +218,10 @@ class NavigationHeader extends React.Component {
                       <Text style={styles.followStateTitle}>
                         {is_followed ? 'Follow' : 'Unfollow'} Thread{'\n'}
                         <Text
-                          style={{ color: 'white', fontFamily: 'OpenSans' }}
+                          style={{
+                            color: isDark ? 'white' : '#000000',
+                            fontFamily: 'OpenSans'
+                          }}
                         >
                           You've{' '}
                           {is_followed ? 'started following' : 'unfollowed'}{' '}
@@ -279,7 +282,7 @@ let setStyles = isDark => {
       backgroundColor: 'rgba(0,0,0,.5)'
     },
     options: {
-      backgroundColor: '#081825',
+      backgroundColor: isDark ? '#081825' : '#F7F9FC',
       padding: 20,
       borderTopEndRadius: 20,
       borderTopStartRadius: 20
@@ -287,17 +290,17 @@ let setStyles = isDark => {
     pill: {
       width: '20%',
       height: 2,
-      backgroundColor: 'white',
+      backgroundColor: isDark ? 'white' : '#000000',
       borderRadius: 1,
       alignSelf: 'center'
     },
     optionText: {
       paddingVertical: 10,
-      color: 'white',
+      color: isDark ? 'white' : '#000000',
       fontFamily: 'OpenSans'
     },
     followStateContainer: {
-      backgroundColor: '#081825',
+      backgroundColor: isDark ? '#081825' : '#F7F9FC',
       margin: 5,
       padding: 15,
       borderTopWidth: 6,
@@ -306,7 +309,7 @@ let setStyles = isDark => {
     },
     followStateTitle: {
       paddingLeft: 15,
-      color: 'white',
+      color: isDark ? 'white' : '#000000',
       fontFamily: 'OpenSans-Bold'
     }
   });
