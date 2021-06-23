@@ -206,6 +206,7 @@ class Post extends React.Component {
               )}
             </TouchableOpacity>
             <TouchableOpacity
+              disabled={!!locked}
               onPress={this.reply}
               disallowInterruption={true}
               style={{ padding: 15, paddingLeft: 7.5 }}
