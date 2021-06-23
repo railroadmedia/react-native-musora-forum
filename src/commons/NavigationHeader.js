@@ -273,8 +273,7 @@ let setStyles = isDark => {
       fontSize: 20,
       color: isDark ? 'white' : 'black',
       textAlign: 'center',
-      textTransform: 'capitalize',
-      width: '85%'
+      textTransform: 'capitalize'
     },
     optionsContainer: {
       flex: 1,
