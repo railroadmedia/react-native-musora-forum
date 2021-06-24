@@ -255,11 +255,11 @@ const mapStateToProps = (
   { themeState },
   {
     route: {
-      params: { isDark, appColor }
+      params: { appColor }
     }
   }
 ) => {
-  isDark = themeState ? themeState.theme === 'dark' : isDark;
+  let isDark = themeState ? themeState.theme === 'dark' : true;
   if (setStyles.isDark !== isDark) styles = setStyles(isDark, appColor);
   return { appColor, isDark };
 };

@@ -53,7 +53,7 @@ class CRUD extends React.Component {
 
   constructor(props) {
     super(props);
-    let { isDark, appColor } = props.route.params;
+    let { isDark, appColor } = props;
     styles = setStyles(isDark, appColor);
   }
 
@@ -165,10 +165,12 @@ class CRUD extends React.Component {
     let { loading } = this.state;
     const {
       route: {
-        params: { isDark, appColor, action, type, quotes }
+        params: { action, type, quotes }
       },
       post,
-      thread
+      thread,
+      isDark,
+      appColor
     } = this.props;
     return (
       <SafeAreaView style={styles.container}>
@@ -385,26 +387,29 @@ let setStyles = (isDark, appColor) =>
     }
   });
 const mapStateToProps = (
-  { threads },
+  { threads, themeState },
   {
     route: {
-      params: { threadId, postId }
+      params: { threadId, postId, appColor }
     }
   }
-) => ({
-  post: {
+) => {
+  let post = {
     ...threads.posts?.[postId],
     content: threads.posts?.[postId]?.content
       .split('</blockquote>')
       .reverse()[0]
       .replace(/<br>/g, '')
-  },
-  thread:
+  };
+  let thread =
     threads.forums?.[threadId] ||
     threads.all?.[threadId] ||
     threads.followed?.[threadId] ||
-    threads.search?.[threadId]
-});
+    threads.search?.[threadId];
+  let isDark = themeState ? themeState.theme === 'dark' : true;
+  if (setStyles.isDark !== isDark) styles = setStyles(isDark, appColor);
+  return { thread, post, isDark, appColor };
+};
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ updateThreads, updatePosts }, dispatch);
 export default connect(mapStateToProps, mapDispatchToProps)(CRUD);

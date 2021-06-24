@@ -49,7 +49,7 @@ class Threads extends React.Component {
 
   constructor(props) {
     super(props);
-    let { isDark, appColor } = props.route.params;
+    let { isDark, appColor } = props;
     styles = setStyles(isDark, appColor);
   }
 
@@ -84,7 +84,7 @@ class Threads extends React.Component {
 
   renderFLHeader = () => {
     let { tab } = this.state;
-    let { isDark, appColor } = this.props.route.params;
+    let { isDark, appColor } = this.props;
     return (
       <>
         <View style={styles.headerContainer}>
@@ -118,8 +118,8 @@ class Threads extends React.Component {
       onNavigate={() => {
         this.navigate('Thread', { threadId: id });
       }}
-      appColor={this.props.route.params.appColor}
-      isDark={this.props.route.params.isDark}
+      appColor={this.props.appColor}
+      isDark={this.props.isDark}
       id={id}
       reduxKey={this.state.tab ? 'followed' : 'all'}
     />
@@ -172,7 +172,7 @@ class Threads extends React.Component {
       allRefreshing,
       followedRefreshing
     } = this.state;
-    let { isDark, appColor, forumId } = this.props.route.params;
+    let { isDark, appColor } = this.props;
     return loading ? (
       <ActivityIndicator
         size='large'
@@ -306,5 +306,16 @@ let setStyles = (isDark, appColor) =>
   });
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ setAllThreads, setFollowedThreads }, dispatch);
-
-export default connect(null, mapDispatchToProps)(Threads);
+const mapStateToProps = (
+  { themeState },
+  {
+    route: {
+      params: { appColor }
+    }
+  }
+) => {
+  let isDark = themeState ? themeState.theme === 'dark' : true;
+  if (setStyles.isDark !== isDark) styles = setStyles(isDark, appColor);
+  return { appColor, isDark };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Threads);

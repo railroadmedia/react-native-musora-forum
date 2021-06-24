@@ -273,7 +273,7 @@ let setStyles = isDark => {
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ setSearchThreads }, dispatch);
 const mapStateToProps = ({ themeState }, { isDark }) => {
-  isDark = themeState ? themeState.theme === 'dark' : isDark;
+  isDark = themeState ? themeState.theme === 'dark' : true;
   if (setStyles.isDark !== isDark) styles = setStyles(isDark);
   return { isDark };
 };

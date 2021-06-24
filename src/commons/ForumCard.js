@@ -98,7 +98,7 @@ let setStyles = isDark => {
   });
 };
 const mapStateToProps = ({ themeState }, { isDark }) => {
-  isDark = themeState ? themeState.theme === 'dark' : isDark;
+  isDark = themeState ? themeState.theme === 'dark' : true;
   if (setStyles.isDark !== isDark) styles = setStyles(isDark);
   return { isDark };
 };

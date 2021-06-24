@@ -40,9 +40,9 @@ class Thread extends React.Component {
 
   constructor(props) {
     super(props);
-    let { isDark, appColor, page, postId } = props.route.params;
+    let { page, postId } = props.route.params;
     this.postId = postId;
-    styles = setStyles(isDark, appColor);
+    styles = setStyles(props.isDark, props.appColor);
     this.page = page || 1;
   }
 
@@ -95,8 +95,8 @@ class Thread extends React.Component {
   };
 
   renderFLItem = ({ item: id, index }) => {
-    let { locked } = this.props;
-    let { isDark, appColor, user } = this.props.route.params;
+    let { locked, isDark, appColor } = this.props;
+    let { user } = this.props.route.params;
     return (
       <View
         onLayout={({
@@ -125,7 +125,7 @@ class Thread extends React.Component {
   };
 
   renderPagination = (marginBottom, borderTopWidth, borderBottomWidth) => {
-    let { isDark, appColor } = this.props.route.params;
+    let { isDark, appColor } = this.props;
     return (
       <View
         onLayout={({
@@ -205,10 +205,10 @@ class Thread extends React.Component {
     );
 
   render() {
-    let { locked } = this.props;
+    let { locked, isDark, appColor } = this.props;
     let { loading, refreshing, postHeight, multiQuoting, lockedModalVisible } =
       this.state;
-    let { isDark, appColor, threadId } = this.props.route.params;
+    let { threadId } = this.props.route.params;
     return loading ? (
       <ActivityIndicator
         size='large'
@@ -376,21 +376,25 @@ let setStyles = (isDark, appColor) =>
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ setPosts, setForumRules }, dispatch);
 const mapStateToProps = (
-  { threads },
+  { themeState, threads },
   {
     route: {
-      params: { threadId }
+      params: { threadId, appColor }
     }
   }
-) => ({
-  locked: !!(
+) => {
+  let isDark = themeState ? themeState.theme === 'dark' : true;
+  if (setStyles.isDark !== isDark) styles = setStyles(isDark, appColor);
+
+  let locked = !!(
     threads?.forums?.[threadId] ||
     threads?.all?.[threadId] ||
     threads?.followed?.[threadId] ||
     threads?.search?.[threadId] ||
     threads.forumRules ||
     {}
-  ).locked
-});
+  ).locked;
+  return { appColor, isDark, locked };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Thread);
