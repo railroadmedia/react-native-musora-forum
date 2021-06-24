@@ -74,6 +74,13 @@ class CRUD extends React.Component {
               url.length
             )}" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p>`
           );
+        else if (url.includes('youtu'))
+          this.richTextRef?.insertHTML(
+            `<p><iframe src="https://www.youtube.com/embed/${url.slice(
+              url.lastIndexOf('/') + 1,
+              url.length
+            )}" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p>`
+          );
         else if (url.includes('vimeo.com'))
           this.richTextRef?.insertHTML(
             `<p><iframe src="https://player.vimeo.com/video/${url.slice(
