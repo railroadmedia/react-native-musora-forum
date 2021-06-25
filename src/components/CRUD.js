@@ -215,31 +215,6 @@ class CRUD extends React.Component {
             keyboardShouldPersistTaps='handled'
             contentInsetAdjustmentBehavior='never'
             showsVerticalScrollIndicator={false}
-            scrollEventThrottle={100}
-            onMomentumScrollEnd={({
-              nativeEvent: {
-                contentOffset: { y }
-              }
-            }) => (this.scrollPos = y)}
-            onScroll={({
-              nativeEvent: {
-                contentOffset: { y }
-              }
-            }) => (this.scrollPos = y)}
-            onScrollEndDrag={({
-              nativeEvent: {
-                contentOffset: { y }
-              }
-            }) => (this.scrollPos = y)}
-            onContentSizeChange={(_, h) => {
-              this.hDiff = h - (this.prevHeight || h);
-              this.prevHeight = h;
-              if (this.hDiff)
-                this.scrollRef.scrollTo({
-                  y: (this.scrollPos || 0) + this.hDiff,
-                  animated: false
-                });
-            }}
           >
             {quotes?.map((post, index) => (
               <View style={{ marginBottom: 10 }} key={index}>
@@ -305,14 +280,10 @@ class CRUD extends React.Component {
             {!(type === 'thread' && action === 'edit') && (
               <RichEditor
                 pasteAsPlainText={true}
-                useContainer={true}
+                useContainer={false}
                 editorStyle={styles.editorStyle}
                 ref={r => (this.richTextRef = r)}
-                style={{
-                  borderBottomLeftRadius: 6,
-                  borderBottomRightRadius: 6,
-                  height: 200
-                }}
+                style={styles.richEditor}
                 placeholder={'Write something'}
                 initialContentHTML={post?.content}
                 onChange={html => (this.richHTML = html)}
@@ -329,14 +300,7 @@ class CRUD extends React.Component {
               size='large'
               color={isDark ? 'white' : 'black'}
               animating={true}
-              style={{
-                backgroundColor: 'rgba(0,0,0,.5)',
-                position: 'absolute',
-                top: 0,
-                bottom: 0,
-                left: 0,
-                right: 0
-              }}
+              style={styles.activityIndicator}
             />
           )}
         </View>
@@ -419,6 +383,19 @@ let setStyles = (isDark, appColor) =>
       color: isDark ? 'white' : 'black',
       padding: 15,
       paddingHorizontal: 10
+    },
+    richEditor: {
+      borderBottomLeftRadius: 6,
+      borderBottomRightRadius: 6,
+      height: 200
+    },
+    activityIndicator: {
+      backgroundColor: 'rgba(0,0,0,.5)',
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      left: 0,
+      right: 0
     }
   });
 const mapStateToProps = (
