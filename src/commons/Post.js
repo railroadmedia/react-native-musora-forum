@@ -219,14 +219,15 @@ class Post extends React.Component {
                 <Text style={styles.likesNoText}>{likeCount}</Text>
               )}
             </TouchableOpacity>
-            <TouchableOpacity
-              disabled={!!locked}
-              onPress={this.reply}
-              disallowInterruption={true}
-              style={{ padding: 15, paddingLeft: 7.5 }}
-            >
-              <Text style={styles.replyText}>REPLY</Text>
-            </TouchableOpacity>
+            {!locked && (
+              <TouchableOpacity
+                onPress={this.reply}
+                disallowInterruption={true}
+                style={{ padding: 15, paddingLeft: 7.5 }}
+              >
+                <Text style={styles.replyText}>REPLY</Text>
+              </TouchableOpacity>
+            )}
           </View>
           {signShown && post.author.signature && (
             <View style={styles.signatureContainer}>
