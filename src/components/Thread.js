@@ -90,7 +90,6 @@ class Thread extends React.Component {
         offset: scrollPos,
         animated: false
       });
-      delete this.postId;
     }
   };
 
@@ -116,9 +115,12 @@ class Thread extends React.Component {
             this.setState({ multiQuoting: !!Post.multiQuotes.length })
           }
           onPostCreated={postId => (this.postId = postId)}
-          onDelete={postId =>
-            (this.posts = this.posts.filter(p => p !== postId))
-          }
+          onDelete={postId => {
+            delete this.postId;
+            this.posts = this.posts.filter(p => p !== postId);
+            if (!this.posts.length && this.page > 1)
+              this.changePage(--this.page);
+          }}
         />
       </View>
     );
@@ -142,7 +144,7 @@ class Thread extends React.Component {
         }}
       >
         <Pagination
-          key={this.page}
+          key={`${this.page}${this.post_count}`}
           active={this.page}
           isDark={isDark}
           appColor={appColor}
@@ -180,6 +182,7 @@ class Thread extends React.Component {
   };
 
   changePage = page => {
+    delete this.postId;
     if (!connection()) return;
     let { threadId } = this.props.route.params;
     this.page = page;
@@ -219,6 +222,7 @@ class Thread extends React.Component {
     ) : (
       <>
         <FlatList
+          onScrollBeginDrag={() => delete this.postId}
           windowSize={10}
           data={this.posts}
           style={styles.fList}
@@ -250,21 +254,21 @@ class Thread extends React.Component {
               !this.state.postHeight &&
               this.setState({ postHeight: layout.height + 15 })
             }
-            onPress={
+            onPress={() => {
+              delete this.postId;
               locked
-                ? this.toggleLockedModal
-                : () =>
-                    this.navigate('CRUD', {
-                      type: 'post',
-                      action: 'create',
-                      onPostCreated: postId => (this.postId = postId),
-                      threadId,
-                      quotes: Post.multiQuotes.map(({ props: { post } }) => ({
-                        ...post,
-                        content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`
-                      }))
-                    })
-            }
+                ? this.toggleLockedModal()
+                : this.navigate('CRUD', {
+                    type: 'post',
+                    action: 'create',
+                    onPostCreated: postId => (this.postId = postId),
+                    threadId,
+                    quotes: Post.multiQuotes.map(({ props: { post } }) => ({
+                      ...post,
+                      content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`
+                    }))
+                  });
+            }}
             style={styles.bottomTOpacity}
           >
             {(locked ? lock : multiQuoting ? multiQuote : post)({
