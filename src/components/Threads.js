@@ -173,6 +173,8 @@ class Threads extends React.Component {
       followedRefreshing
     } = this.state;
     let { isDark, appColor } = this.props;
+    let { forumId } = this.props.route.params;
+
     return loading ? (
       <ActivityIndicator
         size='large'
