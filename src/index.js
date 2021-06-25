@@ -39,7 +39,7 @@ export default ({
   return (
     <Provider store={store}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{ flex: 1, backgroundColor: isDark ? '#00101d' : 'white' }}
       >
         <Stack.Navigator
