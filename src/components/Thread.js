@@ -53,7 +53,7 @@ class Thread extends React.Component {
       () => (reFocused ? this.refresh?.() : (reFocused = true))
     );
     const { threadId, isForumRules } = this.props.route.params;
-    getThread(threadId, this.page, this.postId).then(thread => {
+    getThread(threadId, this.page, isForumRules, this.postId).then(thread => {
       this.page = parseInt(thread.page);
       this.post_count = thread.post_count;
       this.posts = thread.posts.map(p => p.id);
@@ -168,7 +168,7 @@ class Thread extends React.Component {
     let { threadId, isForumRules } = this.props.route.params;
     Post.clearQuoting();
     this.setState({ refreshing: true, multiQuoting: false }, () =>
-      getThread(threadId, this.page, this.postId).then(thread => {
+      getThread(threadId, this.page, isForumRules, this.postId).then(thread => {
         this.page = parseInt(thread.page);
         this.post_count = thread.post_count;
         this.posts = thread.posts.map(p => p.id);
@@ -184,14 +184,15 @@ class Thread extends React.Component {
   changePage = page => {
     delete this.postId;
     if (!connection()) return;
-    let { threadId } = this.props.route.params;
+    let { threadId, isForumRules } = this.props.route.params;
     this.page = page;
     this.setState({ loadingMore: true }, () =>
-      getThread(threadId, page).then(thread => {
+      getThread(threadId, page, isForumRules).then(thread => {
         this.post_count = thread.post_count;
         this.posts = thread.posts.map(p => p.id);
         this.flatListRef.scrollToOffset({ offset: 0, animated: false });
         batch(() => {
+          if (isForumRules) this.props.setForumRules(thread);
           this.props.setPosts(thread.posts);
           this.setState({ loadingMore: false });
         });

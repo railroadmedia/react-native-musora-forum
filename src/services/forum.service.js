@@ -21,9 +21,11 @@ export const getAllThreads = function (forumId, page = 1) {
     }`
   });
 };
-export const getThread = function (threadId, page = 1, postId) {
+export const getThread = function (threadId, page = 1, isForumRules, postId) {
   return this.tryCall({
-    url: postId
+    url: isForumRules
+      ? `${this.rootUrl}/forums/api/rules`
+      : postId
       ? `${this.rootUrl}/forums/api/jump-to-post/${postId}`
       : `${this.rootUrl}/forums/api/thread/show/${threadId}?amount=10&page=${page}`
   });
