@@ -59,6 +59,17 @@ class CRUD extends React.Component {
 
   onInsertLink = type => this.linkModal?.toggle(type);
 
+  componentDidMount() {
+    this.keyboardDidChangeFrameEListener = Keyboard.addListener(
+      'keyboardDidChangeFrame',
+      () => this.scrollRef?.scrollToEnd()
+    );
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidChangeFrameEListener.remove();
+  }
+
   onLinkDone = (title, url, type) => {
     if (url) {
       if (type === 'Link') {
@@ -204,6 +215,31 @@ class CRUD extends React.Component {
             keyboardShouldPersistTaps='handled'
             contentInsetAdjustmentBehavior='never'
             showsVerticalScrollIndicator={false}
+            scrollEventThrottle={100}
+            onMomentumScrollEnd={({
+              nativeEvent: {
+                contentOffset: { y }
+              }
+            }) => (this.scrollPos = y)}
+            onScroll={({
+              nativeEvent: {
+                contentOffset: { y }
+              }
+            }) => (this.scrollPos = y)}
+            onScrollEndDrag={({
+              nativeEvent: {
+                contentOffset: { y }
+              }
+            }) => (this.scrollPos = y)}
+            onContentSizeChange={(_, h) => {
+              this.hDiff = h - (this.prevHeight || h);
+              this.prevHeight = h;
+              if (this.hDiff)
+                this.scrollRef.scrollTo({
+                  y: (this.scrollPos || 0) + this.hDiff,
+                  animated: false
+                });
+            }}
           >
             {quotes?.map((post, index) => (
               <View style={{ marginBottom: 10 }} key={index}>
@@ -269,7 +305,7 @@ class CRUD extends React.Component {
             {!(type === 'thread' && action === 'edit') && (
               <RichEditor
                 pasteAsPlainText={true}
-                useContainer={false}
+                useContainer={true}
                 editorStyle={styles.editorStyle}
                 ref={r => (this.richTextRef = r)}
                 style={{
@@ -280,7 +316,6 @@ class CRUD extends React.Component {
                 placeholder={'Write something'}
                 initialContentHTML={post?.content}
                 onChange={html => (this.richHTML = html)}
-                onFocus={() => this.scrollRef.scrollToEnd()}
               />
             )}
           </ScrollView>
