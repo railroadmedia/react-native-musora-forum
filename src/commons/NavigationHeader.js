@@ -51,7 +51,7 @@ class NavigationHeader extends React.Component {
         text: `${signShown ? 'Hide' : 'Show'} All Signatures`,
         action: this.toggleSign
       };
-      if (this.props.route.params.user.permission_level === 'administrator') {
+      if (this.props.user.permission_level === 'administrator') {
         options.toggleLock = {
           text: locked ? 'Unlock' : 'Lock',
           action: this.toggleLock
@@ -62,8 +62,8 @@ class NavigationHeader extends React.Component {
         };
       }
       if (
-        this.props.route.params.user.permission_level === 'administrator' ||
-        this.props.route.params.user.id === this.props.thread.author_id
+        this.props.user.permission_level === 'administrator' ||
+        this.props.user.id === this.props.thread.author_id
       )
         options.edit = { text: 'Edit', action: this.onEdit };
       options.toggleFollow = {
@@ -313,12 +313,12 @@ let setStyles = isDark => {
   });
 };
 const mapStateToProps = (
-  { threads, themeState },
+  { threads, themeState, userState },
   {
     title,
     route: {
       name,
-      params: { threadId, isDark }
+      params: { threadId, isDark, user }
     }
   }
 ) => {
@@ -337,7 +337,8 @@ const mapStateToProps = (
     threadId,
     isDark,
     signShown: name.match(/^(Thread)$/) ? threads.signShown : undefined,
-    title: thread?.title || title
+    title: thread?.title || title,
+    user: userState?.user || user
   };
 };
 const mapDispatchToProps = dispatch =>

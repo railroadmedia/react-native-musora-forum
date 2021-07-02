@@ -27,7 +27,15 @@ const timingAnim = {
 export default ({
   route: {
     params,
-    params: { tryCall, rootUrl, NetworkContext, isDark, reduxStore }
+    params: {
+      tryCall,
+      rootUrl,
+      NetworkContext,
+      isDark,
+      reduxStore,
+      postId,
+      threadId
+    }
   }
 }) => {
   const networkContext = useContext(NetworkContext);
@@ -43,6 +51,7 @@ export default ({
         style={{ flex: 1, backgroundColor: isDark ? '#00101d' : 'white' }}
       >
         <Stack.Navigator
+          initialRouteName={postId && threadId ? 'Thread' : 'Forums'}
           headerMode={'screen'}
           screenOptions={{
             gestureEnabled: false,

@@ -94,8 +94,7 @@ class Thread extends React.Component {
   };
 
   renderFLItem = ({ item: id, index }) => {
-    let { locked, isDark, appColor } = this.props;
-    let { user } = this.props.route.params;
+    let { locked, isDark, appColor, user } = this.props;
     return (
       <View
         onLayout={({
@@ -381,10 +380,10 @@ let setStyles = (isDark, appColor) =>
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ setPosts, setForumRules }, dispatch);
 const mapStateToProps = (
-  { themeState, threads },
+  { themeState, threads, userState },
   {
     route: {
-      params: { threadId, appColor }
+      params: { threadId, appColor, user }
     }
   }
 ) => {
@@ -399,7 +398,7 @@ const mapStateToProps = (
     threads.forumRules ||
     {}
   ).locked;
-  return { appColor, isDark, locked };
+  return { appColor, isDark, locked, user: userState?.user || user };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Thread);
