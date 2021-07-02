@@ -27,7 +27,15 @@ const timingAnim = {
 export default ({
   route: {
     params,
-    params: { tryCall, rootUrl, NetworkContext, isDark, reduxStore, postId }
+    params: {
+      tryCall,
+      rootUrl,
+      NetworkContext,
+      isDark,
+      reduxStore,
+      postId,
+      threadTitle
+    }
   }
 }) => {
   const networkContext = useContext(NetworkContext);
@@ -80,7 +88,10 @@ export default ({
             initialParams={params}
             options={props => ({
               header: () => (
-                <NavigationHeader {...props} title={props.route.params.title} />
+                <NavigationHeader
+                  {...props}
+                  title={props.route.params.title || threadTitle}
+                />
               )
             })}
           />

@@ -36,30 +36,8 @@ class Forums extends React.Component {
   };
   constructor(props) {
     super(props);
-    let {
-      isDark,
-      appColor,
-      route: {
-        params: { thread, postId, mobile_app_url }
-      }
-    } = props;
+    let { isDark, appColor } = props;
     styles = setStyles(isDark, appColor);
-    if (thread) {
-      this.navigate('Thread', {
-        threadId: thread.id,
-        page: thread.page,
-        postId
-      });
-    } else if (mobile_app_url) {
-      this.navigate('Thread', {
-        postId: parseInt(
-          mobile_app_url.slice(
-            mobile_app_url.lastIndexOf('/') + 1,
-            mobile_app_url.length
-          )
-        )
-      });
-    }
   }
 
   componentDidMount() {
