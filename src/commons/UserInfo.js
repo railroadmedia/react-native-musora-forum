@@ -60,7 +60,7 @@ export default class UserInfo extends React.Component {
                 ],
                 [
                   'Total XP',
-                  'Totalposts',
+                  'Total posts',
                   'Days as a member',
                   'Total post likes'
                 ]
