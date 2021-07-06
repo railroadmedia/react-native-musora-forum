@@ -157,7 +157,11 @@ class CRUD extends React.Component {
       this.setState({ loading: false });
     } else {
       onPostCreated?.(response.id);
-      this.props.navigation.goBack();
+      if (type === 'thread' && action === 'create') {
+        this.props.navigation.navigate('Thread', { threadId: response.id });
+      } else {
+        this.props.navigation.goBack();
+      }
     }
   };
 

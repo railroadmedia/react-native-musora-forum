@@ -92,18 +92,18 @@ let setStyles = isDark => {
     title: {
       fontFamily: 'OpenSans-Bold',
       color: isDark ? 'white' : 'black',
-      fontSize: 20
+      fontSize: 14
     },
     lastPost: {
       fontFamily: 'OpenSans',
       color: '#445F74',
-      fontSize: 14,
+      fontSize: 11,
       paddingVertical: 5
     },
     topicName: {
       fontFamily: 'OpenSans',
       color: '#445F74',
-      fontSize: 14
+      fontSize: 11
     }
   });
 };

@@ -276,7 +276,7 @@ let setStyles = (isDark, appColor) =>
     },
     headerText: {
       fontFamily: 'OpenSans-Bold',
-      fontSize: 20,
+      fontSize: 14,
       color: '#445F74'
     },
     fList: {

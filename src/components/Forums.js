@@ -223,7 +223,8 @@ let setStyles = (isDark, appColor) => {
       fontSize: 16,
       color: isDark ? '#445F74' : '#97AABE',
       margin: 5,
-      marginLeft: 15
+      marginLeft: 15,
+      marginTop: 40
     }
   });
 };
