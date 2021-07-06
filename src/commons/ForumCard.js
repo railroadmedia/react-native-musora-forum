@@ -40,15 +40,19 @@ class ForumCard extends React.Component {
         </View>
         {latest_post && (
           <View style={styles.tagsContainer}>
-          <Text style={[styles.tags,{flexShrink:0}]} numberOfLines={1} ellipsizeMode='tail'>
-            {latest_post.created_at_diff}
-          </Text>
-          <Text style={styles.tags} numberOfLines={1} ellipsizeMode='tail'>
-            -{" "}In:{" "}{latest_post.thread_title}
-          </Text>
-          <Text style={styles.tags} numberOfLines={1} ellipsizeMode='tail'>
-            -{" "}By:{" "}{latest_post.author_display_name}
-          </Text>
+            <Text
+              style={[styles.tags, { flexShrink: 0 }]}
+              numberOfLines={1}
+              ellipsizeMode='tail'
+            >
+              {latest_post.created_at_diff}
+            </Text>
+            <Text style={styles.tags} numberOfLines={1} ellipsizeMode='tail'>
+              - In: {latest_post.thread_title}
+            </Text>
+            <Text style={styles.tags} numberOfLines={1} ellipsizeMode='tail'>
+              - By: {latest_post.author_display_name}
+            </Text>
           </View>
         )}
       </TouchableOpacity>
@@ -96,15 +100,15 @@ let setStyles = isDark => {
       fontSize: 12,
       width: '90%'
     },
-    tagsContainer:{
-      flexDirection:'row',
-      alignItems:'center'
+    tagsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center'
     },
     tags: {
       fontFamily: 'OpenSans',
       color: isDark ? '#445F74' : '#00101D',
       fontSize: 11,
-      flexShrink:1
+      flexShrink: 1
     }
   });
 };
