@@ -283,9 +283,22 @@ class CRUD extends React.Component {
             )}
             {!(type === 'thread' && action === 'edit') && (
               <RichEditor
+                editorInitializedCallback={() =>
+                  this.richTextRef?.webviewBridge?.injectJavaScript(`
+                    let link = document.createElement("link");
+                    link.type = "text/css";
+                    link.rel = "stylesheet";
+                    link.href = "https://fonts.googleapis.com/css?family=Open+Sans";
+                    document.head.appendChild(link);
+                  `)
+                }
                 pasteAsPlainText={true}
                 useContainer={false}
-                editorStyle={styles.editorStyle}
+                editorStyle={{
+                  ...styles.editorStyle,
+                  contentCSSText: 'font-family: Open Sans; font-size: 10px;',
+                  placeholderColor: isDark ? '#445F74' : 'grey'
+                }}
                 ref={r => (this.richTextRef = r)}
                 style={styles.richEditor}
                 placeholder={'Write something'}
@@ -334,12 +347,12 @@ let setStyles = (isDark, appColor) =>
       paddingVertical: 10
     },
     cancelBtn: {
-      fontFamily: 'OpenSans',
+      fontFamily: 'OpenSans-Bold',
       fontSize: 14,
-      color: isDark ? '#445F74' : '#00101D'
+      color: isDark ? 'white' : '#00101D'
     },
     actionBtn: {
-      fontFamily: 'OpenSans',
+      fontFamily: 'OpenSans-Bold',
       fontSize: 14,
       color: appColor
     },
@@ -386,7 +399,9 @@ let setStyles = (isDark, appColor) =>
       borderRadius: 5,
       color: isDark ? 'white' : 'black',
       padding: 15,
-      paddingHorizontal: 10
+      paddingHorizontal: 10,
+      fontFamily: 'OpenSans',
+      fontSize: 12
     },
     richEditor: {
       borderBottomLeftRadius: 6,

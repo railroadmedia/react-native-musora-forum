@@ -28,7 +28,7 @@ export default class HTMLRenderer extends React.Component {
     return (
       <HTML
         key={`${expanderVisible}${maxQuoteHeight}`}
-        ignoredStyles={['font-family']}
+        ignoredStyles={['font-family', 'background-color', 'line-height']}
         WebView={WebView}
         source={{
           html: `<div>${evenOddQuoteClassification(
