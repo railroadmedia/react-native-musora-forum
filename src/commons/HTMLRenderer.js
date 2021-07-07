@@ -5,9 +5,10 @@ import HTML from 'react-native-render-html';
 import WebView from 'react-native-webview';
 import { expandQuote } from '../assets/svgs';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { IGNORED_TAGS } from 'react-native-render-html/src/HTMLUtils';
 
 export default class HTMLRenderer extends React.Component {
-  state = { expanderVisible: false, maxQuoteHeight: undefined };
+  state = { expanderVisible: false, maxQuoteHeight: undefined, width: 0 };
 
   render() {
     let {
@@ -26,124 +27,191 @@ export default class HTMLRenderer extends React.Component {
         '</blockquote></shadow><expander></expander>' +
         html.substring(lastBlockquote + 13);
     return (
-      <HTML
-        key={`${expanderVisible}${maxQuoteHeight}`}
-        ignoredStyles={['font-family', 'background-color', 'line-height']}
-        WebView={WebView}
-        source={{
-          html: `<div>${evenOddQuoteClassification(
-            html.replace('<blockquote', '<shadow><blockquote class=""')
-          )}</div>`
-        }}
-        tagsStyles={tagsStyles}
-        classesStyles={classesStyles}
-        listsPrefixesRenderers={{
-          ol: (_, __, ___, passProps) => (
-            <Text style={olItemStyle}>
-              {passProps.index + 1}.{`  `}
-            </Text>
-          ),
-          ul: () => <Text style={ulItemStyle}>·{`  `}</Text>
-        }}
-        renderersProps={{
-          iframe: {
-            scalesPageToFit: true,
-            webViewProps: {
-              // containerStyle: { width: 300 }
-            }
+      <View
+        onLayout={({
+          nativeEvent: {
+            layout: { width }
           }
-        }}
-        renderers={{
-          shadow: (_, children, __, { key }) => (
-            <View style={classesStyles.shadow} key={key}>
-              {children}
-            </View>
-          ),
-          blockquote: (htmlAttribs, children, _, { key }) => {
-            let { class: className } = htmlAttribs;
-            return className?.includes('blockquote') ? (
-              <View
-                key={key}
-                onLayout={({
-                  nativeEvent: {
-                    layout: { height }
-                  }
-                }) => {
-                  if (
-                    className.includes('first') &&
-                    height > 150 &&
-                    !expanderVisible
-                  )
-                    this.setState({
-                      expanderVisible: true,
-                      maxQuoteHeight: 150
-                    });
-                }}
-                style={[
-                  {
-                    padding: 10,
-                    borderRadius: 5,
-                    maxHeight: maxQuoteHeight,
-                    overflow: 'hidden'
-                  },
-                  classesStyles[
-                    className.includes('odd')
-                      ? 'blockquote-odd'
-                      : 'blockquote-even'
-                  ]
-                ]}
-              >
-                {children}
-              </View>
-            ) : (
-              children
-            );
-          },
-          expander: (_, __, ___, { key }) =>
-            expanderVisible ? (
-              <TouchableOpacity
-                key={key}
-                disallowInterruption={true}
-                onPress={() =>
-                  this.setState(({ maxQuoteHeight }) => ({
-                    maxQuoteHeight: maxQuoteHeight === 150 ? undefined : 150
-                  }))
+        }) => this.setState({ width })}
+      >
+        {this.state.width ? (
+          <HTML
+            ignoredTags={IGNORED_TAGS.filter(
+              tag => tag !== 'video' && tag !== 'source'
+            )}
+            key={`${expanderVisible}${maxQuoteHeight}`}
+            ignoredStyles={['font-family', 'background-color', 'line-height']}
+            WebView={WebView}
+            source={{
+              html: `<div>${evenOddQuoteClassification(
+                html.replace('<blockquote', '<shadow><blockquote class=""')
+              )}</div>`
+            }}
+            tagsStyles={tagsStyles}
+            classesStyles={classesStyles}
+            listsPrefixesRenderers={{
+              ol: (_, __, ___, passProps) => (
+                <Text style={olItemStyle} key={passProps.key}>
+                  {passProps.index + 1}.{`  `}
+                </Text>
+              ),
+              ul: (_, __, ___, { key }) => (
+                <Text key={key} style={ulItemStyle}>
+                  ·{`  `}
+                </Text>
+              )
+            }}
+            renderersProps={{
+              iframe: {
+                scalesPageToFit: true,
+                webViewProps: {
+                  scrollEnabled: false
+                  // containerStyle: { width: 300 }
                 }
-                containerStyle={{
-                  padding: 20,
-                  paddingTop: 10,
-                  alignSelf: 'flex-end',
-                  paddingRight: maxQuoteHeight === 150 ? 0 : 20,
-                  paddingLeft: maxQuoteHeight === 150 ? 20 : 0,
-                  transform: [
-                    {
-                      rotate: `${maxQuoteHeight === 150 ? 0 : 180}deg`
+              }
+            }}
+            renderers={{
+              shadow: (_, children, __, { key }) => (
+                <View style={classesStyles.shadow} key={key}>
+                  {children}
+                </View>
+              ),
+              blockquote: (htmlAttribs, children, _, { key }) => {
+                let { class: className } = htmlAttribs;
+                return className?.includes('blockquote') ? (
+                  <View
+                    key={key}
+                    onLayout={({
+                      nativeEvent: {
+                        layout: { height }
+                      }
+                    }) => {
+                      if (
+                        className.includes('first') &&
+                        height > 150 &&
+                        !expanderVisible
+                      )
+                        this.setState({
+                          expanderVisible: true,
+                          maxQuoteHeight: 150
+                        });
+                    }}
+                    style={[
+                      {
+                        padding: 10,
+                        borderRadius: 5,
+                        maxHeight: maxQuoteHeight,
+                        overflow: 'hidden'
+                      },
+                      classesStyles[
+                        className.includes('odd')
+                          ? 'blockquote-odd'
+                          : 'blockquote-even'
+                      ]
+                    ]}
+                  >
+                    {children}
+                  </View>
+                ) : (
+                  children
+                );
+              },
+              expander: (_, __, ___, { key }) =>
+                expanderVisible ? (
+                  <TouchableOpacity
+                    key={key}
+                    disallowInterruption={true}
+                    onPress={() =>
+                      this.setState(({ maxQuoteHeight }) => ({
+                        maxQuoteHeight: maxQuoteHeight === 150 ? undefined : 150
+                      }))
                     }
-                  ]
-                }}
-              >
-                {expandQuote({ height: 15, width: 15, fill: appColor })}
-              </TouchableOpacity>
-            ) : null,
-          iframe: (htmlAttribs, children, convertedCSSStyles, passProps) => {
-            let { width, height } = htmlAttribs;
-            return iframe(
-              { ...htmlAttribs, width: 300, height: (300 * height) / width },
-              children,
-              convertedCSSStyles,
-              passProps
-            );
-          },
-          a: ({ href }, children, _, { onLinkPress }) => (
-            <TouchableOpacity
-              style={{ padding: 5 }}
-              onPress={() => onLinkPress(null, href)}
-            >
-              {children}
-            </TouchableOpacity>
-          )
-        }}
-      />
+                    containerStyle={{
+                      padding: 20,
+                      paddingTop: 10,
+                      alignSelf: 'flex-end',
+                      paddingRight: maxQuoteHeight === 150 ? 0 : 20,
+                      paddingLeft: maxQuoteHeight === 150 ? 20 : 0,
+                      transform: [
+                        {
+                          rotate: `${maxQuoteHeight === 150 ? 0 : 180}deg`
+                        }
+                      ]
+                    }}
+                  >
+                    {expandQuote({ height: 15, width: 15, fill: appColor })}
+                  </TouchableOpacity>
+                ) : null,
+              iframe: (
+                htmlAttribs,
+                children,
+                convertedCSSStyles,
+                passProps
+              ) => {
+                let { width, height } = htmlAttribs,
+                  ar = height / width || 9 / 16;
+                return (
+                  <View
+                    onStartShouldSetResponder={() => true}
+                    key={passProps.key}
+                  >
+                    {iframe(
+                      {
+                        ...htmlAttribs,
+                        src: htmlAttribs.src + '?fs=0&modestbranding=1&rel=0',
+                        width: this.state.width,
+                        height: this.state.width * ar
+                      },
+                      children,
+                      convertedCSSStyles,
+                      passProps
+                    )}
+                  </View>
+                );
+              },
+              source: (htmlAttribs, _, __, passProps) => {
+                if (!htmlAttribs.src) return null;
+                let { width, height } = htmlAttribs,
+                  ar = height / width || 9 / 16;
+                return (
+                  <View
+                    onStartShouldSetResponder={() => true}
+                    key={passProps.key}
+                  >
+                    <WebView
+                      automaticallyAdjustContentInsets={true}
+                      allowsInlineMediaPlayback={true}
+                      scrollEnabled={false}
+                      source={{
+                        html: `
+                        <video width="100%" height="100%" controls style="background: black;">
+                            <source src="${htmlAttribs.src}" type="video/mp4">
+                        </video>
+                        `
+                      }}
+                      style={{
+                        width: this.state.width,
+                        height: this.state.width * ar,
+                        backgroundColor: 'black'
+                      }}
+                    />
+                  </View>
+                );
+              },
+              a: ({ href }, children, _, { onLinkPress, key }) => (
+                <View
+                  style={{ padding: 5 }}
+                  onStartShouldSetResponder={() => true}
+                  key={key}
+                  onResponderGrant={() => onLinkPress(null, href)}
+                >
+                  {children}
+                </View>
+              )
+            }}
+          />
+        ) : null}
+      </View>
     );
   }
 }

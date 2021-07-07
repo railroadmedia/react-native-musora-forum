@@ -126,14 +126,20 @@ class Post extends React.Component {
     let baseColor = isDark ? '#081825' : '#E1E6EB4D';
     return (
       <>
-        <TouchableOpacity
+        <View
           disabled={!!locked}
           activeOpacity={1}
           style={{
             marginBottom: 20,
             backgroundColor: selected ? selectedColor : baseColor
           }}
-          onPress={multiQuotes.length ? this.multiQuote : this.toggleMenu}
+          onStartShouldSetResponder={() => true}
+          onMoveShouldSetResponder={() => false}
+          onStartShouldSetResponderCapture={() => false}
+          onMoveShouldSetResponderCapture={() => false}
+          onResponderRelease={
+            multiQuotes.length ? this.multiQuote : this.toggleMenu
+          }
         >
           <View style={styles.header}>
             <View style={styles.userDetails}>
@@ -237,7 +243,7 @@ class Post extends React.Component {
               />
             </View>
           )}
-        </TouchableOpacity>
+        </View>
         {selected && !multiQuotes.length && (
           <View
             style={{
