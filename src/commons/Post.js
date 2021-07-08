@@ -130,7 +130,7 @@ class Post extends React.Component {
           disabled={!!locked}
           activeOpacity={1}
           style={{
-            marginBottom: 20,
+            marginBottom: 40,
             backgroundColor: selected ? selectedColor : baseColor
           }}
           onStartShouldSetResponder={() => true}
