@@ -35,7 +35,8 @@ class Thread extends React.Component {
     loadingMore: false,
     refreshing: false,
     multiQuoting: false,
-    lockedModalVisible: false
+    lockedModalVisible: false,
+    postKey: false
   };
 
   constructor(props) {
@@ -52,6 +53,9 @@ class Thread extends React.Component {
       'focus',
       () => (reFocused ? this.refresh?.() : (reFocused = true))
     );
+    this.blurListener = this.props.navigation?.addListener('blur', () =>
+      this.setState(({ postKey }) => ({ postKey: !postKey }))
+    );
     const { threadId, isForumRules } = this.props.route.params;
     getThread(threadId, this.page, isForumRules, this.postId).then(thread => {
       this.page = parseInt(thread.page);
@@ -66,6 +70,7 @@ class Thread extends React.Component {
   }
 
   componentWillUnmount() {
+    this.blurListener?.();
     this.refreshOnFocusListener?.();
   }
 
@@ -94,9 +99,11 @@ class Thread extends React.Component {
   };
 
   renderFLItem = ({ item: id, index }) => {
+    let { postKey } = this.state;
     let { locked, isDark, appColor, user } = this.props;
     return (
       <View
+        key={postKey}
         onLayout={({
           nativeEvent: {
             layout: { height }
