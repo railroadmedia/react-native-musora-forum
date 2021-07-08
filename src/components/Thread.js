@@ -241,8 +241,9 @@ class Thread extends React.Component {
           ListFooterComponent={this.renderPagination(postHeight, 1, 0)}
           refreshControl={
             <RefreshControl
-              colors={[isDark ? 'white' : 'black']}
-              tintColor={isDark ? 'white' : 'black'}
+              colors={['white']}
+              tintColor={appColor}
+              progressBackgroundColor={appColor}
               onRefresh={this.refresh}
               refreshing={refreshing}
             />

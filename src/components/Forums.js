@@ -143,8 +143,9 @@ class Forums extends React.Component {
             ref={r => (this.flatListRef = r)}
             refreshControl={
               <RefreshControl
-                colors={[appColor]}
+                colors={['white']}
                 tintColor={appColor}
+                progressBackgroundColor={appColor}
                 onRefresh={this.refresh}
                 refreshing={refreshing}
               />

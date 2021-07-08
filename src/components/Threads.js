@@ -231,8 +231,9 @@ class Threads extends React.Component {
           }
           refreshControl={
             <RefreshControl
-              colors={[isDark ? 'white' : 'black']}
-              tintColor={isDark ? 'white' : 'black'}
+              colors={['white']}
+              tintColor={appColor}
+              progressBackgroundColor={appColor}
               onRefresh={this.refresh}
               refreshing={tab ? followedRefreshing : allRefreshing}
             />
