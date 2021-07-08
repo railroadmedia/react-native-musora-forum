@@ -65,7 +65,8 @@ export default class HTMLRenderer extends React.Component {
               iframe: {
                 scalesPageToFit: true,
                 webViewProps: {
-                  scrollEnabled: false
+                  scrollEnabled: false,
+                  androidLayerType: 'software'
                   // containerStyle: { width: 300 }
                 }
               }
@@ -179,6 +180,7 @@ export default class HTMLRenderer extends React.Component {
                     key={passProps.key}
                   >
                     <WebView
+                      androidLayerType={'software'}
                       automaticallyAdjustContentInsets={true}
                       allowsInlineMediaPlayback={true}
                       scrollEnabled={false}
