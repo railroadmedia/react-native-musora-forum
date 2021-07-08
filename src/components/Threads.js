@@ -178,7 +178,7 @@ class Threads extends React.Component {
     return loading ? (
       <ActivityIndicator
         size='large'
-        color={isDark ? 'white' : 'black'}
+        color={appColor}
         animating={true}
         style={styles.loading}
       />
@@ -222,7 +222,7 @@ class Threads extends React.Component {
               {(followedLoadingMore || allLoadingMore) && (
                 <ActivityIndicator
                   size='small'
-                  color={isDark ? 'white' : 'black'}
+                  color={appColor}
                   animating={true}
                   style={{ padding: 15 }}
                 />

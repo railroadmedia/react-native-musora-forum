@@ -153,7 +153,7 @@ class Thread extends React.Component {
         {this.state.loadingMore && (
           <ActivityIndicator
             size='small'
-            color={isDark ? 'white' : 'black'}
+            color={appColor}
             animating={true}
             style={{ padding: 15 }}
           />
@@ -215,7 +215,7 @@ class Thread extends React.Component {
     return loading ? (
       <ActivityIndicator
         size='large'
-        color={isDark ? 'white' : 'black'}
+        color={appColor}
         animating={true}
         style={styles.loading}
       />

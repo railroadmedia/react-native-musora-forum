@@ -285,12 +285,12 @@ class CRUD extends React.Component {
               <RichEditor
                 editorInitializedCallback={() =>
                   this.richTextRef?.webviewBridge?.injectJavaScript(`
-                    let link = document.createElement("link");
-                    link.type = "text/css";
-                    link.rel = "stylesheet";
-                    link.href = "https://fonts.googleapis.com/css?family=Open+Sans";
-                    document.head.appendChild(link);
-                  `)
+                     let link = document.createElement("link");
+                     link.type = "text/css";
+                     link.rel = "stylesheet";
+                     link.href = "https://fonts.googleapis.com/css?family=Open+Sans";
+                     document.head.appendChild(link);
+                   `)
                 }
                 pasteAsPlainText={true}
                 useContainer={false}
@@ -315,7 +315,7 @@ class CRUD extends React.Component {
           {loading && (
             <ActivityIndicator
               size='large'
-              color={isDark ? 'white' : 'black'}
+              color={appColor}
               animating={true}
               style={styles.activityIndicator}
             />
