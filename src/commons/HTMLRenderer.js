@@ -66,7 +66,7 @@ export default class HTMLRenderer extends React.Component {
                 scalesPageToFit: true,
                 webViewProps: {
                   scrollEnabled: false,
-                  androidLayerType: 'software'
+                  androidLayerType: 'hardware'
                   // containerStyle: { width: 300 }
                 }
               }
@@ -180,7 +180,7 @@ export default class HTMLRenderer extends React.Component {
                     key={passProps.key}
                   >
                     <WebView
-                      androidLayerType={'software'}
+                      androidLayerType={'hardware'}
                       automaticallyAdjustContentInsets={true}
                       allowsInlineMediaPlayback={true}
                       scrollEnabled={false}
