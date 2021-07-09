@@ -75,7 +75,7 @@ class NavigationHeader extends React.Component {
       text: 'Forum Rules',
       action: () =>
         this.setState({ optionsVisible: false }, () =>
-          this.navigate('Thread', {
+          this.props.navigation.push('Thread', {
             title: 'Forum Rules',
             isForumRules: true
           })

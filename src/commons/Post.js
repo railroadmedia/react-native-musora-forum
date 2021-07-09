@@ -126,124 +126,126 @@ class Post extends React.Component {
     let baseColor = isDark ? '#081825' : '#E1E6EB4D';
     return (
       <>
-        <View
-          disabled={!!locked}
-          activeOpacity={1}
-          style={{
-            marginBottom: 40,
-            backgroundColor: selected ? selectedColor : baseColor
-          }}
-          onStartShouldSetResponder={() => true}
-          onMoveShouldSetResponder={() => false}
-          onStartShouldSetResponderCapture={() => false}
-          onMoveShouldSetResponderCapture={() => false}
-          onResponderRelease={
-            multiQuotes.length ? this.multiQuote : this.toggleMenu
-          }
-        >
-          <View style={styles.header}>
-            <View style={styles.userDetails}>
-              <AccessLevelAvatar
-                author={post.author}
-                height={45}
-                appColor={appColor}
-                isDark={isDark}
-                tagHeight={4}
-                showUserInfo={true}
-              />
-              <View style={{ marginLeft: 5 }}>
-                <Text style={styles.name}>{post.author.display_name}</Text>
-                <Text style={styles.xp}>
-                  {post.author.total_posts} Posts - {post.author.xp_rank} -
-                  Level {post.author.level_rank}
-                </Text>
+        {post && (
+          <View
+            disabled={!!locked}
+            activeOpacity={1}
+            style={{
+              marginBottom: 40,
+              backgroundColor: selected ? selectedColor : baseColor
+            }}
+            onStartShouldSetResponder={() => true}
+            onMoveShouldSetResponder={() => false}
+            onStartShouldSetResponderCapture={() => false}
+            onMoveShouldSetResponderCapture={() => false}
+            onResponderRelease={
+              multiQuotes.length ? this.multiQuote : this.toggleMenu
+            }
+          >
+            <View style={styles.header}>
+              <View style={styles.userDetails}>
+                <AccessLevelAvatar
+                  author={post.author}
+                  height={45}
+                  appColor={appColor}
+                  isDark={isDark}
+                  tagHeight={4}
+                  showUserInfo={true}
+                />
+                <View style={{ marginLeft: 5 }}>
+                  <Text style={styles.name}>{post.author.display_name}</Text>
+                  <Text style={styles.xp}>
+                    {post.author.total_posts} Posts - {post.author.xp_rank} -
+                    Level {post.author.level_rank}
+                  </Text>
+                </View>
               </View>
+              <Text style={styles.xp}>
+                {post.published_on_formatted} #{index}
+              </Text>
             </View>
-            <Text style={styles.xp}>
-              {post.published_on_formatted} #{index}
-            </Text>
-          </View>
-          <View style={{ paddingHorizontal: 15 }}>
-            <HTMLRenderer
-              appColor={appColor}
-              html={post.content}
-              tagsStyles={{
-                div: {
+            <View style={{ paddingHorizontal: 15 }}>
+              <HTMLRenderer
+                appColor={appColor}
+                html={post.content}
+                tagsStyles={{
+                  div: {
+                    color: isDark ? 'white' : '#00101D',
+                    fontFamily: 'OpenSans'
+                  },
+                  blockquote: {
+                    padding: 10,
+                    borderRadius: 5,
+                    fontFamily: 'OpenSans'
+                  }
+                }}
+                olItemStyle={{
                   color: isDark ? 'white' : '#00101D',
                   fontFamily: 'OpenSans'
-                },
-                blockquote: {
-                  padding: 10,
-                  borderRadius: 5,
+                }}
+                ulItemStyle={{
+                  color: isDark ? 'white' : '#00101D',
                   fontFamily: 'OpenSans'
-                }
-              }}
-              olItemStyle={{
-                color: isDark ? 'white' : '#00101D',
-                fontFamily: 'OpenSans'
-              }}
-              ulItemStyle={{
-                color: isDark ? 'white' : '#00101D',
-                fontFamily: 'OpenSans'
-              }}
-              classesStyles={{
-                'blockquote-even': {
-                  backgroundColor: isDark ? '#081825' : 'white'
-                },
-                'blockquote-odd': {
-                  backgroundColor: isDark ? '#002039' : '#E1E6EB'
-                },
-                shadow: {
-                  elevation: 5,
-                  shadowColor: 'black',
-                  shadowOffset: { height: 4 },
-                  shadowOpacity: 0.4,
-                  shadowRadius: 2,
-                  borderRadius: 5
-                }
-              }}
-            />
-          </View>
-          <View style={styles.likeContainer}>
-            <TouchableOpacity
-              disabled={user.id === post.author_id}
-              onPress={this.toggleLike}
-              disallowInterruption={true}
-              style={{
-                padding: 15,
-                paddingRight: 7.5,
-                flexDirection: 'row',
-                alignItems: 'center'
-              }}
-            >
-              {(isLiked ? likeOn : like)({
-                height: 15,
-                width: 15,
-                fill: appColor
-              })}
-              {likeCount > 0 && (
-                <Text style={styles.likesNoText}>{likeCount}</Text>
-              )}
-            </TouchableOpacity>
-            {!locked && (
-              <TouchableOpacity
-                onPress={this.reply}
-                disallowInterruption={true}
-                style={{ padding: 15, paddingLeft: 7.5 }}
-              >
-                <Text style={styles.replyText}>REPLY</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          {signShown && post.author.signature && (
-            <View style={styles.signatureContainer}>
-              <HTMLRenderer
-                html={post.author.signature}
-                tagsStyles={{ div: styles.signature }}
+                }}
+                classesStyles={{
+                  'blockquote-even': {
+                    backgroundColor: isDark ? '#081825' : 'white'
+                  },
+                  'blockquote-odd': {
+                    backgroundColor: isDark ? '#002039' : '#E1E6EB'
+                  },
+                  shadow: {
+                    elevation: 5,
+                    shadowColor: 'black',
+                    shadowOffset: { height: 4 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 2,
+                    borderRadius: 5
+                  }
+                }}
               />
             </View>
-          )}
-        </View>
+            <View style={styles.likeContainer}>
+              <TouchableOpacity
+                disabled={user.id === post.author_id}
+                onPress={this.toggleLike}
+                disallowInterruption={true}
+                style={{
+                  padding: 15,
+                  paddingRight: 7.5,
+                  flexDirection: 'row',
+                  alignItems: 'center'
+                }}
+              >
+                {(isLiked ? likeOn : like)({
+                  height: 15,
+                  width: 15,
+                  fill: appColor
+                })}
+                {likeCount > 0 && (
+                  <Text style={styles.likesNoText}>{likeCount}</Text>
+                )}
+              </TouchableOpacity>
+              {!locked && (
+                <TouchableOpacity
+                  onPress={this.reply}
+                  disallowInterruption={true}
+                  style={{ padding: 15, paddingLeft: 7.5 }}
+                >
+                  <Text style={styles.replyText}>REPLY</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            {signShown && post.author.signature && (
+              <View style={styles.signatureContainer}>
+                <HTMLRenderer
+                  html={post.author.signature}
+                  tagsStyles={{ div: styles.signature }}
+                />
+              </View>
+            )}
+          </View>
+        )}
         {selected && !multiQuotes.length && (
           <View
             style={{
