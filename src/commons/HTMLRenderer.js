@@ -204,14 +204,13 @@ export default class HTMLRenderer extends React.Component {
                 );
               },
               a: ({ href }, children, _, { onLinkPress, key }) => (
-                <View
-                  style={{ padding: 5 }}
+                <Text
                   onStartShouldSetResponder={() => true}
                   key={key}
                   onResponderGrant={() => onLinkPress(null, href)}
                 >
                   {children}
-                </View>
+                </Text>
               )
             }}
           />
