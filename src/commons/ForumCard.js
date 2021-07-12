@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 
 import { connect } from 'react-redux';
 
-import { arrowRight, drum } from '../assets/svgs';
+import { arrowRight, defaultForumIcon } from '../assets/svgs';
 
 let styles;
 class ForumCard extends React.Component {
@@ -25,17 +25,17 @@ class ForumCard extends React.Component {
       >
         <View style={styles.titleContainer}>
           <View style={styles.icon}>
-            <Image
-              source={
-                icon_path
-                  ? {
-                      uri: `https://cdn.musora.com/image/fetch/w_200,fl_lossy,q_auto:eco,c_fill,g_face/${icon_path}`
-                    }
-                  : require('../assets/defaultForumIcon.png')
-              }
-              style={{ height: '50%', aspectRatio: 1 }}
-              resizeMode={'contain'}
-            />
+            {icon_path ? (
+              <Image
+                source={{
+                  uri: `https://cdn.musora.com/image/fetch/w_200,fl_lossy,q_auto:eco,c_fill,g_face/${icon_path}`
+                }}
+                style={{ height: '50%', aspectRatio: 1 }}
+                resizeMode={'contain'}
+              />
+            ) : (
+              defaultForumIcon({ height: '50%', fill: appColor })
+            )}
           </View>
           <View style={{ marginLeft: 5 }}>
             <Text style={styles.title}>{title}</Text>
