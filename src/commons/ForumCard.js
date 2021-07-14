@@ -27,9 +27,7 @@ class ForumCard extends React.Component {
           <View style={styles.icon}>
             {icon_path ? (
               <Image
-                source={{
-                  uri: `https://cdn.musora.com/image/fetch/w_200,fl_lossy,q_auto:eco,c_fill,g_face/${icon_path}`
-                }}
+                source={{ uri: icon_path }}
                 style={{ height: '50%', aspectRatio: 1 }}
                 resizeMode={'contain'}
               />
