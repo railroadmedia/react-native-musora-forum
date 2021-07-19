@@ -170,7 +170,7 @@ class NavigationHeader extends React.Component {
               numberOfLines={2}
               ellipsizeMode='tail'
             >
-              {title}
+              {title?.replace(/-/g, ' ')}
             </Text>
           </View>
           <TouchableOpacity

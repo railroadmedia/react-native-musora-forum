@@ -34,7 +34,9 @@ export default ({
       isDark,
       reduxStore,
       postId,
-      threadTitle
+      threadTitle,
+      threadId,
+      categoryId
     }
   }
 }) => {
@@ -51,7 +53,7 @@ export default ({
         style={{ flex: 1, backgroundColor: isDark ? '#00101d' : 'white' }}
       >
         <Stack.Navigator
-          initialRouteName={postId ? 'Thread' : 'Forums'}
+          initialRouteName={categoryId ? 'Threads': postId || threadId ? 'Thread' : 'Forums'}
           headerMode={'screen'}
           screenOptions={{
             gestureEnabled: false,
@@ -71,7 +73,7 @@ export default ({
             component={Threads}
             options={props => ({
               header: () => (
-                <NavigationHeader {...props} title={props.route.params.title} />
+                <NavigationHeader {...props} title={props.route.params.title || threadTitle} />
               )
             })}
             initialParams={params}
