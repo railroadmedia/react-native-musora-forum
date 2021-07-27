@@ -7,6 +7,8 @@ import { expandQuote } from '../assets/svgs';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { IGNORED_TAGS } from 'react-native-render-html/src/HTMLUtils';
 
+import { getRootUrl, decideWhereToRedirect } from '../services/forum.service';
+
 export default class HTMLRenderer extends React.Component {
   state = { expanderVisible: false, maxQuoteHeight: undefined, width: 0 };
 
@@ -207,7 +209,13 @@ export default class HTMLRenderer extends React.Component {
                 <Text
                   onStartShouldSetResponder={() => true}
                   key={key}
-                  onResponderGrant={() => onLinkPress(null, href)}
+                  onResponderGrant={() => {
+                    let brand = getRootUrl().split('.');
+                    brand = [brand.pop(), brand.pop()].reverse().join('.');
+                    if (href.toLowerCase().includes(brand))
+                      return decideWhereToRedirect(href);
+                    onLinkPress(null, href);
+                  }}
                 >
                   {children}
                 </Text>

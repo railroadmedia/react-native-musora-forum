@@ -120,3 +120,9 @@ export const deletePost = function (id) {
     method: 'DELETE'
   });
 };
+export const getRootUrl = () => {
+  return this.rootUrl;
+};
+export const decideWhereToRedirect = urlToOpen => {
+  return this.decideWhereToRedirect(urlToOpen);
+};
