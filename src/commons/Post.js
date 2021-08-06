@@ -4,7 +4,14 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  Pressable,
+  Dimensions
+} from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 
@@ -152,8 +159,19 @@ class Post extends React.Component {
                   tagHeight={4}
                   showUserInfo={true}
                 />
-                <View style={{ marginLeft: 5 }}>
-                  <Text style={styles.name}>{post.author.display_name}</Text>
+                <View
+                  style={{
+                    marginLeft: 5,
+                    maxWidth: Dimensions.get('screen').width - 170
+                  }}
+                >
+                  <Text
+                    style={styles.name}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                  >
+                    {post.author.display_name}
+                  </Text>
                   <Text style={styles.xp}>
                     {post.author.total_posts} Posts - {post.author.xp_rank} -
                     Level {post.author.level_rank}
@@ -329,20 +347,18 @@ class Post extends React.Component {
 let setStyles = (isDark, appColor) =>
   StyleSheet.create({
     header: {
-      padding: 15,
+      padding: 10,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between'
     },
     userDetails: {
       flexDirection: 'row',
-      justifyContent: 'center',
       alignItems: 'center'
     },
     xp: {
       fontSize: 12,
       fontFamily: 'OpenSans',
-      alignSelf: 'center',
       color: isDark ? '#445F74' : '#00101D'
     },
     name: {
