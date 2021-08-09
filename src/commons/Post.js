@@ -254,7 +254,7 @@ class Post extends React.Component {
                 </TouchableOpacity>
               )}
             </View>
-            {signShown && post.author.signature && (
+            {signShown && !!post.author.signature && (
               <View style={styles.signatureContainer}>
                 <HTMLRenderer
                   html={post.author.signature}
