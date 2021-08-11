@@ -55,6 +55,7 @@ class CRUD extends React.Component {
     super(props);
     let { isDark, appColor } = props;
     styles = setStyles(isDark, appColor);
+    this.richHTML = props.post?.content;
   }
 
   onInsertLink = type => this.linkModal?.toggle(type);
