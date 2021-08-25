@@ -124,32 +124,41 @@ class CRUD extends React.Component {
         response = await updateThread(threadId, { title: this.title });
       }
     } else {
-      if (action === 'create') {
-        response = await createPost({
-          content: `${quotes
-            ?.map(({ content }) => content)
-            .join('<br>')
-            .concat('<br>')}${this.richHTML}`,
-          thread_id: threadId,
-          parent_ids: quotes.map(q => q.id)
-        });
+      if (this.richHTML) {
+        if (action === 'create') {
+          response = await createPost({
+            content: `${quotes
+              ?.map(({ content }) => content)
+              .join('<br>')
+              .concat('<br>')}${this.richHTML}`,
+            thread_id: threadId,
+            parent_ids: quotes.map(q => q.id)
+          });
+        } else {
+          this.props.updatePosts({
+            ...this.props.post,
+            content: `${quotes
+              ?.map(({ content }) => content)
+              .join('<br>')
+              .concat('<br>')}${this.richHTML}`
+          });
+          response = await editPost(
+            postId,
+            `${quotes
+              ?.map(({ content }) => content)
+              .join('<br>')
+              .concat('<br>')}${this.richHTML}`
+          );
+        }
       } else {
-        this.props.updatePosts({
-          ...this.props.post,
-          content: `${quotes
-            ?.map(({ content }) => content)
-            .join('<br>')
-            .concat('<br>')}${this.richHTML}`
-        });
-        response = await editPost(
-          postId,
-          `${quotes
-            ?.map(({ content }) => content)
-            .join('<br>')
-            .concat('<br>')}${this.richHTML}`
+        this.customModal.toggle(
+          'Something went wrong',
+          'Post cannot be empty.'
         );
+        this.setState({ loading: false });
       }
     }
+
     if (response.errors) {
       this.customModal.toggle(
         'Something went wrong',
@@ -286,12 +295,12 @@ class CRUD extends React.Component {
               <RichEditor
                 editorInitializedCallback={() =>
                   this.richTextRef?.webviewBridge?.injectJavaScript(`
-                     let link = document.createElement("link");
-                     link.type = "text/css";
-                     link.rel = "stylesheet";
-                     link.href = "https://fonts.googleapis.com/css?family=Open+Sans";
-                     document.head.appendChild(link);
-                   `)
+                      let link = document.createElement("link");
+                      link.type = "text/css";
+                      link.rel = "stylesheet";
+                      link.href = "https://fonts.googleapis.com/css?family=Open+Sans";
+                      document.head.appendChild(link);
+                    `)
                 }
                 pasteAsPlainText={true}
                 useContainer={false}
