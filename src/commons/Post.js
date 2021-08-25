@@ -131,7 +131,7 @@ class Post extends React.Component {
     let { post, appColor, index, isDark, signShown, locked, user } = this.props;
     let selectedColor = isDark ? '#002039' : '#E1E6EB';
     let baseColor = isDark ? '#081825' : '#E1E6EB4D';
-    if (post.content.includes(`<p><img src="https://cdn.tiny.cloud`)) {
+    if (post && post.content.includes(`<p><img src="https://cdn.tiny.cloud`)) {
       post.content = post.content.replace(
         `<p><img`,
         `<p style="flex-direction:row;"><img `

@@ -69,7 +69,7 @@ let setStyles = (isDark, appColor) =>
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(0,0,0,.5)'
+      backgroundColor: 'rgba(0,0,0,.7)'
     },
     modalHeaderText: {
       fontFamily: 'OpenSans-Bold',
@@ -79,7 +79,7 @@ let setStyles = (isDark, appColor) =>
     },
     animatedView: {
       padding: 10,
-      paddingHorizontal: 50,
+      paddingHorizontal: 30,
       borderRadius: 10,
       margin: 15,
       backgroundColor: isDark ? '#00101D' : '#F7F9FC'
