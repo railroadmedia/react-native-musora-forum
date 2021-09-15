@@ -168,12 +168,12 @@ class Post extends React.Component {
                 <View
                   style={{
                     marginLeft: 5,
-                    maxWidth: Dimensions.get('screen').width - 170
+                    maxWidth: Dimensions.get('screen').width - 220
                   }}
                 >
                   <Text
                     style={styles.name}
-                    numberOfLines={1}
+                    numberOfLines={2}
                     ellipsizeMode='tail'
                   >
                     {post.author.display_name}
