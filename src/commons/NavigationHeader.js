@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, Text, View, Modal } from 'react-native';
 import { connect, batch } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { updateThreads, toggleSignShown } from '../redux/ThreadActions';
