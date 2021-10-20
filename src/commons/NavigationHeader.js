@@ -323,7 +323,7 @@ const mapStateToProps = (
     }
   }
 ) => {
-  isDark = themeState ? themeState.theme === 'dark' : true;
+  isDark = themeState ? themeState.theme === 'dark' : isDark;
   if (setStyles.isDark !== isDark) styles = setStyles(isDark);
   let thread;
   if (name.match(/^(Thread)$/))

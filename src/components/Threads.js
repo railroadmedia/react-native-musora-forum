@@ -313,12 +313,12 @@ const mapStateToProps = (
   { themeState },
   {
     route: {
-      params: { appColor }
+      params: { appColor, isDark }
     }
   }
 ) => {
-  let isDark = themeState ? themeState.theme === 'dark' : true;
-  if (setStyles.isDark !== isDark) styles = setStyles(isDark, appColor);
-  return { appColor, isDark };
+  let dark = themeState ? themeState.theme === 'dark' : isDark;
+  if (setStyles.isDark !== dark) styles = setStyles(dark, appColor);
+  return { appColor, isDark: dark };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Threads);

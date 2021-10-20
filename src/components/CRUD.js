@@ -432,7 +432,7 @@ const mapStateToProps = (
   { threads, themeState },
   {
     route: {
-      params: { threadId, postId, appColor }
+      params: { threadId, postId, appColor, isDark }
     }
   }
 ) => {
@@ -448,9 +448,9 @@ const mapStateToProps = (
     threads.all?.[threadId] ||
     threads.followed?.[threadId] ||
     threads.search?.[threadId];
-  let isDark = themeState ? themeState.theme === 'dark' : true;
-  if (setStyles.isDark !== isDark) styles = setStyles(isDark, appColor);
-  return { thread, post, isDark, appColor };
+  let dark = themeState ? themeState.theme === 'dark' : isDark;
+  if (setStyles.isDark !== dark) styles = setStyles(dark, appColor);
+  return { thread, post, isDark: dark, appColor };
 };
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ updateThreads, updatePosts }, dispatch);

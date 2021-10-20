@@ -109,7 +109,7 @@ let setStyles = isDark => {
 };
 
 const mapStateToProps = ({ threads, themeState }, { reduxKey, id, isDark }) => {
-  isDark = themeState ? themeState.theme === 'dark' : true;
+  isDark = themeState ? themeState.theme === 'dark' : isDark;
   if (setStyles.isDark !== isDark) styles = setStyles(isDark);
   return {
     thread: threads[reduxKey]?.[id]

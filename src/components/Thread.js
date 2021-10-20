@@ -391,12 +391,12 @@ const mapStateToProps = (
   { themeState, threads, userState },
   {
     route: {
-      params: { threadId, appColor, user }
+      params: { threadId, appColor, user, isDark }
     }
   }
 ) => {
-  let isDark = themeState ? themeState.theme === 'dark' : true;
-  if (setStyles.isDark !== isDark) styles = setStyles(isDark, appColor);
+  let dark = themeState ? themeState.theme === 'dark' : isDark;
+  if (setStyles.isDark !== dark) styles = setStyles(dark, appColor);
 
   let locked = !!(
     threads?.forums?.[threadId] ||
@@ -406,7 +406,7 @@ const mapStateToProps = (
     threads.forumRules ||
     {}
   ).locked;
-  return { appColor, isDark, locked, user: userState?.user || user };
+  return { appColor, isDark: dark, locked, user: userState?.user || user };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Thread);
