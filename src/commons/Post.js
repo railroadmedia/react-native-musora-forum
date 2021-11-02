@@ -156,6 +156,12 @@ class Post extends React.Component {
             }
           >
             <View style={styles.header}>
+              <Text style={styles.headerText}>#{index}</Text>
+              <Text style={styles.headerText}>
+                {post.published_on_formatted}
+              </Text>
+            </View>
+            <View style={styles.header}>
               <View style={styles.userDetails}>
                 <AccessLevelAvatar
                   author={post.author}
@@ -165,12 +171,7 @@ class Post extends React.Component {
                   tagHeight={4}
                   showUserInfo={true}
                 />
-                <View
-                  style={{
-                    marginLeft: 5,
-                    maxWidth: Dimensions.get('screen').width - 220
-                  }}
-                >
+                <View style={{ marginLeft: 5 }}>
                   <Text
                     style={styles.name}
                     numberOfLines={2}
@@ -184,9 +185,6 @@ class Post extends React.Component {
                   </Text>
                 </View>
               </View>
-              <Text style={styles.xp}>
-                {post.published_on_formatted} #{index}
-              </Text>
             </View>
             <View style={{ paddingHorizontal: 15 }}>
               <HTMLRenderer
@@ -353,7 +351,8 @@ class Post extends React.Component {
 let setStyles = (isDark, appColor) =>
   StyleSheet.create({
     header: {
-      padding: 10,
+      paddingHorizontal: 10,
+      paddingBottom: 5,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between'
@@ -365,6 +364,11 @@ let setStyles = (isDark, appColor) =>
     xp: {
       fontSize: 12,
       fontFamily: 'OpenSans',
+      color: isDark ? '#445F74' : '#00101D'
+    },
+    headerText: {
+      fontSize: 12,
+      fontFamily: 'OpenSans-Italic',
       color: isDark ? '#445F74' : '#00101D'
     },
     name: {
