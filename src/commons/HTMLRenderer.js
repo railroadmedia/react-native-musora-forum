@@ -90,7 +90,7 @@ export default class HTMLRenderer extends React.Component {
                       }
                     }) => {
                       if (
-                        className.includes('first') &&
+                        className?.includes('first') &&
                         height > 150 &&
                         !expanderVisible
                       )
@@ -107,7 +107,7 @@ export default class HTMLRenderer extends React.Component {
                         overflow: 'hidden'
                       },
                       classesStyles[
-                        className.includes('odd')
+                        className?.includes('odd')
                           ? 'blockquote-odd'
                           : 'blockquote-even'
                       ]
@@ -212,7 +212,7 @@ export default class HTMLRenderer extends React.Component {
                   onResponderGrant={() => {
                     let brand = getRootUrl().split('.');
                     brand = [brand.pop(), brand.pop()].reverse().join('.');
-                    if (href.toLowerCase().includes(brand))
+                    if (href.toLowerCase()?.includes(brand))
                       return decideWhereToRedirect(href);
                     onLinkPress(null, href);
                   }}
