@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   ActivityIndicator,
+  BackHandler,
   FlatList,
   RefreshControl,
   StyleSheet,
@@ -46,6 +47,7 @@ class Forums extends React.Component {
       'focus',
       () => (reFocused ? this.refresh?.() : (reFocused = true))
     );
+    BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
     Promise.all([getForums(), getFollowedThreads()]).then(
       ([forums, followed]) => {
         this.forums = forums.results;
@@ -59,7 +61,15 @@ class Forums extends React.Component {
     );
   }
 
-  componentWillUnmount = () => this.refreshOnFocusListener?.();
+  componentWillUnmount = () => {
+    BackHandler.removeEventListener('hardwareBackPress', this.onAndroidBack);
+    this.refreshOnFocusListener?.();
+  };
+
+  onAndroidBack = () => {
+    this.props.navigation.goBack();
+    return true;
+  };
 
   navigate = (route, params) =>
     connection(true) && this.props.navigation.navigate(route, params);

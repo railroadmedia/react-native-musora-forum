@@ -65,7 +65,7 @@ export default ({
           }
           headerMode={'screen'}
           screenOptions={{
-            gestureEnabled: false,
+            gestureEnabled: true,
             transitionSpec: { open: timingAnim, close: timingAnim }
           }}
         >
