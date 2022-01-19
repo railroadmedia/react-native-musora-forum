@@ -229,6 +229,7 @@ class Thread extends React.Component {
     ) : (
       <>
         <FlatList
+          overScrollMode='never'
           onScrollBeginDrag={() => delete this.postId}
           windowSize={10}
           data={this.posts}
