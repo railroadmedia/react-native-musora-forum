@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { coach, team, edge, lifetime } from '../assets/svgs';
@@ -11,8 +11,9 @@ export default class AccessLevelAvatar extends React.Component {
   };
 
   get userBorderColor() {
-    let borderColor, userTagIcon;
+    let borderColor, userTagIcon, userTagText;
     let { appColor, author } = this.props;
+
     switch (author.access_level) {
       case 'edge': {
         borderColor = appColor;
@@ -38,13 +39,19 @@ export default class AccessLevelAvatar extends React.Component {
         userTagIcon = coach;
         break;
       }
+      case 'house-coach': {
+        borderColor = '#FAA300';
+        userTagText = 'HOUSE';
+        break;
+      }
     }
-    return { borderColor, userTagIcon };
+
+    return { borderColor, userTagIcon, userTagText };
   }
 
   render() {
     let { author, height, tagHeight, showUserInfo, isDark, appColor } = this.props;
-    let { borderColor, userTagIcon } = this.userBorderColor;
+    let { borderColor, userTagIcon, userTagText } = this.userBorderColor;
     return (
       <>
         <TouchableOpacity
@@ -58,16 +65,29 @@ export default class AccessLevelAvatar extends React.Component {
             }}
             style={{ height, aspectRatio: 1 }}
           />
-          <View
-            style={{
-              ...styles.userTagContainer,
-              backgroundColor: borderColor,
-              height: tagHeight + 2,
-              lineHeight: tagHeight + 2,
-            }}
-          >
-            {userTagIcon?.({ height: tagHeight, fill: 'white' })}
-          </View>
+          {userTagText ? (
+            <View
+              style={{
+                ...styles.userTagContainer,
+                backgroundColor: borderColor,
+                height: 10,
+                lineHeight: 10,
+              }}
+            >
+              <Text style={styles.userTagText}>{userTagText}</Text>
+            </View>
+          ) : (
+            <View
+              style={{
+                ...styles.userTagContainer,
+                backgroundColor: borderColor,
+                height: tagHeight + 2,
+                lineHeight: tagHeight + 2,
+              }}
+            >
+              {userTagIcon?.({ height: tagHeight, fill: 'white' })}
+            </View>
+          )}
         </TouchableOpacity>
         <UserInfo
           isVisible={this.state.showUserInfo}
@@ -92,5 +112,10 @@ let styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  userTagText: {
+    fontFamily: 'RobotoCondensed-Bold',
+    fontSize: 7,
+    color: '#FFFFFF',
   },
 });
