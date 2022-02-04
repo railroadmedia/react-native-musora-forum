@@ -13,14 +13,7 @@ export default class HTMLRenderer extends React.Component {
   state = { expanderVisible: false, maxQuoteHeight: undefined, width: 0 };
 
   render() {
-    let {
-      html,
-      tagsStyles,
-      classesStyles,
-      olItemStyle,
-      ulItemStyle,
-      appColor
-    } = this.props;
+    let { html, tagsStyles, classesStyles, olItemStyle, ulItemStyle, appColor } = this.props;
     let { expanderVisible, maxQuoteHeight } = this.state;
     let lastBlockquote = html.lastIndexOf('</blockquote>');
     if (lastBlockquote >= 0)
@@ -32,22 +25,20 @@ export default class HTMLRenderer extends React.Component {
       <View
         onLayout={({
           nativeEvent: {
-            layout: { width }
-          }
+            layout: { width },
+          },
         }) => this.setState({ width })}
       >
         {this.state.width ? (
           <HTML
-            ignoredTags={IGNORED_TAGS.filter(
-              tag => tag !== 'video' && tag !== 'source'
-            )}
+            ignoredTags={IGNORED_TAGS.filter(tag => tag !== 'video' && tag !== 'source')}
             key={`${expanderVisible}${maxQuoteHeight}`}
             ignoredStyles={['font-family', 'background-color', 'line-height']}
             WebView={WebView}
             source={{
               html: `<div>${evenOddQuoteClassification(
                 html.replace('<blockquote', '<shadow><blockquote class=""')
-              )}</div>`
+              )}</div>`,
             }}
             tagsStyles={tagsStyles}
             classesStyles={classesStyles}
@@ -61,17 +52,17 @@ export default class HTMLRenderer extends React.Component {
                 <Text key={key} style={ulItemStyle}>
                   ·{`  `}
                 </Text>
-              )
+              ),
             }}
             renderersProps={{
               iframe: {
                 scalesPageToFit: true,
                 webViewProps: {
                   scrollEnabled: false,
-                  androidLayerType: 'hardware'
+                  androidLayerType: 'hardware',
                   // containerStyle: { width: 300 }
-                }
-              }
+                },
+              },
             }}
             renderers={{
               shadow: (_, children, __, { key }) => (
@@ -86,17 +77,13 @@ export default class HTMLRenderer extends React.Component {
                     key={key}
                     onLayout={({
                       nativeEvent: {
-                        layout: { height }
-                      }
+                        layout: { height },
+                      },
                     }) => {
-                      if (
-                        className?.includes('first') &&
-                        height > 150 &&
-                        !expanderVisible
-                      )
+                      if (className?.includes('first') && height > 150 && !expanderVisible)
                         this.setState({
                           expanderVisible: true,
-                          maxQuoteHeight: 150
+                          maxQuoteHeight: 150,
                         });
                     }}
                     style={[
@@ -104,13 +91,11 @@ export default class HTMLRenderer extends React.Component {
                         padding: 10,
                         borderRadius: 5,
                         maxHeight: maxQuoteHeight,
-                        overflow: 'hidden'
+                        overflow: 'hidden',
                       },
                       classesStyles[
-                        className?.includes('odd')
-                          ? 'blockquote-odd'
-                          : 'blockquote-even'
-                      ]
+                        className?.includes('odd') ? 'blockquote-odd' : 'blockquote-even'
+                      ],
                     ]}
                   >
                     {children}
@@ -126,7 +111,7 @@ export default class HTMLRenderer extends React.Component {
                     disallowInterruption={true}
                     onPress={() =>
                       this.setState(({ maxQuoteHeight }) => ({
-                        maxQuoteHeight: maxQuoteHeight === 150 ? undefined : 150
+                        maxQuoteHeight: maxQuoteHeight === 150 ? undefined : 150,
                       }))
                     }
                     containerStyle={{
@@ -137,33 +122,25 @@ export default class HTMLRenderer extends React.Component {
                       paddingLeft: maxQuoteHeight === 150 ? 20 : 0,
                       transform: [
                         {
-                          rotate: `${maxQuoteHeight === 150 ? 0 : 180}deg`
-                        }
-                      ]
+                          rotate: `${maxQuoteHeight === 150 ? 0 : 180}deg`,
+                        },
+                      ],
                     }}
                   >
                     {expandQuote({ height: 15, width: 15, fill: appColor })}
                   </TouchableOpacity>
                 ) : null,
-              iframe: (
-                htmlAttribs,
-                children,
-                convertedCSSStyles,
-                passProps
-              ) => {
+              iframe: (htmlAttribs, children, convertedCSSStyles, passProps) => {
                 let { width, height } = htmlAttribs,
                   ar = height / width || 9 / 16;
                 return (
-                  <View
-                    onStartShouldSetResponder={() => true}
-                    key={passProps.key}
-                  >
+                  <View onStartShouldSetResponder={() => true} key={passProps.key}>
                     {iframe(
                       {
                         ...htmlAttribs,
                         src: htmlAttribs.src + '?fs=0&modestbranding=1&rel=0',
                         width: this.state.width,
-                        height: this.state.width * ar
+                        height: this.state.width * ar,
                       },
                       children,
                       convertedCSSStyles,
@@ -177,10 +154,7 @@ export default class HTMLRenderer extends React.Component {
                 let { width, height } = htmlAttribs,
                   ar = height / width || 9 / 16;
                 return (
-                  <View
-                    onStartShouldSetResponder={() => true}
-                    key={passProps.key}
-                  >
+                  <View onStartShouldSetResponder={() => true} key={passProps.key}>
                     <WebView
                       originWhitelist={['*']}
                       androidLayerType={'hardware'}
@@ -194,12 +168,12 @@ export default class HTMLRenderer extends React.Component {
                               <source src="${htmlAttribs.src}" type="video/mp4">
                           </video>
                         </body>
-                        `
+                        `,
                       }}
                       style={{
                         width: this.state.width,
                         height: this.state.width * ar,
-                        backgroundColor: 'black'
+                        backgroundColor: 'black',
                       }}
                     />
                   </View>
@@ -212,14 +186,13 @@ export default class HTMLRenderer extends React.Component {
                   onResponderGrant={() => {
                     let brand = getRootUrl().split('.');
                     brand = [brand.pop(), brand.pop()].reverse().join('.');
-                    if (href.toLowerCase()?.includes(brand))
-                      return decideWhereToRedirect(href);
+                    if (href.toLowerCase()?.includes(brand)) return decideWhereToRedirect(href);
                     onLinkPress(null, href);
                   }}
                 >
                   {children}
                 </Text>
-              )
+              ),
             }}
           />
         ) : null}
@@ -234,17 +207,12 @@ const evenOddQuoteClassification = html => {
   return html
     .split('<blockquote')
     .map(blockquote => {
-      if (i === 2)
-        blockquote = blockquote.replace('class="', `class="blockquote-first`);
+      if (i === 2) blockquote = blockquote.replace('class="', `class="blockquote-first`);
       blockquote = blockquote.replace(
         'class="',
         `class="${++i % 2 ? 'blockquote-odd ' : 'blockquote-even '}`
       );
-      for (
-        let j = 0;
-        j < (blockquote.match(/<\/blockquote/g) || []).length;
-        j++
-      ) {
+      for (let j = 0; j < (blockquote.match(/<\/blockquote/g) || []).length; j++) {
         i--;
       }
       return blockquote;

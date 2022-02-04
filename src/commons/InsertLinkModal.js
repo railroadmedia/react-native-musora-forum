@@ -7,7 +7,7 @@ import {
   View,
   Modal,
   KeyboardAvoidingView,
-  Platform
+  Platform,
 } from 'react-native';
 
 export class InsertLinkModal extends React.PureComponent {
@@ -18,24 +18,17 @@ export class InsertLinkModal extends React.PureComponent {
     styles = setStyles(isDark, appColor);
     this.state = {
       visible: false,
-      type: ''
+      type: '',
     };
   }
 
   toggle = type => {
-    if (this.state.visible)
-      this.props.onClose?.(this.title, this.url, this.state.type);
+    if (this.state.visible) this.props.onClose?.(this.title, this.url, this.state.type);
     this.setState(
       ({ visible }) => ({ visible: !visible, type }),
       () => {
         if (this.state.visible)
-          setTimeout(
-            () =>
-              this[
-                type === 'Link' ? 'titleTInputRef' : 'urlTInputRef'
-              ]?.focus(),
-            500
-          );
+          setTimeout(() => this[type === 'Link' ? 'titleTInputRef' : 'urlTInputRef']?.focus(), 500);
       }
     );
   };
@@ -56,10 +49,7 @@ export class InsertLinkModal extends React.PureComponent {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}
         >
-          <TouchableOpacity
-            style={styles.modalBackground}
-            onPress={this.toggle}
-          >
+          <TouchableOpacity style={styles.modalBackground} onPress={this.toggle}>
             <View style={styles.modalContainer}>
               <Text style={styles.text}>Insert {type} Url</Text>
               {type === 'Link' && (
@@ -85,10 +75,7 @@ export class InsertLinkModal extends React.PureComponent {
                 />
               </View>
 
-              <TouchableOpacity
-                style={styles.btn}
-                onPress={() => this.toggle()}
-              >
+              <TouchableOpacity style={styles.btn} onPress={() => this.toggle()}>
                 <Text style={styles.text}>OK</Text>
               </TouchableOpacity>
             </View>
@@ -105,7 +92,7 @@ let setStyles = (isDark, appColor) =>
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(0,0,0,.8)'
+      backgroundColor: 'rgba(0,0,0,.8)',
     },
     modalContainer: {
       backgroundColor: isDark ? '#00101D' : '#F7F9FC',
@@ -113,7 +100,7 @@ let setStyles = (isDark, appColor) =>
       paddingHorizontal: 50,
       borderRadius: 10,
       margin: 5,
-      width: '80%'
+      width: '80%',
     },
     item: {
       borderBottomWidth: 1,
@@ -121,22 +108,22 @@ let setStyles = (isDark, appColor) =>
       flexDirection: 'row',
       height: 40,
       alignItems: 'center',
-      paddingHorizontal: 15
+      paddingHorizontal: 15,
     },
     input: {
       flex: 1,
       height: 40,
-      color: isDark ? '#EDEEEF' : '#00101D'
+      color: isDark ? '#EDEEEF' : '#00101D',
     },
     btn: {
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: appColor,
       borderRadius: 20,
-      marginVertical: 15
+      marginVertical: 15,
     },
     text: {
       color: isDark ? '#EDEEEF' : '#00101D',
-      paddingVertical: 10
-    }
+      paddingVertical: 10,
+    },
   });

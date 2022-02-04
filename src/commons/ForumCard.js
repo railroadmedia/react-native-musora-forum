@@ -16,13 +16,10 @@ class ForumCard extends React.Component {
   render() {
     let {
       appColor,
-      data: { title, post_count, description, latest_post, icon_path }
+      data: { title, post_count, description, latest_post, icon_path },
     } = this.props;
     return (
-      <TouchableOpacity
-        onPress={this.props.onNavigate}
-        style={styles.container}
-      >
+      <TouchableOpacity onPress={this.props.onNavigate} style={styles.container}>
         <View style={styles.titleContainer}>
           <View style={styles.icon}>
             {icon_path ? (
@@ -46,11 +43,7 @@ class ForumCard extends React.Component {
         </View>
         {latest_post && (
           <View style={styles.tagsContainer}>
-            <Text
-              style={[styles.tags, { flexShrink: 0 }]}
-              numberOfLines={1}
-              ellipsizeMode='tail'
-            >
+            <Text style={[styles.tags, { flexShrink: 0 }]} numberOfLines={1} ellipsizeMode='tail'>
               {latest_post.created_at_diff}
             </Text>
             <Text style={styles.tags} numberOfLines={1} ellipsizeMode='tail'>
@@ -71,11 +64,11 @@ let setStyles = isDark => {
     container: {
       backgroundColor: isDark ? '#081825' : '#F7F9FC',
       padding: 10,
-      margin: 5
+      margin: 5,
     },
     titleContainer: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     icon: {
       height: 35,
@@ -83,39 +76,39 @@ let setStyles = isDark => {
       borderRadius: 17,
       backgroundColor: isDark ? '#002039' : '#F7F9FC',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
     },
     title: {
       fontFamily: 'OpenSans-Bold',
       color: isDark ? '#FFFFFF' : '#00101D',
-      fontSize: 14
+      fontSize: 14,
     },
     subtitle: {
       fontFamily: 'OpenSans',
       color: isDark ? '#445F74' : '#00101D',
-      fontSize: 11
+      fontSize: 11,
     },
     descriptionContainer: {
       flexDirection: 'row',
       padding: 5,
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
     },
     description: {
       fontFamily: 'OpenSans',
       color: isDark ? '#FFFFFF' : '#00101D',
       fontSize: 12,
-      width: '90%'
+      width: '90%',
     },
     tagsContainer: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     tags: {
       fontFamily: 'OpenSans',
       color: isDark ? '#445F74' : '#00101D',
       fontSize: 11,
-      flexShrink: 1
-    }
+      flexShrink: 1,
+    },
   });
 };
 const mapStateToProps = ({ themeState }, { isDark }) => {

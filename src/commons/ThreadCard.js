@@ -27,18 +27,15 @@ class ThreadCard extends React.Component {
         post_count,
         published_on_formatted,
         author_display_name,
-        latest_post
-      }
+        latest_post,
+      },
     } = this.props;
     return (
-      <TouchableOpacity
-        style={styles.container}
-        onPress={this.props.onNavigate}
-      >
+      <TouchableOpacity style={styles.container} onPress={this.props.onNavigate}>
         <AccessLevelAvatar
           author={{
             avatar_url: author_avatar_url,
-            access_level: author_access_level
+            access_level: author_access_level,
           }}
           height={60}
           appColor={appColor}
@@ -54,14 +51,8 @@ class ThreadCard extends React.Component {
             <Text style={styles.title}>{title}</Text>
           </View>
           <Text style={styles.lastPost}>
-            Started On{' '}
-            <Text style={{ fontFamily: 'OpenSans-Bold' }}>
-              {published_on_formatted}
-            </Text>{' '}
-            By{' '}
-            <Text style={{ fontFamily: 'OpenSans-Bold' }}>
-              {author_display_name}
-            </Text>
+            Started On <Text style={{ fontFamily: 'OpenSans-Bold' }}>{published_on_formatted}</Text>{' '}
+            By <Text style={{ fontFamily: 'OpenSans-Bold' }}>{author_display_name}</Text>
           </Text>
           <Text style={styles.topicName}>
             {`${post_count} Replies`} · {latest_post.created_at_diff} · By{' '}
@@ -87,24 +78,24 @@ let setStyles = isDark => {
       shadowColor: isDark ? 'black' : 'lightgrey',
       shadowOffset: { width: 3, height: 4 },
       shadowOpacity: 1,
-      shadowRadius: 4
+      shadowRadius: 4,
     },
     title: {
       fontFamily: 'OpenSans-Bold',
       color: isDark ? 'white' : 'black',
-      fontSize: 14
+      fontSize: 14,
     },
     lastPost: {
       fontFamily: 'OpenSans',
       color: '#445F74',
       fontSize: 11,
-      paddingVertical: 5
+      paddingVertical: 5,
     },
     topicName: {
       fontFamily: 'OpenSans',
       color: '#445F74',
-      fontSize: 11
-    }
+      fontSize: 11,
+    },
   });
 };
 
@@ -112,7 +103,7 @@ const mapStateToProps = ({ threads, themeState }, { reduxKey, id, isDark }) => {
   isDark = themeState ? themeState.theme === 'dark' : isDark;
   if (setStyles.isDark !== isDark) styles = setStyles(isDark);
   return {
-    thread: threads[reduxKey]?.[id]
+    thread: threads[reduxKey]?.[id],
   };
 };
 export default connect(mapStateToProps)(ThreadCard);

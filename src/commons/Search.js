@@ -8,7 +8,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   TouchableOpacity,
-  Modal
+  Modal,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,7 +36,7 @@ class Search extends React.Component {
       loadingMore: false,
       loading: true,
       refreshing: false,
-      showSearchResults: false
+      showSearchResults: false,
     };
   }
 
@@ -47,7 +47,7 @@ class Search extends React.Component {
         this.props.navigation.navigate('Thread', {
           threadId: item.thread_id,
           title: item.thread.title,
-          postId: item.id
+          postId: item.id,
         });
       }}
       item={item}
@@ -65,7 +65,7 @@ class Search extends React.Component {
             {searchSvg({
               height: 15,
               width: 15,
-              fill: isDark ? '#445F74' : '#97AABE'
+              fill: isDark ? '#445F74' : '#97AABE',
             })}
           </View>
           <TextInput
@@ -89,10 +89,8 @@ class Search extends React.Component {
         {this.searchText && this.state.showSearchResults && (
           <Text style={styles.resultText}>
             Showing results for{' '}
-            <Text style={{ fontFamily: 'OpenSans-BoldItalic' }}>
-              "{this.searchText}"
-            </Text>{' '}
-            in All Forums
+            <Text style={{ fontFamily: 'OpenSans-BoldItalic' }}>"{this.searchText}"</Text> in All
+            Forums
           </Text>
         )}
       </View>
@@ -116,16 +114,14 @@ class Search extends React.Component {
         this.setState({
           loading: false,
           loadingMore: false,
-          refreshing: false
+          refreshing: false,
         });
       });
     });
 
   closeModal = () =>
     this.setState({ showSearchResults: false }, () =>
-      ['page', 'searchResults', 'searchText', 'searchTotal'].map(
-        item => delete this[item]
-      )
+      ['page', 'searchResults', 'searchText', 'searchTotal'].map(item => delete this[item])
     );
 
   refresh = () => {
@@ -148,10 +144,7 @@ class Search extends React.Component {
             transparent={false}
           >
             <SafeAreaView style={styles.safeArea}>
-              <TouchableOpacity
-                style={styles.navHeader}
-                onPress={this.closeModal}
-              >
+              <TouchableOpacity style={styles.navHeader} onPress={this.closeModal}>
                 {arrowLeft({ height: 20, fill: isDark ? 'white' : 'black' })}
                 <Text style={styles.navHeaderTitle}>All Forums</Text>
               </TouchableOpacity>
@@ -183,9 +176,7 @@ class Search extends React.Component {
                       refreshing={refreshing}
                     />
                   }
-                  ListEmptyComponent={
-                    <Text style={styles.emptyList}>No Results</Text>
-                  }
+                  ListEmptyComponent={<Text style={styles.emptyList}>No Results</Text>}
                   ListHeaderComponent={<>{this.renderSearchInput()}</>}
                   ListFooterComponent={
                     !!this.searchTotal && (
@@ -223,7 +214,7 @@ let setStyles = isDark => {
     navHeader: {
       paddingHorizontal: 15,
       paddingVertical: 20,
-      justifyContent: 'center'
+      justifyContent: 'center',
     },
     navHeaderTitle: {
       fontFamily: 'OpenSans-ExtraBold',
@@ -231,21 +222,21 @@ let setStyles = isDark => {
       color: isDark ? 'white' : 'black',
       textAlign: 'center',
       position: 'absolute',
-      alignSelf: 'center'
+      alignSelf: 'center',
     },
     headerText: {
       fontFamily: 'OpenSans-ExtraBold',
       fontSize: 20,
-      color: isDark ? 'white' : 'black'
+      color: isDark ? 'white' : 'black',
     },
     resultText: {
       fontFamily: 'OpenSans-Italic',
       color: isDark ? 'white' : 'black',
-      paddingVertical: 5
+      paddingVertical: 5,
     },
     inputContainer: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     searchIcon: { position: 'absolute', left: 15, zIndex: 2 },
     searchInput: {
@@ -256,23 +247,22 @@ let setStyles = isDark => {
       borderRadius: 25,
       paddingLeft: 40,
       color: isDark ? '#445F74' : '#97AABE',
-      backgroundColor: isDark ? '#F7F9FC' : '#E1E6EB'
+      backgroundColor: isDark ? '#F7F9FC' : '#E1E6EB',
     },
     emptyList: {
       color: isDark ? '#445F74' : 'black',
       fontFamily: 'OpenSans',
-      padding: 15
+      padding: 15,
     },
     footerContainer: {
       borderTopWidth: 1,
       borderColor: '#445F74',
       marginHorizontal: 15,
-      marginBottom: 10
-    }
+      marginBottom: 10,
+    },
   });
 };
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({ setSearchThreads }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ setSearchThreads }, dispatch);
 const mapStateToProps = ({ themeState }, { isDark }) => {
   isDark = themeState ? themeState.theme === 'dark' : isDark;
   if (setStyles.isDark !== isDark) styles = setStyles(isDark);

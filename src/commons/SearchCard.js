@@ -26,12 +26,12 @@ export default class SearchCard extends React.Component {
           published_on_formatted,
           post_count,
           latest_post,
-          category
-        }
+          category,
+        },
       },
       isDark,
       appColor,
-      onNavigate
+      onNavigate,
     } = this.props;
 
     return (
@@ -39,7 +39,7 @@ export default class SearchCard extends React.Component {
         <AccessLevelAvatar
           author={{
             avatar_url: author_avatar_url,
-            access_level: author_access_level
+            access_level: author_access_level,
           }}
           height={45}
           appColor={appColor}
@@ -61,8 +61,7 @@ export default class SearchCard extends React.Component {
           {arrowRight({ height: 15, fill: isDark ? 'white' : 'black' })}
         </View>
         <Text style={styles.text}>
-          Replied {latest_post.created_at_diff} by{' '}
-          {latest_post.author_display_name} - {category}
+          Replied {latest_post.created_at_diff} by {latest_post.author_display_name} - {category}
         </Text>
       </TouchableOpacity>
     );
@@ -77,24 +76,24 @@ let setStyles = isDark =>
       flexDirection: 'row',
       padding: 10,
       flexWrap: 'wrap',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     title: {
       flex: 1,
       fontFamily: 'OpenSans-Bold',
       color: isDark ? 'white' : 'black',
       fontSize: 20,
-      paddingHorizontal: 10
+      paddingHorizontal: 10,
     },
     text: {
       fontFamily: 'OpenSans',
       color: '#445F74',
-      fontSize: 14
+      fontSize: 14,
     },
     contentContainer: {
       width: '100%',
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     content: {
       color: isDark ? '#FFFFFF' : '#000000',
@@ -102,6 +101,6 @@ let setStyles = isDark =>
       fontSize: 14,
       padding: 10,
       paddingLeft: 0,
-      flex: 1
-    }
+      flex: 1,
+    },
   });

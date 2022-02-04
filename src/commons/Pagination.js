@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  TextInput,
-  StyleSheet
-} from 'react-native';
+import { View, Text, Modal, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 
 export default class Pagination extends React.Component {
   constructor(props) {
@@ -19,8 +12,7 @@ export default class Pagination extends React.Component {
     let { active } = this.state;
     let pages = Array.from({ length: this.pagesNo }, (_, i) => i + 1);
     if (active < 2) active = 2;
-    if (active < this.pagesNo - 2)
-      pages.splice(active + 1, pages.length - active - 2, '...');
+    if (active < this.pagesNo - 2) pages.splice(active + 1, pages.length - active - 2, '...');
     if (active > 3) pages.splice(1, active - 3, '...');
     pages.unshift('<');
     pages.push('>');
@@ -46,7 +38,7 @@ export default class Pagination extends React.Component {
   togglePagePicker = () => {
     delete this.pagePickerText;
     this.setState(({ showPagePicker }) => ({
-      showPagePicker: !showPagePicker
+      showPagePicker: !showPagePicker,
     }));
   };
 
@@ -66,7 +58,7 @@ export default class Pagination extends React.Component {
             <Text
               style={{
                 color: active === p ? appColor : isDark ? '#445F74' : 'black',
-                fontFamily: active === p ? 'OpenSans-Bold' : 'OpenSans'
+                fontFamily: active === p ? 'OpenSans-Bold' : 'OpenSans',
               }}
             >
               {p}
@@ -80,10 +72,7 @@ export default class Pagination extends React.Component {
           transparent={true}
           visible={showPagePicker}
         >
-          <TouchableOpacity
-            onPress={this.togglePagePicker}
-            style={styles.pagePickerContainer}
-          >
+          <TouchableOpacity onPress={this.togglePagePicker} style={styles.pagePickerContainer}>
             <View>
               <TextInput
                 autoFocus={true}
@@ -97,8 +86,7 @@ export default class Pagination extends React.Component {
               />
               <TouchableOpacity
                 onPress={() => {
-                  if (this.pagePickerText)
-                    this.changePage(parseInt(this.pagePickerText));
+                  if (this.pagePickerText) this.changePage(parseInt(this.pagePickerText));
                   this.togglePagePicker();
                 }}
                 style={{ backgroundColor: appColor, padding: 20 }}
@@ -116,23 +104,23 @@ let styles = new StyleSheet.create({
   container: {
     flexDirection: 'row',
     paddingVertical: 10,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   pagePickerContainer: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,.5)',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   textInput: {
     marginTop: '5%',
     backgroundColor: 'white',
     padding: 20,
     minWidth: '30%',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   goText: {
     textAlign: 'center',
     color: 'white',
-    fontFamily: 'OpenSans-Bold'
-  }
+    fontFamily: 'OpenSans-Bold',
+  },
 });

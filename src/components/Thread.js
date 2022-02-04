@@ -7,7 +7,7 @@ import {
   Text,
   ActivityIndicator,
   View,
-  Modal
+  Modal,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,7 +36,7 @@ class Thread extends React.Component {
     refreshing: false,
     multiQuoting: false,
     lockedModalVisible: false,
-    postKey: false
+    postKey: false,
   };
 
   constructor(props) {
@@ -49,9 +49,8 @@ class Thread extends React.Component {
 
   componentDidMount() {
     let reFocused;
-    this.refreshOnFocusListener = this.props.navigation?.addListener(
-      'focus',
-      () => (reFocused ? this.refresh?.() : (reFocused = true))
+    this.refreshOnFocusListener = this.props.navigation?.addListener('focus', () =>
+      reFocused ? this.refresh?.() : (reFocused = true)
     );
     this.blurListener = this.props.navigation?.addListener('blur', () =>
       this.setState(({ postKey }) => ({ postKey: !postKey }))
@@ -74,16 +73,12 @@ class Thread extends React.Component {
     this.refreshOnFocusListener?.();
   }
 
-  navigate = (route, params) =>
-    connection(true) && this.props.navigation.navigate(route, params);
+  navigate = (route, params) => connection(true) && this.props.navigation.navigate(route, params);
 
   handleAutoScroll = (id, height) => {
     this.postLayouts[id] = height;
     let { postId } = this;
-    if (
-      postId &&
-      this.posts.every(p => Object.keys(this.postLayouts).includes(`${p}`))
-    ) {
+    if (postId && this.posts.every(p => Object.keys(this.postLayouts).includes(`${p}`))) {
       let scrollPos = this.flHeaderHeight;
       this.posts
         .slice(
@@ -93,7 +88,7 @@ class Thread extends React.Component {
         .map(pId => (scrollPos += this.postLayouts[pId]));
       this.flatListRef?.scrollToOffset({
         offset: scrollPos,
-        animated: false
+        animated: false,
       });
     }
   };
@@ -106,8 +101,8 @@ class Thread extends React.Component {
         key={postKey}
         onLayout={({
           nativeEvent: {
-            layout: { height }
-          }
+            layout: { height },
+          },
         }) => this.handleAutoScroll(id, height)}
       >
         <Post
@@ -117,15 +112,12 @@ class Thread extends React.Component {
           index={index + 1 + 10 * (this.page - 1)}
           appColor={appColor}
           isDark={isDark}
-          onMultiQuote={() =>
-            this.setState({ multiQuoting: !!Post.multiQuotes.length })
-          }
+          onMultiQuote={() => this.setState({ multiQuoting: !!Post.multiQuotes.length })}
           onPostCreated={postId => (this.postId = postId)}
           onDelete={postId => {
             delete this.postId;
             this.posts = this.posts.filter(p => p !== postId);
-            if (!this.posts.length && this.page > 1)
-              this.changePage(--this.page);
+            if (!this.posts.length && this.page > 1) this.changePage(--this.page);
           }}
         />
       </View>
@@ -138,15 +130,15 @@ class Thread extends React.Component {
       <View
         onLayout={({
           nativeEvent: {
-            layout: { height }
-          }
+            layout: { height },
+          },
         }) => (this.flHeaderHeight = height)}
         style={{
           borderTopWidth,
           borderBottomWidth,
           borderColor: isDark ? '#445F74' : 'lightgrey',
           marginHorizontal: 15,
-          marginBottom
+          marginBottom,
         }}
       >
         <Pagination
@@ -216,16 +208,10 @@ class Thread extends React.Component {
 
   render() {
     let { locked, isDark, appColor } = this.props;
-    let { loading, refreshing, postHeight, multiQuoting, lockedModalVisible } =
-      this.state;
+    let { loading, refreshing, postHeight, multiQuoting, lockedModalVisible } = this.state;
     let { threadId } = this.props.route.params;
     return loading ? (
-      <ActivityIndicator
-        size='large'
-        color={appColor}
-        animating={true}
-        style={styles.loading}
-      />
+      <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
     ) : (
       <>
         <FlatList
@@ -243,9 +229,7 @@ class Thread extends React.Component {
           ListHeaderComponent={this.renderPagination(20, 0, 1)}
           keyExtractor={id => id.toString()}
           ref={r => (this.flatListRef = r)}
-          ListEmptyComponent={
-            <Text style={styles.emptyList}>{'No posts.'}</Text>
-          }
+          ListEmptyComponent={<Text style={styles.emptyList}>{'No posts.'}</Text>}
           ListFooterComponent={this.renderPagination(postHeight, 1, 0)}
           refreshControl={
             <RefreshControl
@@ -260,8 +244,7 @@ class Thread extends React.Component {
         <SafeAreaView style={styles.bottomTOpacitySafeArea} mode='margin'>
           <TouchableOpacity
             onLayout={({ nativeEvent: { layout } }) =>
-              !this.state.postHeight &&
-              this.setState({ postHeight: layout.height + 15 })
+              !this.state.postHeight && this.setState({ postHeight: layout.height + 15 })
             }
             onPress={() => {
               delete this.postId;
@@ -274,8 +257,8 @@ class Thread extends React.Component {
                     threadId,
                     quotes: Post.multiQuotes.map(({ props: { post } }) => ({
                       ...post,
-                      content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`
-                    }))
+                      content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`,
+                    })),
                   });
             }}
             style={styles.bottomTOpacity}
@@ -283,13 +266,11 @@ class Thread extends React.Component {
             {(locked ? lock : multiQuoting ? multiQuote : post)({
               height: 25,
               width: 25,
-              fill: 'white'
+              fill: 'white',
             })}
             {multiQuoting && (
               <View style={styles.multiQuoteBadge}>
-                <Text style={{ color: appColor, fontSize: 10 }}>
-                  +{Post.multiQuotes.length}
-                </Text>
+                <Text style={{ color: appColor, fontSize: 10 }}>+{Post.multiQuotes.length}</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -313,7 +294,7 @@ class Thread extends React.Component {
                 <Text
                   style={{
                     color: isDark ? 'white' : '#000000',
-                    fontFamily: 'OpenSans'
+                    fontFamily: 'OpenSans',
                   }}
                 >
                   This thread is locked.
@@ -330,29 +311,29 @@ let setStyles = (isDark, appColor) =>
   StyleSheet.create({
     fList: {
       flex: 1,
-      backgroundColor: isDark ? '#00101D' : 'white'
+      backgroundColor: isDark ? '#00101D' : 'white',
     },
     loading: {
       flex: 1,
       backgroundColor: isDark ? '#00101D' : 'white',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     emptyList: {
       color: isDark ? '#445F74' : 'black',
       fontFamily: 'OpenSans',
-      padding: 15
+      padding: 15,
     },
     bottomTOpacity: {
       padding: 15,
       marginBottom: 15,
       marginRight: 15,
       borderRadius: 99,
-      backgroundColor: appColor
+      backgroundColor: appColor,
     },
     bottomTOpacitySafeArea: {
       position: 'absolute',
       bottom: 0,
-      alignSelf: 'flex-end'
+      alignSelf: 'flex-end',
     },
     multiQuoteBadge: {
       aspectRatio: 1,
@@ -363,12 +344,12 @@ let setStyles = (isDark, appColor) =>
       borderRadius: 99,
       position: 'absolute',
       padding: 4,
-      bottom: 0
+      bottom: 0,
     },
     lockedModalBackground: {
       flex: 1,
       backgroundColor: 'rgba(0,0,0,.5)',
-      justifyContent: 'flex-end'
+      justifyContent: 'flex-end',
     },
     lockedModalMsgContainer: {
       backgroundColor: isDark ? '#081825' : '#F7F9FC',
@@ -377,23 +358,22 @@ let setStyles = (isDark, appColor) =>
       borderTopWidth: 6,
       borderTopColor: '#FFAE00',
       borderRadius: 8,
-      flexDirection: 'row'
+      flexDirection: 'row',
     },
     lockedTitle: {
       paddingLeft: 15,
       color: isDark ? 'white' : '#000000',
-      fontFamily: 'OpenSans-Bold'
-    }
+      fontFamily: 'OpenSans-Bold',
+    },
   });
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({ setPosts, setForumRules }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ setPosts, setForumRules }, dispatch);
 const mapStateToProps = (
   { themeState, threads, userState },
   {
     route: {
-      params: { threadId, appColor, user, isDark }
-    }
+      params: { threadId, appColor, user, isDark },
+    },
   }
 ) => {
   let dark = themeState ? themeState.theme === 'dark' : isDark;

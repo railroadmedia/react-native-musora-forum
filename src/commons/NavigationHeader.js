@@ -9,21 +9,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { updateThreads, toggleSignShown } from '../redux/ThreadActions';
 
-import {
-  connection,
-  followThread,
-  unfollowThread,
-  updateThread
-} from '../services/forum.service';
+import { connection, followThread, unfollowThread, updateThread } from '../services/forum.service';
 
-import {
-  arrowLeft,
-  lock,
-  moderate,
-  pin,
-  check,
-  unfollow
-} from '../assets/svgs';
+import { arrowLeft, lock, moderate, pin, check, unfollow } from '../assets/svgs';
 
 let styles;
 class NavigationHeader extends React.Component {
@@ -45,20 +33,20 @@ class NavigationHeader extends React.Component {
     if (this.props.route.name.match(/^(Thread)$/)) {
       let {
         signShown,
-        thread: { locked, pinned, is_followed }
+        thread: { locked, pinned, is_followed },
       } = this.props;
       options.toggleSign = {
         text: `${signShown ? 'Hide' : 'Show'} All Signatures`,
-        action: this.toggleSign
+        action: this.toggleSign,
       };
       if (this.props.user.permission_level === 'administrator') {
         options.toggleLock = {
           text: locked ? 'Unlock' : 'Lock',
-          action: this.toggleLock
+          action: this.toggleLock,
         };
         options.togglePin = {
           text: pinned ? 'Unpin' : 'Pin',
-          action: this.togglePin
+          action: this.togglePin,
         };
       }
       if (
@@ -68,7 +56,7 @@ class NavigationHeader extends React.Component {
         options.edit = { text: 'Edit', action: this.onEdit };
       options.toggleFollow = {
         text: `${is_followed ? 'Unfollow' : 'Follow'} Thread`,
-        action: this.toggleFollow
+        action: this.toggleFollow,
       };
     }
     options.forumRules = {
@@ -77,15 +65,14 @@ class NavigationHeader extends React.Component {
         this.setState({ optionsVisible: false }, () =>
           this.props.navigation.push('Thread', {
             title: 'Forum Rules',
-            isForumRules: true
+            isForumRules: true,
           })
-        )
+        ),
     };
     return options;
   }
 
-  navigate = (route, params) =>
-    connection(true) && this.props.navigation.navigate(route, params);
+  navigate = (route, params) => connection(true) && this.props.navigation.navigate(route, params);
 
   toggleSign = () =>
     batch(() => {
@@ -135,7 +122,7 @@ class NavigationHeader extends React.Component {
         this.navigate('CRUD', {
           type: 'thread',
           action: 'edit',
-          threadId: this.props.threadId
+          threadId: this.props.threadId,
         })
     );
 
@@ -145,10 +132,10 @@ class NavigationHeader extends React.Component {
       title,
       route: {
         name,
-        params: { isForumRules }
+        params: { isForumRules },
       },
       isDark,
-      thread: { locked, pinned, is_followed } = {}
+      thread: { locked, pinned, is_followed } = {},
     } = this.props;
     let { optionsVisible, followStateVisible } = this.state;
     return (
@@ -165,21 +152,14 @@ class NavigationHeader extends React.Component {
                 {pin({ width: 10, fill: isDark ? 'white' : 'black' })}
               </View>
             )}
-            <Text
-              style={styles.titleText}
-              numberOfLines={2}
-              ellipsizeMode='tail'
-            >
+            <Text style={styles.titleText} numberOfLines={2} ellipsizeMode='tail'>
               {title?.replace(/-/g, ' ')}
             </Text>
           </View>
-          <TouchableOpacity
-            style={{ paddingHorizontal: 15 }}
-            onPress={navigation.goBack}
-          >
+          <TouchableOpacity style={{ paddingHorizontal: 15 }} onPress={navigation.goBack}>
             {arrowLeft({
               height: 20,
-              fill: isDark ? 'white' : 'black'
+              fill: isDark ? 'white' : 'black',
             })}
           </TouchableOpacity>
           {name.match(/^(Forums|Threads|Thread)$/) && !isForumRules && (
@@ -206,25 +186,23 @@ class NavigationHeader extends React.Component {
                     <View
                       style={{
                         ...styles.followStateContainer,
-                        borderTopColor: is_followed ? '#34D399' : '#FFAE00'
+                        borderTopColor: is_followed ? '#34D399' : '#FFAE00',
                       }}
                     >
                       {(is_followed ? check : unfollow)({
                         height: 25,
                         width: 25,
-                        fill: is_followed ? '#34D399' : '#FFAE00'
+                        fill: is_followed ? '#34D399' : '#FFAE00',
                       })}
                       <Text style={styles.followStateTitle}>
                         {is_followed ? 'Follow' : 'Unfollow'} Thread{'\n'}
                         <Text
                           style={{
                             color: isDark ? 'white' : '#000000',
-                            fontFamily: 'OpenSans'
+                            fontFamily: 'OpenSans',
                           }}
                         >
-                          You've{' '}
-                          {is_followed ? 'started following' : 'unfollowed'}{' '}
-                          this thread.
+                          You've {is_followed ? 'started following' : 'unfollowed'} this thread.
                         </Text>
                       </Text>
                     </View>
@@ -252,12 +230,12 @@ let setStyles = isDark => {
   return StyleSheet.create({
     container: {
       backgroundColor: isDark ? '#00101d' : 'white',
-      paddingVertical: 10
+      paddingVertical: 10,
     },
     subContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
     },
     titleContainer: {
       flexDirection: 'row',
@@ -265,7 +243,7 @@ let setStyles = isDark => {
       justifyContent: 'center',
       position: 'absolute',
       left: 50,
-      right: 50
+      right: 50,
     },
     titleText: {
       fontFamily: 'OpenSans-ExtraBold',
@@ -273,30 +251,30 @@ let setStyles = isDark => {
       color: isDark ? 'white' : 'black',
       textAlign: 'center',
       textTransform: 'capitalize',
-      padding: 2
+      padding: 2,
     },
     optionsContainer: {
       flex: 1,
       justifyContent: 'flex-end',
-      backgroundColor: 'rgba(0,0,0,.5)'
+      backgroundColor: 'rgba(0,0,0,.5)',
     },
     options: {
       backgroundColor: isDark ? '#081825' : '#F7F9FC',
       padding: 20,
       borderTopEndRadius: 20,
-      borderTopStartRadius: 20
+      borderTopStartRadius: 20,
     },
     pill: {
       width: '20%',
       height: 2,
       backgroundColor: isDark ? 'white' : '#000000',
       borderRadius: 1,
-      alignSelf: 'center'
+      alignSelf: 'center',
     },
     optionText: {
       paddingVertical: 10,
       color: isDark ? 'white' : '#000000',
-      fontFamily: 'OpenSans'
+      fontFamily: 'OpenSans',
     },
     followStateContainer: {
       backgroundColor: isDark ? '#081825' : '#F7F9FC',
@@ -304,13 +282,13 @@ let setStyles = isDark => {
       padding: 15,
       borderTopWidth: 6,
       borderRadius: 8,
-      flexDirection: 'row'
+      flexDirection: 'row',
     },
     followStateTitle: {
       paddingLeft: 15,
       color: isDark ? 'white' : '#000000',
-      fontFamily: 'OpenSans-Bold'
-    }
+      fontFamily: 'OpenSans-Bold',
+    },
   });
 };
 const mapStateToProps = (
@@ -319,8 +297,8 @@ const mapStateToProps = (
     title,
     route: {
       name,
-      params: { threadId, isDark, user }
-    }
+      params: { threadId, isDark, user },
+    },
   }
 ) => {
   isDark = themeState ? themeState.theme === 'dark' : isDark;
@@ -339,7 +317,7 @@ const mapStateToProps = (
     isDark,
     signShown: name.match(/^(Thread)$/) ? threads.signShown : undefined,
     title: thread?.title || title,
-    user: userState?.user || user
+    user: userState?.user || user,
   };
 };
 const mapDispatchToProps = dispatch =>

@@ -17,18 +17,14 @@ import {
   ScrollView,
   TextInput,
   Keyboard,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  RichEditor,
-  RichToolbar,
-  actions
-} from 'react-native-pell-rich-editor';
+import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
 
 import { InsertLinkModal } from '../commons/InsertLinkModal';
 import HTMLRenderer from '../commons/HTMLRenderer';
@@ -41,7 +37,7 @@ import {
   deletePost,
   deleteThread,
   editPost,
-  updateThread
+  updateThread,
 } from '../services/forum.service';
 
 import { updateThreads, updatePosts } from '../redux/ThreadActions';
@@ -61,9 +57,8 @@ class CRUD extends React.Component {
   onInsertLink = type => this.linkModal?.toggle(type);
 
   componentDidMount() {
-    this.keyboardDidChangeFrameEListener = Keyboard.addListener(
-      'keyboardDidChangeFrame',
-      () => this.scrollRef?.scrollToEnd()
+    this.keyboardDidChangeFrameEListener = Keyboard.addListener('keyboardDidChangeFrame', () =>
+      this.scrollRef?.scrollToEnd()
     );
   }
 
@@ -132,7 +127,7 @@ class CRUD extends React.Component {
               .join('<br>')
               .concat('<br>')}${this.richHTML}`,
             thread_id: threadId,
-            parent_ids: quotes.map(q => q.id)
+            parent_ids: quotes.map(q => q.id),
           });
         } else {
           this.props.updatePosts({
@@ -140,7 +135,7 @@ class CRUD extends React.Component {
             content: `${quotes
               ?.map(({ content }) => content)
               .join('<br>')
-              .concat('<br>')}${this.richHTML}`
+              .concat('<br>')}${this.richHTML}`,
           });
           response = await editPost(
             postId,
@@ -151,19 +146,13 @@ class CRUD extends React.Component {
           );
         }
       } else {
-        this.customModal.toggle(
-          'Something went wrong',
-          'Post cannot be empty.'
-        );
+        this.customModal.toggle('Something went wrong', 'Post cannot be empty.');
         this.setState({ loading: false });
       }
     }
 
     if (response.errors) {
-      this.customModal.toggle(
-        'Something went wrong',
-        response.errors.map(m => m.detail).join(' ')
-      );
+      this.customModal.toggle('Something went wrong', response.errors.map(m => m.detail).join(' '));
       this.setState({ loading: false });
     } else {
       onPostCreated?.(response.id);
@@ -191,12 +180,12 @@ class CRUD extends React.Component {
     let { loading } = this.state;
     const {
       route: {
-        params: { action, type, quotes }
+        params: { action, type, quotes },
       },
       post,
       thread,
       isDark,
-      appColor
+      appColor,
     } = this.props;
     return (
       <SafeAreaView style={styles.container}>
@@ -215,11 +204,7 @@ class CRUD extends React.Component {
           </Text>
           <TouchableOpacity onPress={this.save} disabled={loading}>
             <Text style={styles.actionBtn}>
-              {action === 'create'
-                ? quotes?.length
-                  ? 'Reply'
-                  : 'Create'
-                : 'Save'}
+              {action === 'create' ? (quotes?.length ? 'Reply' : 'Create') : 'Save'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -238,16 +223,16 @@ class CRUD extends React.Component {
                   html={post.content}
                   tagsStyles={{
                     div: { color: isDark ? 'white' : '#00101D' },
-                    blockquote: { padding: 10, borderRadius: 5 }
+                    blockquote: { padding: 10, borderRadius: 5 },
                   }}
                   olItemStyle={{ color: isDark ? 'white' : '#00101D' }}
                   ulItemStyle={{ color: isDark ? 'white' : '#00101D' }}
                   classesStyles={{
                     'blockquote-even': {
-                      backgroundColor: isDark ? '#081825' : 'white'
+                      backgroundColor: isDark ? '#081825' : 'white',
                     },
                     'blockquote-odd': {
-                      backgroundColor: isDark ? '#002039' : '#E1E6EB'
+                      backgroundColor: isDark ? '#002039' : '#E1E6EB',
                     },
                     shadow: {
                       elevation: 5,
@@ -255,8 +240,8 @@ class CRUD extends React.Component {
                       shadowOffset: { height: 4 },
                       shadowOpacity: 0.4,
                       shadowRadius: 2,
-                      borderRadius: 5
-                    }
+                      borderRadius: 5,
+                    },
                   }}
                 />
               </View>
@@ -288,7 +273,7 @@ class CRUD extends React.Component {
                   actions.insertOrderedList,
                   actions.insertLink,
                   actions.insertImage,
-                  actions.insertVideo
+                  actions.insertVideo,
                 ]}
               />
             )}
@@ -308,7 +293,7 @@ class CRUD extends React.Component {
                 editorStyle={{
                   ...styles.editorStyle,
                   contentCSSText: 'font-family: Open Sans; font-size: 10px;',
-                  placeholderColor: isDark ? '#445F74' : 'grey'
+                  placeholderColor: isDark ? '#445F74' : 'grey',
                 }}
                 ref={r => (this.richTextRef = r)}
                 style={styles.richEditor}
@@ -338,11 +323,7 @@ class CRUD extends React.Component {
           onClose={this.onLinkDone}
           ref={ref => (this.linkModal = ref)}
         />
-        <CustomModal
-          ref={ref => (this.customModal = ref)}
-          isDark={isDark}
-          appColor={appColor}
-        />
+        <CustomModal ref={ref => (this.customModal = ref)} isDark={isDark} appColor={appColor} />
       </SafeAreaView>
     );
   }
@@ -355,38 +336,38 @@ let setStyles = (isDark, appColor) =>
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: 15,
-      paddingVertical: 10
+      paddingVertical: 10,
     },
     cancelBtn: {
       fontFamily: 'OpenSans-Bold',
       fontSize: 14,
-      color: isDark ? 'white' : '#00101D'
+      color: isDark ? 'white' : '#00101D',
     },
     actionBtn: {
       fontFamily: 'OpenSans-Bold',
       fontSize: 14,
-      color: appColor
+      color: appColor,
     },
     headerTitle: {
       textTransform: 'capitalize',
       fontFamily: 'OpenSans-Bold',
       fontSize: 16,
-      color: isDark ? 'white' : '#000000'
+      color: isDark ? 'white' : '#000000',
     },
     container: {
       flex: 1,
-      backgroundColor: isDark ? '#00101D' : '#F7F9FC'
+      backgroundColor: isDark ? '#00101D' : '#F7F9FC',
     },
     richBar: {
       backgroundColor: '#001424',
       borderColor: isDark ? '#002039' : '#E1E6EB',
       borderWidth: 4,
       borderTopLeftRadius: 6,
-      borderTopRightRadius: 6
+      borderTopRightRadius: 6,
     },
     editorStyle: {
       backgroundColor: isDark ? '#002039' : '#E1E6EB',
-      color: isDark ? 'white' : 'black'
+      color: isDark ? 'white' : 'black',
     },
     deleteBtn: {
       backgroundColor: appColor,
@@ -395,14 +376,14 @@ let setStyles = (isDark, appColor) =>
       alignSelf: 'center',
       padding: 20,
       paddingHorizontal: 80,
-      marginBottom: 15
+      marginBottom: 15,
     },
     deleteBtnText: {
       textAlign: 'center',
       fontFamily: 'RobotoCondensed-Bold',
       fontSize: 15,
       color: 'white',
-      textTransform: 'uppercase'
+      textTransform: 'uppercase',
     },
     titleInput: {
       marginBottom: 15,
@@ -412,12 +393,12 @@ let setStyles = (isDark, appColor) =>
       padding: 15,
       paddingHorizontal: 10,
       fontFamily: 'OpenSans',
-      fontSize: 12
+      fontSize: 12,
     },
     richEditor: {
       borderBottomLeftRadius: 6,
       borderBottomRightRadius: 6,
-      height: 200
+      height: 200,
     },
     activityIndicator: {
       backgroundColor: 'rgba(0,0,0,.5)',
@@ -425,15 +406,15 @@ let setStyles = (isDark, appColor) =>
       top: 0,
       bottom: 0,
       left: 0,
-      right: 0
-    }
+      right: 0,
+    },
   });
 const mapStateToProps = (
   { threads, themeState },
   {
     route: {
-      params: { threadId, postId, appColor, isDark }
-    }
+      params: { threadId, postId, appColor, isDark },
+    },
   }
 ) => {
   let post = {
@@ -441,7 +422,7 @@ const mapStateToProps = (
     content: threads.posts?.[postId]?.content
       .split('</blockquote>')
       .reverse()[0]
-      .replace(/<br>/g, '')
+      .replace(/<br>/g, ''),
   };
   let thread =
     threads.forums?.[threadId] ||
@@ -452,6 +433,5 @@ const mapStateToProps = (
   if (setStyles.isDark !== dark) styles = setStyles(dark, appColor);
   return { thread, post, isDark: dark, appColor };
 };
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({ updateThreads, updatePosts }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ updateThreads, updatePosts }, dispatch);
 export default connect(mapStateToProps, mapDispatchToProps)(CRUD);

@@ -7,7 +7,7 @@ import UserInfo from './UserInfo';
 
 export default class AccessLevelAvatar extends React.Component {
   state = {
-    showUserInfo: false
+    showUserInfo: false,
   };
 
   get userBorderColor() {
@@ -43,14 +43,7 @@ export default class AccessLevelAvatar extends React.Component {
   }
 
   render() {
-    let {
-      author,
-      height,
-      tagHeight,
-      showUserInfo,
-      isDark,
-      appColor
-    } = this.props;
+    let { author, height, tagHeight, showUserInfo, isDark, appColor } = this.props;
     let { borderColor, userTagIcon } = this.userBorderColor;
     return (
       <>
@@ -61,7 +54,7 @@ export default class AccessLevelAvatar extends React.Component {
         >
           <Image
             source={{
-              uri: `https://cdn.musora.com/image/fetch/w_200,fl_lossy,q_auto:eco,c_fill,g_face/${author.avatar_url}`
+              uri: `https://cdn.musora.com/image/fetch/w_200,fl_lossy,q_auto:eco,c_fill,g_face/${author.avatar_url}`,
             }}
             style={{ height, aspectRatio: 1 }}
           />
@@ -70,7 +63,7 @@ export default class AccessLevelAvatar extends React.Component {
               ...styles.userTagContainer,
               backgroundColor: borderColor,
               height: tagHeight + 2,
-              lineHeight: tagHeight + 2
+              lineHeight: tagHeight + 2,
             }}
           >
             {userTagIcon?.({ height: tagHeight, fill: 'white' })}
@@ -91,13 +84,13 @@ let styles = StyleSheet.create({
   imgContainer: {
     borderRadius: 99,
     overflow: 'hidden',
-    borderWidth: 2
+    borderWidth: 2,
   },
   userTagContainer: {
     width: '100%',
     position: 'absolute',
     bottom: 0,
     alignItems: 'center',
-    justifyContent: 'center'
-  }
+    justifyContent: 'center',
+  },
 });

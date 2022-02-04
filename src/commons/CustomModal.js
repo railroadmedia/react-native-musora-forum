@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Modal,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Animated
-} from 'react-native';
+import { Modal, TouchableOpacity, Text, StyleSheet, Animated } from 'react-native';
 
 let styles;
 
@@ -15,7 +9,7 @@ export default class CustomModal extends React.PureComponent {
     styles = setStyles(props.isDark, props.appColor);
     this.state = {
       visible: false,
-      opacity: new Animated.Value(0)
+      opacity: new Animated.Value(0),
     };
   }
 
@@ -29,7 +23,7 @@ export default class CustomModal extends React.PureComponent {
     Animated.timing(this.state.opacity, {
       duration: 250,
       useNativeDriver: true,
-      toValue: this.state.visible ? 1 : 0
+      toValue: this.state.visible ? 1 : 0,
     }).start();
   };
 
@@ -43,16 +37,10 @@ export default class CustomModal extends React.PureComponent {
         supportedOrientations={['portrait', 'landscape']}
         onBackButtonPress={this.toggle}
       >
-        <TouchableOpacity
-          style={styles.modalBackground}
-          onPress={() => this.toggle()}
-        >
-          <Animated.View
-            style={[styles.animatedView, { opacity: this.state.opacity }]}
-          >
+        <TouchableOpacity style={styles.modalBackground} onPress={() => this.toggle()}>
+          <Animated.View style={[styles.animatedView, { opacity: this.state.opacity }]}>
             <Text style={styles.modalHeaderText}>{this.title}</Text>
             <Text style={styles.modalBodyText}>{this.message}</Text>
-
             <TouchableOpacity style={styles.btn} onPress={() => this.toggle()}>
               <Text style={styles.btnText}>OK</Text>
             </TouchableOpacity>
@@ -69,37 +57,37 @@ let setStyles = (isDark, appColor) =>
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(0,0,0,.7)'
+      backgroundColor: 'rgba(0,0,0,.7)',
     },
     modalHeaderText: {
       fontFamily: 'OpenSans-Bold',
       textAlign: 'center',
       fontSize: 18,
-      color: isDark ? '#FFFFFF' : '#000000'
+      color: isDark ? '#FFFFFF' : '#000000',
     },
     animatedView: {
       padding: 10,
       paddingHorizontal: 30,
       borderRadius: 10,
       margin: 15,
-      backgroundColor: isDark ? '#00101D' : '#F7F9FC'
+      backgroundColor: isDark ? '#00101D' : '#F7F9FC',
     },
     modalBodyText: {
       textAlign: 'center',
       fontFamily: 'OpenSans',
       fontSize: 12,
       color: isDark ? '#FFFFFF' : '#000000',
-      padding: 10
+      padding: 10,
     },
     btn: {
       backgroundColor: appColor,
-      borderRadius: 20
+      borderRadius: 20,
     },
     btnText: {
       fontFamily: 'OpenSans',
       textAlign: 'center',
       padding: 10,
       color: '#FFFFFF',
-      paddingHorizontal: 50
-    }
+      paddingHorizontal: 50,
+    },
   });
