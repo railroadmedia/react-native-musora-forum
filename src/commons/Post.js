@@ -55,6 +55,13 @@ class Post extends React.Component {
     });
   };
 
+  onNavigateToCoach = id => {
+    this.props.navigation.navigate(
+      this.props.appColor === '#0b76db' ? 'coachOverview' : 'COACHOVERVIEW',
+      { id }
+    );
+  };
+
   toggleMenu = () =>
     this.setState(
       ({ selected }) => ({ selected: !selected }),
@@ -148,6 +155,7 @@ class Post extends React.Component {
                   isDark={isDark}
                   tagHeight={4}
                   showUserInfo={true}
+                  onNavigateToCoach={this.onNavigateToCoach}
                 />
                 <View style={{ marginLeft: 5 }}>
                   <Text style={styles.name} numberOfLines={2} ellipsizeMode='tail'>
