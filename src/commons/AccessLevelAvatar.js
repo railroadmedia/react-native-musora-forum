@@ -49,14 +49,28 @@ export default class AccessLevelAvatar extends React.Component {
     return { borderColor, userTagIcon, userTagText };
   }
 
+  onAvatarPress = () => {
+    let { author, showUserInfo, onNavigateToCoach } = this.props;
+    if (showUserInfo) {
+      if (
+        (author.access_level === 'coach' || author.access_level === 'house-coach') &&
+        author.associated_coach?.id
+      ) {
+        onNavigateToCoach?.(author.associated_coach?.id);
+      } else {
+        this.setState({ showUserInfo: true });
+      }
+    }
+  };
+
   render() {
-    let { author, height, tagHeight, showUserInfo, isDark, appColor } = this.props;
+    let { author, height, tagHeight, isDark, appColor } = this.props;
     let { borderColor, userTagIcon, userTagText } = this.userBorderColor;
     return (
       <>
         <TouchableOpacity
           style={{ ...styles.imgContainer, borderColor }}
-          onPress={() => showUserInfo && this.setState({ showUserInfo: true })}
+          onPress={this.onAvatarPress}
           disallowInterruption={true}
         >
           <Image
