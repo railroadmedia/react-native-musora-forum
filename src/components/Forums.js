@@ -1,5 +1,13 @@
 import React from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  BackHandler,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import { connect, batch } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -34,6 +42,7 @@ class Forums extends React.Component {
     this.refreshOnFocusListener = this.props.navigation?.addListener('focus', () =>
       reFocused ? this.refresh?.() : (reFocused = true)
     );
+    BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
     Promise.all([getForums(), getFollowedThreads()]).then(([forums, followed]) => {
       this.forums = forums.results;
       this.followedThreads = followed.results.map(r => r.id);
@@ -45,7 +54,15 @@ class Forums extends React.Component {
     });
   }
 
-  componentWillUnmount = () => this.refreshOnFocusListener?.();
+  componentWillUnmount = () => {
+    BackHandler.removeEventListener('hardwareBackPress', this.onAndroidBack);
+    this.refreshOnFocusListener?.();
+  };
+
+  onAndroidBack = () => {
+    this.props.navigation.goBack();
+    return true;
+  };
 
   navigate = (route, params) => connection(true) && this.props.navigation.navigate(route, params);
 
