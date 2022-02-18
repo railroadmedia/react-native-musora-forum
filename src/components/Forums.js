@@ -52,15 +52,6 @@ class Forums extends React.Component {
         this.setState({ loading: false });
       });
     });
-    Promise.all([getForums(), getFollowedThreads()]).then(([forums, followed]) => {
-      this.forums = forums.results;
-      this.followedThreads = followed.results.map(r => r.id);
-      this.followedThreadsTotal = followed.total_results;
-      batch(() => {
-        this.props.setForumsThreads(followed.results);
-        this.setState({ loading: false });
-      });
-    });
   }
 
   componentWillUnmount = () => {
