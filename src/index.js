@@ -21,7 +21,7 @@ let store;
 const Stack = createStackNavigator();
 const timingAnim = {
   animation: 'timing',
-  config: { duration: 250, easing: Easing.out(Easing.circle) }
+  config: { duration: 250, easing: Easing.out(Easing.circle) },
 };
 
 export default ({
@@ -37,9 +37,9 @@ export default ({
       postId,
       threadTitle,
       threadId,
-      categoryId
-    }
-  }
+      categoryId,
+    },
+  },
 }) => {
   const networkContext = useContext(NetworkContext);
   setForumService({
@@ -47,7 +47,7 @@ export default ({
     rootUrl,
     networkContext,
     NetworkContext,
-    decideWhereToRedirect
+    decideWhereToRedirect,
   });
   if (!store)
     store =
@@ -60,20 +60,18 @@ export default ({
         style={{ flex: 1, backgroundColor: isDark ? '#00101d' : 'white' }}
       >
         <Stack.Navigator
-          initialRouteName={
-            categoryId ? 'Threads' : postId || threadId ? 'Thread' : 'Forums'
-          }
+          initialRouteName={categoryId ? 'Threads' : postId || threadId ? 'Thread' : 'Forums'}
           headerMode={'screen'}
           screenOptions={{
             gestureEnabled: true,
-            transitionSpec: { open: timingAnim, close: timingAnim }
+            transitionSpec: { open: timingAnim, close: timingAnim },
           }}
         >
           <Stack.Screen
             name='Forums'
             component={Forums}
             options={props => ({
-              header: () => <NavigationHeader {...props} title={'Forums'} />
+              header: () => <NavigationHeader {...props} title={'Forums'} />,
             })}
             initialParams={params}
           />
@@ -82,11 +80,8 @@ export default ({
             component={Threads}
             options={props => ({
               header: () => (
-                <NavigationHeader
-                  {...props}
-                  title={props.route.params.title || threadTitle}
-                />
-              )
+                <NavigationHeader {...props} title={props.route.params.title || threadTitle} />
+              ),
             })}
             initialParams={params}
           />
@@ -102,18 +97,11 @@ export default ({
             initialParams={params}
             options={props => ({
               header: () => (
-                <NavigationHeader
-                  {...props}
-                  title={props.route.params.title || threadTitle}
-                />
-              )
+                <NavigationHeader {...props} title={props.route.params.title || threadTitle} />
+              ),
             })}
           />
-          <Stack.Screen
-            name='Search'
-            component={Search}
-            initialParams={params}
-          />
+          <Stack.Screen name='Search' component={Search} initialParams={params} />
         </Stack.Navigator>
       </KeyboardAvoidingView>
     </Provider>

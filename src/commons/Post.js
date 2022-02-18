@@ -4,14 +4,7 @@
  */
 
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  Pressable,
-  Dimensions
-} from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable, Dimensions } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 
@@ -22,12 +15,7 @@ import HTMLRenderer from './HTMLRenderer';
 
 import { like, likeOn } from '../assets/svgs';
 
-import {
-  likePost,
-  disLikePost,
-  connection,
-  reportPost
-} from '../services/forum.service';
+import { likePost, disLikePost, connection, reportPost } from '../services/forum.service';
 
 let styles;
 let multiQuotes = [];
@@ -47,7 +35,7 @@ class Post extends React.Component {
       likeCount: post.like_count,
       selected: false,
       menuTop: 0,
-      reportModalVisible: false
+      reportModalVisible: false,
     };
     styles = setStyles(isDark, appColor);
   }
@@ -65,6 +53,13 @@ class Post extends React.Component {
       }
       return { likeCount, isLiked: !isLiked };
     });
+  };
+
+  onNavigateToCoach = id => {
+    this.props.navigation.navigate(
+      this.props.appColor === '#0b76db' ? 'coachOverview' : 'COACHOVERVIEW',
+      { id }
+    );
   };
 
   toggleMenu = () =>
@@ -86,12 +81,10 @@ class Post extends React.Component {
       quotes: [
         {
           content:
-            post.content
-              .split('</blockquote>')
-              .slice(0, -1)
-              .join('</blockquote>') + '</blockquote>'
-        }
-      ]
+            post.content.split('</blockquote>').slice(0, -1).join('</blockquote>') +
+            '</blockquote>',
+        },
+      ],
     });
   };
 
@@ -119,23 +112,19 @@ class Post extends React.Component {
       quotes: [
         {
           ...post,
-          content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`
-        }
-      ]
+          content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`,
+        },
+      ],
     });
   };
 
   render() {
-    let { isLiked, likeCount, selected, menuTop, reportModalVisible } =
-      this.state;
+    let { isLiked, likeCount, selected, menuTop, reportModalVisible } = this.state;
     let { post, appColor, index, isDark, signShown, locked, user } = this.props;
     let selectedColor = isDark ? '#002039' : '#E1E6EB';
     let baseColor = isDark ? '#081825' : '#E1E6EB4D';
     if (post && post.content.includes(`<p><img src="https://cdn.tiny.cloud`)) {
-      post.content = post.content.replace(
-        `<p><img`,
-        `<p style="flex-direction:row;"><img `
-      );
+      post.content = post.content.replace(`<p><img`, `<p style="flex-direction:row;"><img `);
     }
     return (
       <>
@@ -145,21 +134,17 @@ class Post extends React.Component {
             activeOpacity={1}
             style={{
               marginBottom: 40,
-              backgroundColor: selected ? selectedColor : baseColor
+              backgroundColor: selected ? selectedColor : baseColor,
             }}
             onStartShouldSetResponder={() => true}
             onMoveShouldSetResponder={() => false}
             onStartShouldSetResponderCapture={() => false}
             onMoveShouldSetResponderCapture={() => false}
-            onResponderRelease={
-              multiQuotes.length ? this.multiQuote : this.toggleMenu
-            }
+            onResponderRelease={multiQuotes.length ? this.multiQuote : this.toggleMenu}
           >
             <View style={styles.header}>
               <Text style={styles.headerText}>#{index}</Text>
-              <Text style={styles.headerText}>
-                {post.published_on_formatted}
-              </Text>
+              <Text style={styles.headerText}>{post.published_on_formatted}</Text>
             </View>
             <View style={styles.header}>
               <View style={styles.userDetails}>
@@ -170,18 +155,15 @@ class Post extends React.Component {
                   isDark={isDark}
                   tagHeight={4}
                   showUserInfo={true}
+                  onNavigateToCoach={this.onNavigateToCoach}
                 />
                 <View style={{ marginLeft: 5 }}>
-                  <Text
-                    style={styles.name}
-                    numberOfLines={2}
-                    ellipsizeMode='tail'
-                  >
+                  <Text style={styles.name} numberOfLines={2} ellipsizeMode='tail'>
                     {post.author.display_name}
                   </Text>
                   <Text style={styles.xp}>
-                    {post.author.total_posts} Posts - {post.author.xp_rank} -
-                    Level {post.author.level_rank}
+                    {post.author.total_posts} Posts - {post.author.xp_rank} - Level{' '}
+                    {post.author.level_rank}
                   </Text>
                 </View>
               </View>
@@ -193,28 +175,28 @@ class Post extends React.Component {
                 tagsStyles={{
                   div: {
                     color: isDark ? 'white' : '#00101D',
-                    fontFamily: 'OpenSans'
+                    fontFamily: 'OpenSans',
                   },
                   blockquote: {
                     padding: 10,
                     borderRadius: 5,
-                    fontFamily: 'OpenSans'
-                  }
+                    fontFamily: 'OpenSans',
+                  },
                 }}
                 olItemStyle={{
                   color: isDark ? 'white' : '#00101D',
-                  fontFamily: 'OpenSans'
+                  fontFamily: 'OpenSans',
                 }}
                 ulItemStyle={{
                   color: isDark ? 'white' : '#00101D',
-                  fontFamily: 'OpenSans'
+                  fontFamily: 'OpenSans',
                 }}
                 classesStyles={{
                   'blockquote-even': {
-                    backgroundColor: isDark ? '#081825' : 'white'
+                    backgroundColor: isDark ? '#081825' : 'white',
                   },
                   'blockquote-odd': {
-                    backgroundColor: isDark ? '#002039' : '#E1E6EB'
+                    backgroundColor: isDark ? '#002039' : '#E1E6EB',
                   },
                   shadow: {
                     elevation: 5,
@@ -222,8 +204,8 @@ class Post extends React.Component {
                     shadowOffset: { height: 4 },
                     shadowOpacity: 0.4,
                     shadowRadius: 2,
-                    borderRadius: 5
-                  }
+                    borderRadius: 5,
+                  },
                 }}
               />
             </View>
@@ -236,17 +218,15 @@ class Post extends React.Component {
                   padding: 15,
                   paddingRight: 7.5,
                   flexDirection: 'row',
-                  alignItems: 'center'
+                  alignItems: 'center',
                 }}
               >
                 {(isLiked ? likeOn : like)({
                   height: 15,
                   width: 15,
-                  fill: appColor
+                  fill: appColor,
                 })}
-                {likeCount > 0 && (
-                  <Text style={styles.likesNoText}>{likeCount}</Text>
-                )}
+                {likeCount > 0 && <Text style={styles.likesNoText}>{likeCount}</Text>}
               </TouchableOpacity>
               {!locked && (
                 <TouchableOpacity
@@ -260,10 +240,7 @@ class Post extends React.Component {
             </View>
             {signShown && !!post.author.signature && (
               <View style={styles.signatureContainer}>
-                <HTMLRenderer
-                  html={post.author.signature}
-                  tagsStyles={{ div: styles.signature }}
-                />
+                <HTMLRenderer html={post.author.signature} tagsStyles={{ div: styles.signature }} />
               </View>
             )}
           </View>
@@ -275,12 +252,12 @@ class Post extends React.Component {
               alignSelf: 'center',
               alignItems: 'center',
               top: menuTop,
-              opacity: menuTop ? 1 : 0
+              opacity: menuTop ? 1 : 0,
             }}
             onLayout={({
               nativeEvent: {
-                layout: { height }
-              }
+                layout: { height },
+              },
             }) => !menuTop && this.setState({ menuTop: -height })}
           >
             <View style={styles.selectedMenuContainer}>
@@ -290,7 +267,7 @@ class Post extends React.Component {
                 this.props.user.id === this.props.post.author_id
                   ? 'edit'
                   : '',
-                'multiQuote'
+                'multiQuote',
               ].map((action, i) =>
                 action ? (
                   <TouchableOpacity
@@ -301,7 +278,7 @@ class Post extends React.Component {
                       padding: 10,
                       paddingHorizontal: 15,
                       backgroundColor: appColor,
-                      borderLeftWidth: i ? 0.5 : 0
+                      borderLeftWidth: i ? 0.5 : 0,
                     }}
                   >
                     <Text style={styles.selectedMenuActionText}>{action}</Text>
@@ -325,16 +302,12 @@ class Post extends React.Component {
           >
             <View style={styles.reportModalContainer}>
               <Text style={styles.reportTitle}>Report Post</Text>
-              <Text style={styles.reportMessage}>
-                Are you sure you want to report this post?
-              </Text>
+              <Text style={styles.reportMessage}>Are you sure you want to report this post?</Text>
               <View style={styles.reportBtnsContainer}>
                 <Pressable
                   style={{ flex: 1 }}
                   onPress={() =>
-                    this.setState({ reportModalVisible: false }, () =>
-                      reportPost(post.id)
-                    )
+                    this.setState({ reportModalVisible: false }, () => reportPost(post.id))
                   }
                 >
                   <Text style={styles.reportBtnText}>Report</Text>
@@ -355,73 +328,73 @@ let setStyles = (isDark, appColor) =>
       paddingBottom: 5,
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between'
+      justifyContent: 'space-between',
     },
     userDetails: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     xp: {
       fontSize: 12,
       fontFamily: 'OpenSans',
-      color: isDark ? '#445F74' : '#00101D'
+      color: isDark ? '#445F74' : '#00101D',
     },
     headerText: {
       fontSize: 12,
       fontFamily: 'OpenSans-Italic',
-      color: isDark ? '#445F74' : '#00101D'
+      color: isDark ? '#445F74' : '#00101D',
     },
     name: {
       fontSize: 14,
       fontFamily: 'OpenSans-Bold',
-      color: isDark ? '#FFFFFF' : '#00101D'
+      color: isDark ? '#FFFFFF' : '#00101D',
     },
     post: {
       fontSize: 14,
       fontFamily: 'OpenSans',
-      color: isDark ? '#FFFFFF' : '#00101D'
+      color: isDark ? '#FFFFFF' : '#00101D',
     },
     likeContainer: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     likesNoContainer: {
       padding: 5,
       paddingHorizontal: 10,
       borderRadius: 10,
-      backgroundColor: isDark ? '#001f38' : '#97AABE'
+      backgroundColor: isDark ? '#001f38' : '#97AABE',
     },
     likesNoText: {
       fontSize: 11,
       fontFamily: 'OpenSans',
       color: appColor,
-      paddingLeft: 5
+      paddingLeft: 5,
     },
     replyText: {
       color: isDark ? '#445F74' : '#00101D',
       fontSize: 10,
-      fontFamily: 'RobotoCondensed-Bold'
+      fontFamily: 'RobotoCondensed-Bold',
     },
     signatureContainer: {
       borderTopColor: isDark ? '#445F74' : 'lightgrey',
       borderTopWidth: 1,
       padding: 15,
-      paddingVertical: 5
+      paddingVertical: 5,
     },
     signature: {
       color: isDark ? '#445F74' : '#00101D',
       fontFamily: 'OpenSans',
-      fontSize: 10
+      fontSize: 10,
     },
     selectedMenuContainer: {
       flexDirection: 'row',
       borderRadius: 5,
-      overflow: 'hidden'
+      overflow: 'hidden',
     },
     selectedMenuActionText: {
       textTransform: 'capitalize',
       color: 'white',
-      fontFamily: 'OpenSans-Bold'
+      fontFamily: 'OpenSans-Bold',
     },
     triangle: {
       width: 0,
@@ -430,18 +403,18 @@ let setStyles = (isDark, appColor) =>
       borderLeftWidth: 5,
       borderRightWidth: 5,
       borderColor: 'transparent',
-      borderTopColor: appColor
+      borderTopColor: appColor,
     },
     reportModalBackground: {
       flex: 1,
       backgroundColor: 'rgba(0,0,0,.5)',
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     reportModalContainer: {
       backgroundColor: isDark ? '#002039' : '#E1E6EB',
       borderRadius: 10,
-      maxWidth: 300
+      maxWidth: 300,
     },
     reportTitle: {
       padding: 15,
@@ -449,35 +422,33 @@ let setStyles = (isDark, appColor) =>
       fontFamily: 'OpenSans-Bold',
       fontSize: 14,
       color: isDark ? '#FFFFFF' : '#000000',
-      textAlign: 'center'
+      textAlign: 'center',
     },
     reportMessage: {
       padding: 15,
       fontFamily: 'OpenSans',
       fontSize: 12,
       color: isDark ? '#FFFFFF' : '#000000',
-      textAlign: 'center'
+      textAlign: 'center',
     },
     reportBtnsContainer: {
       flexDirection: 'row',
       borderTopWidth: 1,
-      borderTopColor: '#545458A6'
+      borderTopColor: '#545458A6',
     },
     reportBtnText: {
       fontFamily: 'OpenSans-Bold',
       fontSize: 12,
       color: isDark ? '#FFFFFF' : '#000000',
       textAlign: 'center',
-      paddingVertical: 15
-    }
+      paddingVertical: 15,
+    },
   });
 const mapStateToProps = ({ threads: { signShown, posts } }, { id }) => ({
   signShown,
-  post: posts[id]
+  post: posts[id],
 });
-let NavigationWrapper = props => (
-  <Post {...props} navigation={useNavigation()} />
-);
+let NavigationWrapper = props => <Post {...props} navigation={useNavigation()} />;
 NavigationWrapper.multiQuotes = multiQuotes;
 NavigationWrapper.clearQuoting = () => {
   closeMenus();

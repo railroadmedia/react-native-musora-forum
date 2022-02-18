@@ -1,6 +1,6 @@
 export const setForumsThreads = threads => ({
   threads,
-  type: 'SETFORUMS'
+  type: 'SETFORUMS',
 });
 
 export const setAllThreads = threads => ({ threads, type: 'SETALL' });
@@ -19,5 +19,5 @@ export const updatePosts = post => ({ post, type: 'UPDATEPOSTS' });
 
 export const setForumRules = forumRules => ({
   forumRules,
-  type: 'SETFORUMRULES'
+  type: 'SETFORUMRULES',
 });

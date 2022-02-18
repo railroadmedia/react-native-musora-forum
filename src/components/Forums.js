@@ -6,7 +6,7 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
-  View
+  View,
 } from 'react-native';
 
 import { connect, batch } from 'react-redux';
@@ -16,11 +16,7 @@ import ForumCard from '../commons/ForumCard';
 import ThreadCard from '../commons/ThreadCard';
 import Search from '../commons/Search';
 import Pagination from '../commons/Pagination';
-import {
-  connection,
-  getForums,
-  getFollowedThreads
-} from '../services/forum.service';
+import { connection, getForums, getFollowedThreads } from '../services/forum.service';
 
 import { setForumsThreads } from '../redux/ThreadActions';
 
@@ -33,7 +29,7 @@ class Forums extends React.Component {
   state = {
     loadingMore: false,
     loading: true,
-    refreshing: false
+    refreshing: false,
   };
   constructor(props) {
     super(props);
@@ -43,22 +39,28 @@ class Forums extends React.Component {
 
   componentDidMount() {
     let reFocused;
-    this.refreshOnFocusListener = this.props.navigation?.addListener(
-      'focus',
-      () => (reFocused ? this.refresh?.() : (reFocused = true))
+    this.refreshOnFocusListener = this.props.navigation?.addListener('focus', () =>
+      reFocused ? this.refresh?.() : (reFocused = true)
     );
     BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
-    Promise.all([getForums(), getFollowedThreads()]).then(
-      ([forums, followed]) => {
-        this.forums = forums.results;
-        this.followedThreads = followed.results.map(r => r.id);
-        this.followedThreadsTotal = followed.total_results;
-        batch(() => {
-          this.props.setForumsThreads(followed.results);
-          this.setState({ loading: false });
-        });
-      }
-    );
+    Promise.all([getForums(), getFollowedThreads()]).then(([forums, followed]) => {
+      this.forums = forums.results;
+      this.followedThreads = followed.results.map(r => r.id);
+      this.followedThreadsTotal = followed.total_results;
+      batch(() => {
+        this.props.setForumsThreads(followed.results);
+        this.setState({ loading: false });
+      });
+    });
+    Promise.all([getForums(), getFollowedThreads()]).then(([forums, followed]) => {
+      this.forums = forums.results;
+      this.followedThreads = followed.results.map(r => r.id);
+      this.followedThreadsTotal = followed.total_results;
+      batch(() => {
+        this.props.setForumsThreads(followed.results);
+        this.setState({ loading: false });
+      });
+    });
   }
 
   componentWillUnmount = () => {
@@ -71,8 +73,7 @@ class Forums extends React.Component {
     return true;
   };
 
-  navigate = (route, params) =>
-    connection(true) && this.props.navigation.navigate(route, params);
+  navigate = (route, params) => connection(true) && this.props.navigation.navigate(route, params);
 
   renderFLItem = ({ item: id }) => (
     <ThreadCard
@@ -90,25 +91,21 @@ class Forums extends React.Component {
       data={item}
       appColor={this.props.appColor}
       isDark={this.props.isDark}
-      onNavigate={() =>
-        this.navigate('Threads', { title: item.title, forumId: item.id })
-      }
+      onNavigate={() => this.navigate('Threads', { title: item.title, forumId: item.id })}
     />
   );
 
   refresh = () => {
     if (!connection()) return;
     this.setState({ refreshing: true }, () => {
-      Promise.all([getForums(), getFollowedThreads()]).then(
-        ([forums, followed]) => {
-          this.forums = forums.results;
-          this.followedThreads = followed.results.map(r => r.id);
-          batch(() => {
-            this.props.setForumsThreads(followed.results);
-            this.setState({ refreshing: false });
-          });
-        }
-      );
+      Promise.all([getForums(), getFollowedThreads()]).then(([forums, followed]) => {
+        this.forums = forums.results;
+        this.followedThreads = followed.results.map(r => r.id);
+        batch(() => {
+          this.props.setForumsThreads(followed.results);
+          this.setState({ refreshing: false });
+        });
+      });
     });
   };
 
@@ -160,16 +157,14 @@ class Forums extends React.Component {
                 refreshing={refreshing}
               />
             }
-            ListEmptyComponent={
-              <Text style={styles.emptyList}>You don't follow any threads</Text>
-            }
+            ListEmptyComponent={<Text style={styles.emptyList}>You don't follow any threads</Text>}
             ListFooterComponent={
               <View
                 style={{
                   borderTopWidth: 1,
                   borderColor: isDark ? '#445F74' : 'lightgrey',
                   marginHorizontal: 15,
-                  marginBottom: 10
+                  marginBottom: 10,
                 }}
               >
                 <Pagination
@@ -206,17 +201,17 @@ let setStyles = (isDark, appColor) => {
   return StyleSheet.create({
     fList: {
       flex: 1,
-      backgroundColor: isDark ? '#00101D' : 'white'
+      backgroundColor: isDark ? '#00101D' : 'white',
     },
     loading: {
       flex: 1,
       backgroundColor: isDark ? '#00101D' : 'white',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     emptyList: {
       color: isDark ? '#445F74' : 'black',
       fontFamily: 'OpenSans',
-      padding: 15
+      padding: 15,
     },
     createForumIcon: {
       position: 'absolute',
@@ -227,7 +222,7 @@ let setStyles = (isDark, appColor) => {
       borderRadius: 27,
       backgroundColor: appColor,
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     sectionTitle: {
       fontFamily: 'RobotoCondensed-Bold',
@@ -235,18 +230,17 @@ let setStyles = (isDark, appColor) => {
       color: isDark ? '#445F74' : '#97AABE',
       margin: 5,
       marginLeft: 15,
-      marginTop: 40
-    }
+      marginTop: 40,
+    },
   });
 };
-const mapDispatchToProps = dispatch =>
-  bindActionCreators({ setForumsThreads }, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators({ setForumsThreads }, dispatch);
 const mapStateToProps = (
   { themeState },
   {
     route: {
-      params: { appColor, isDark }
-    }
+      params: { appColor, isDark },
+    },
   }
 ) => {
   let dark = themeState ? themeState.theme === 'dark' : isDark;

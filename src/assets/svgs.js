@@ -12,10 +12,7 @@ export const arrowLeft = props => (
   </Svg>
 );
 export const moderate = props => (
-  <Svg
-    viewBox='0 0 14 4'
-    style={{ width: props.width, height: props.height, aspectRatio: 14 / 4 }}
-  >
+  <Svg viewBox='0 0 14 4' style={{ width: props.width, height: props.height, aspectRatio: 14 / 4 }}>
     <Circle
       fill={props.fill}
       cx='12.2386'
@@ -87,7 +84,7 @@ export const pin = props => (
     style={{
       width: props.width,
       height: props.height,
-      aspectRatio: 8 / 10
+      aspectRatio: 8 / 10,
     }}
   >
     <Path
@@ -102,7 +99,7 @@ export const coach = props => (
     style={{
       width: props.width,
       height: props.height,
-      aspectRatio: 46.3 / 36.4
+      aspectRatio: 46.3 / 36.4,
     }}
   >
     <Polygon fill={props.fill} points='23.2,9.3 25.1,11.7 30.3,8.6 27.9,6.4 	' />
@@ -121,7 +118,7 @@ export const team = props => (
     style={{
       width: props.width,
       height: props.height,
-      aspectRatio: 80.5 / 25.5
+      aspectRatio: 80.5 / 25.5,
     }}
   >
     <Path
@@ -138,7 +135,7 @@ export const edge = props => (
     style={{
       width: props.width,
       height: props.height,
-      aspectRatio: 65.8 / 24.2
+      aspectRatio: 65.8 / 24.2,
     }}
   >
     <Path
@@ -162,7 +159,7 @@ export const lifetime = props => (
     style={{
       width: props.width,
       height: props.height,
-      aspectRatio: 63.1 / 30.1
+      aspectRatio: 63.1 / 30.1,
     }}
   >
     <Path
@@ -181,7 +178,7 @@ export const arrowRight = props => (
     style={{
       width: props.width,
       height: props.height,
-      aspectRatio: 15 / 27
+      aspectRatio: 15 / 27,
     }}
   >
     <Path
@@ -196,7 +193,7 @@ export const pencil = props => (
     style={{
       width: props.width,
       height: props.height,
-      aspectRatio: 10 / 11
+      aspectRatio: 10 / 11,
     }}
   >
     <Path

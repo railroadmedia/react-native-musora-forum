@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import { coach, team, edge, lifetime } from '../assets/svgs';
@@ -7,12 +7,13 @@ import UserInfo from './UserInfo';
 
 export default class AccessLevelAvatar extends React.Component {
   state = {
-    showUserInfo: false
+    showUserInfo: false,
   };
 
   get userBorderColor() {
-    let borderColor, userTagIcon;
+    let borderColor, userTagIcon, userTagText;
     let { appColor, author } = this.props;
+
     switch (author.access_level) {
       case 'edge': {
         borderColor = appColor;
@@ -38,43 +39,69 @@ export default class AccessLevelAvatar extends React.Component {
         userTagIcon = coach;
         break;
       }
+      case 'house-coach': {
+        borderColor = '#FAA300';
+        userTagText = 'HOUSE';
+        break;
+      }
     }
-    return { borderColor, userTagIcon };
+
+    return { borderColor, userTagIcon, userTagText };
   }
 
+  onAvatarPress = () => {
+    let { author, showUserInfo, onNavigateToCoach } = this.props;
+    if (showUserInfo) {
+      if (
+        (author.access_level === 'coach' || author.access_level === 'house-coach') &&
+        author.associated_coach?.id
+      ) {
+        onNavigateToCoach?.(author.associated_coach?.id);
+      } else {
+        this.setState({ showUserInfo: true });
+      }
+    }
+  };
+
   render() {
-    let {
-      author,
-      height,
-      tagHeight,
-      showUserInfo,
-      isDark,
-      appColor
-    } = this.props;
-    let { borderColor, userTagIcon } = this.userBorderColor;
+    let { author, height, tagHeight, isDark, appColor } = this.props;
+    let { borderColor, userTagIcon, userTagText } = this.userBorderColor;
     return (
       <>
         <TouchableOpacity
           style={{ ...styles.imgContainer, borderColor }}
-          onPress={() => showUserInfo && this.setState({ showUserInfo: true })}
+          onPress={this.onAvatarPress}
           disallowInterruption={true}
         >
           <Image
             source={{
-              uri: `https://cdn.musora.com/image/fetch/w_200,fl_lossy,q_auto:eco,c_fill,g_face/${author.avatar_url}`
+              uri: `https://cdn.musora.com/image/fetch/w_200,fl_lossy,q_auto:eco,c_fill,g_face/${author.avatar_url}`,
             }}
             style={{ height, aspectRatio: 1 }}
           />
-          <View
-            style={{
-              ...styles.userTagContainer,
-              backgroundColor: borderColor,
-              height: tagHeight + 2,
-              lineHeight: tagHeight + 2
-            }}
-          >
-            {userTagIcon?.({ height: tagHeight, fill: 'white' })}
-          </View>
+          {userTagText ? (
+            <View
+              style={{
+                ...styles.userTagContainer,
+                backgroundColor: borderColor,
+                height: 10,
+                lineHeight: 10,
+              }}
+            >
+              <Text style={styles.userTagText}>{userTagText}</Text>
+            </View>
+          ) : (
+            <View
+              style={{
+                ...styles.userTagContainer,
+                backgroundColor: borderColor,
+                height: tagHeight + 2,
+                lineHeight: tagHeight + 2,
+              }}
+            >
+              {userTagIcon?.({ height: tagHeight, fill: 'white' })}
+            </View>
+          )}
         </TouchableOpacity>
         <UserInfo
           isVisible={this.state.showUserInfo}
@@ -91,13 +118,18 @@ let styles = StyleSheet.create({
   imgContainer: {
     borderRadius: 99,
     overflow: 'hidden',
-    borderWidth: 2
+    borderWidth: 2,
   },
   userTagContainer: {
     width: '100%',
     position: 'absolute',
     bottom: 0,
     alignItems: 'center',
-    justifyContent: 'center'
-  }
+    justifyContent: 'center',
+  },
+  userTagText: {
+    fontFamily: 'RobotoCondensed-Bold',
+    fontSize: 7,
+    color: '#FFFFFF',
+  },
 });

@@ -43,27 +43,13 @@ export default class UserInfo extends React.Component {
               {'\n'}
               <Text style={styles.yearSince}>
                 MEMBER SINCE{' '}
-                {new Date(
-                  Date.now() - author.days_as_member * 86400000
-                ).getUTCFullYear()}
+                {new Date(Date.now() - author.days_as_member * 86400000).getUTCFullYear()}
               </Text>
             </Text>
-            <View
-              style={{ width: '100%', flexDirection: 'row', marginTop: 30 }}
-            >
+            <View style={{ width: '100%', flexDirection: 'row', marginTop: 30 }}>
               {[
-                [
-                  author.xp,
-                  author.total_posts,
-                  author.days_as_member,
-                  author.total_post_likes
-                ],
-                [
-                  'Total XP',
-                  'Total posts',
-                  'Days as a member',
-                  'Total post likes'
-                ]
+                [author.xp, author.total_posts, author.days_as_member, author.total_post_likes],
+                ['Total XP', 'Total posts', 'Days as a member', 'Total post likes'],
               ].map((array, i) => (
                 <View style={i ? { flex: 1 } : {}} key={`${i}`}>
                   {array.map((a, j) => (
@@ -74,7 +60,7 @@ export default class UserInfo extends React.Component {
                           paddingLeft: i ? 10 : 15,
                           color: i ? (isDark ? '#445f73' : 'black') : appColor,
                           fontSize: 18,
-                          fontFamily: i ? 'OpenSans' : 'OpenSans-Bold'
+                          fontFamily: i ? 'OpenSans' : 'OpenSans-Bold',
                         }}
                       >
                         {a}
@@ -96,7 +82,7 @@ let setStyles = (isDark, appColor) =>
     background: {
       flex: 1,
       justifyContent: 'flex-end',
-      backgroundColor: 'rgba(0,0,0,.5)'
+      backgroundColor: 'rgba(0,0,0,.5)',
     },
     infoContainer: {
       flex: 0.85,
@@ -106,13 +92,13 @@ let setStyles = (isDark, appColor) =>
       flexDirection: 'row',
       flexWrap: 'wrap',
       paddingVertical: 30,
-      justifyContent: 'center'
+      justifyContent: 'center',
     },
     header: {
       width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 30
+      marginBottom: 30,
     },
     name: {
       fontFamily: 'OpenSans-ExtraBold',
@@ -120,7 +106,7 @@ let setStyles = (isDark, appColor) =>
       fontSize: 20,
       position: 'absolute',
       textAlign: 'center',
-      width: '100%'
+      width: '100%',
     },
     rank: {
       width: '100%',
@@ -128,23 +114,23 @@ let setStyles = (isDark, appColor) =>
       marginTop: 5,
       fontSize: 20,
       color: appColor,
-      fontFamily: 'RobotoCondensed-Bold'
+      fontFamily: 'RobotoCondensed-Bold',
     },
     level: {
       color: isDark ? 'white' : 'black',
       fontSize: 16,
-      fontFamily: 'OpenSans-Bold'
+      fontFamily: 'OpenSans-Bold',
     },
     yearSince: {
       color: isDark ? '#445f73' : 'black',
       fontSize: 18,
       fontFamily: 'OpenSans-Bold',
-      marginTop: 20
+      marginTop: 20,
     },
     tableRow: {
       borderBottomWidth: 1,
       borderBottomColor: isDark ? '#002039' : 'lightgrey',
       height: 40,
-      justifyContent: 'center'
-    }
+      justifyContent: 'center',
+    },
   });

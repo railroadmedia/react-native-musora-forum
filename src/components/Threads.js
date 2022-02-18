@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,11 +21,7 @@ import ThreadCard from '../commons/ThreadCard';
 
 import { setAllThreads, setFollowedThreads } from '../redux/ThreadActions';
 
-import {
-  getFollowedThreads,
-  getAllThreads,
-  connection
-} from '../services/forum.service';
+import { getFollowedThreads, getAllThreads, connection } from '../services/forum.service';
 
 import { addThread } from '../assets/svgs';
 
@@ -45,7 +41,7 @@ class Threads extends React.Component {
     loading: true,
     createForumHeight: 0,
     followedRefreshing: false,
-    allRefreshing: false
+    allRefreshing: false,
   };
 
   constructor(props) {
@@ -56,25 +52,22 @@ class Threads extends React.Component {
 
   componentDidMount() {
     let reFocused;
-    this.refreshOnFocusListener = this.props.navigation?.addListener(
-      'focus',
-      () => (reFocused ? this.refresh?.() : (reFocused = true))
+    this.refreshOnFocusListener = this.props.navigation?.addListener('focus', () =>
+      reFocused ? this.refresh?.() : (reFocused = true)
     );
     BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
     let { forumId } = this.props.route.params;
-    Promise.all([getAllThreads(forumId), getFollowedThreads(forumId)]).then(
-      ([all, followed]) => {
-        this.all = all.results.map(r => r.id);
-        this.followed = followed.results.map(r => r.id);
-        this.followedResultsTotal = followed.total_results;
-        this.allResultsTotal = all.total_results;
-        batch(() => {
-          this.props.setAllThreads(all.results);
-          this.props.setFollowedThreads(followed.results);
-          this.setState({ loading: false });
-        });
-      }
-    );
+    Promise.all([getAllThreads(forumId), getFollowedThreads(forumId)]).then(([all, followed]) => {
+      this.all = all.results.map(r => r.id);
+      this.followed = followed.results.map(r => r.id);
+      this.followedResultsTotal = followed.total_results;
+      this.allResultsTotal = all.total_results;
+      batch(() => {
+        this.props.setAllThreads(all.results);
+        this.props.setFollowedThreads(followed.results);
+        this.setState({ loading: false });
+      });
+    });
   }
 
   componentWillUnmount() {
@@ -87,8 +80,7 @@ class Threads extends React.Component {
     return true;
   };
 
-  navigate = (route, params) =>
-    connection(true) && this.props.navigation.navigate(route, params);
+  navigate = (route, params) => connection(true) && this.props.navigation.navigate(route, params);
 
   renderFLHeader = () => {
     let { tab } = this.state;
@@ -100,16 +92,10 @@ class Threads extends React.Component {
             <TouchableOpacity
               key={t}
               onPress={() => this.setState({ tab: i }, this.refresh)}
-              style={[
-                styles.headerTOpacity,
-                tab === i ? { borderColor: appColor } : {}
-              ]}
+              style={[styles.headerTOpacity, tab === i ? { borderColor: appColor } : {}]}
             >
               <Text
-                style={[
-                  styles.headerText,
-                  tab === i ? { color: isDark ? 'white' : 'black' } : {}
-                ]}
+                style={[styles.headerText, tab === i ? { color: isDark ? 'white' : 'black' } : {}]}
               >
                 {t}
               </Text>
@@ -157,10 +143,7 @@ class Threads extends React.Component {
     let { forumId } = this.props.route.params;
     let fORa = tab ? 'followed' : 'all';
     this.setState({ [`${fORa}Refreshing`]: true }, () =>
-      (tab ? getFollowedThreads : getAllThreads)(
-        forumId,
-        this[`${fORa}Page`]
-      ).then(r => {
+      (tab ? getFollowedThreads : getAllThreads)(forumId, this[`${fORa}Page`]).then(r => {
         this[fORa] = r.results.map(r => r.id);
         batch(() => {
           this.props[tab ? 'setFollowedThreads' : 'setAllThreads'](r.results);
@@ -178,18 +161,13 @@ class Threads extends React.Component {
       loading,
       createForumHeight,
       allRefreshing,
-      followedRefreshing
+      followedRefreshing,
     } = this.state;
     let { isDark, appColor } = this.props;
     let { forumId } = this.props.route.params;
 
     return loading ? (
-      <ActivityIndicator
-        size='large'
-        color={appColor}
-        animating={true}
-        style={styles.loading}
-      />
+      <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
     ) : (
       <>
         <FlatList
@@ -217,7 +195,7 @@ class Threads extends React.Component {
                 borderTopWidth: 1,
                 borderColor: isDark ? '#445F74' : 'lightgrey',
                 marginHorizontal: 15,
-                marginBottom: createForumHeight
+                marginBottom: createForumHeight,
               }}
             >
               <Pagination
@@ -257,7 +235,7 @@ class Threads extends React.Component {
               this.navigate('CRUD', {
                 type: 'thread',
                 action: 'create',
-                forumId
+                forumId,
               })
             }
             style={styles.bottomTOpacity}
@@ -275,45 +253,45 @@ let setStyles = (isDark, appColor) =>
       paddingHorizontal: 15,
       flexDirection: 'row',
       backgroundColor: isDark ? '#00101D' : 'white',
-      flexWrap: 'wrap'
+      flexWrap: 'wrap',
     },
     headerTOpacity: {
       paddingVertical: 15,
       marginRight: 15,
       borderBottomWidth: 2,
-      borderColor: isDark ? '#00101D' : 'white'
+      borderColor: isDark ? '#00101D' : 'white',
     },
     headerText: {
       fontFamily: 'OpenSans-Bold',
       fontSize: 14,
-      color: '#445F74'
+      color: '#445F74',
     },
     fList: {
       flex: 1,
-      backgroundColor: isDark ? '#00101D' : 'white'
+      backgroundColor: isDark ? '#00101D' : 'white',
     },
     loading: {
       flex: 1,
       backgroundColor: isDark ? '#00101D' : 'white',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     emptyList: {
       color: isDark ? '#445F74' : 'black',
       fontFamily: 'OpenSans',
-      padding: 15
+      padding: 15,
     },
     bottomTOpacity: {
       padding: 15,
       marginBottom: 15,
       marginRight: 15,
       borderRadius: 99,
-      backgroundColor: appColor
+      backgroundColor: appColor,
     },
     bottomTOpacitySafeArea: {
       position: 'absolute',
       bottom: 0,
-      alignSelf: 'flex-end'
-    }
+      alignSelf: 'flex-end',
+    },
   });
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ setAllThreads, setFollowedThreads }, dispatch);
@@ -321,8 +299,8 @@ const mapStateToProps = (
   { themeState },
   {
     route: {
-      params: { appColor, isDark }
-    }
+      params: { appColor, isDark },
+    },
   }
 ) => {
   let dark = themeState ? themeState.theme === 'dark' : isDark;
