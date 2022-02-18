@@ -1,6 +1,6 @@
 {
   "name": "react-native-musora-forum",
-  "version": "0.5.28",
+  "version": "0.5.29",
   "description": "Forum component for musora apps.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
