@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   View,
   Modal,
+  BackHandler,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -56,6 +57,7 @@ class Thread extends React.Component {
       this.setState(({ postKey }) => ({ postKey: !postKey }))
     );
     const { threadId, isForumRules } = this.props.route.params;
+    BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
     getThread(threadId, this.page, isForumRules, this.postId).then(thread => {
       this.page = parseInt(thread.page);
       this.post_count = thread.post_count;
@@ -71,7 +73,13 @@ class Thread extends React.Component {
   componentWillUnmount() {
     this.blurListener?.();
     this.refreshOnFocusListener?.();
+    BackHandler.removeEventListener('hardwareBackPress', this.onAndroidBack);
   }
+
+  onAndroidBack = () => {
+    this.props.navigation.goBack();
+    return true;
+  };
 
   navigate = (route, params) => connection(true) && this.props.navigation.navigate(route, params);
 
