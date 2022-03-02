@@ -31,8 +31,8 @@ class Post extends React.Component {
     const { post, isDark, appColor } = props;
 
     this.state = {
-      isLiked: post.is_liked_by_viewer,
-      likeCount: post.like_count,
+      isLiked: post?.is_liked_by_viewer,
+      likeCount: post?.like_count,
       selected: false,
       menuTop: 0,
       reportModalVisible: false,
