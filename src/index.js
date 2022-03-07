@@ -65,6 +65,7 @@ export default ({
           screenOptions={{
             gestureEnabled: true,
             transitionSpec: { open: timingAnim, close: timingAnim },
+            animationEnabled: false
           }}
         >
           <Stack.Screen
