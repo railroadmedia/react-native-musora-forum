@@ -172,6 +172,7 @@ class Threads extends React.Component {
       <>
         <FlatList
           key={tab}
+          overScrollMode='never'
           windowSize={10}
           data={this[tab ? 'followed' : 'all']}
           style={styles.fList}
