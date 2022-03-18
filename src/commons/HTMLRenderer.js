@@ -54,7 +54,7 @@ export default class HTMLRenderer extends React.Component {
             listsPrefixesRenderers={{
               ol: (_, __, ___, passProps) => (
                 <Text style={olItemStyle} key={passProps.key}>
-                  {passProps.index + 1}.{`  `}
+                  {passProps.nodeIndex + 1}.{`  `}
                 </Text>
               ),
               ul: (_, __, ___, { key }) => (
