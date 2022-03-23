@@ -186,6 +186,7 @@ export default class HTMLRenderer extends React.Component {
                   onResponderGrant={() => {
                     let brand = getRootUrl().split('.');
                     brand = [brand.pop(), brand.pop()].reverse().join('.');
+                    brand = brand.substring(0, brand.indexOf(".com") + 4);
                     if (href.toLowerCase()?.includes(brand)) return decideWhereToRedirect(href);
                     onLinkPress(null, href);
                   }}

@@ -120,5 +120,5 @@ export const getRootUrl = () => {
   return this.rootUrl;
 };
 export const decideWhereToRedirect = urlToOpen => {
-  return this.decideWhereToRedirect(urlToOpen);
+  return this.decideWhereToRedirect(this.rootUrl.includes('pianote')? urlToOpen: { url: urlToOpen });
 };
