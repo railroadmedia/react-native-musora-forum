@@ -19,6 +19,7 @@ import Pagination from '../commons/Pagination';
 import { connection, getForums, getFollowedThreads } from '../services/forum.service';
 
 import { setForumsThreads } from '../redux/ThreadActions';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 let styles;
 class Forums extends React.Component {
@@ -43,15 +44,23 @@ class Forums extends React.Component {
       reFocused ? this.refresh?.() : (reFocused = true)
     );
     BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
-    Promise.all([getForums(), getFollowedThreads()]).then(([forums, followed]) => {
-      this.forums = forums.results;
-      this.followedThreads = followed.results.map(r => r.id);
-      this.followedThreadsTotal = followed.total_results;
+    const { request: forumsRequest, controller: forumsController } = getForums();
+    const { request: followedRequest, controller: followedController } = getFollowedThreads();
+
+    Promise.all([forumsRequest, followedRequest]).then(([forums, followed]) => {
+      this.forums = forums.data.results;
+      this.followedThreads = followed.data.results.map(r => r.id);
+      this.followedThreadsTotal = followed.data.total_results;
       batch(() => {
-        this.props.setForumsThreads(followed.results);
+        this.props.setForumsThreads(followed.data.results);
         this.setState({ loading: false });
       });
     });
+
+    return () => {
+      forumsController.abort();
+      followedController.abort();
+    };
   }
 
   componentWillUnmount = () => {
@@ -89,37 +98,51 @@ class Forums extends React.Component {
   refresh = () => {
     if (!connection()) return;
     this.setState({ refreshing: true }, () => {
-      Promise.all([getForums(), getFollowedThreads()]).then(([forums, followed]) => {
-        this.forums = forums.results;
-        this.followedThreads = followed.results.map(r => r.id);
+      const { request: forumsRequest, controller: forumsController } = getForums();
+      const { request: followedRequest, controller: followedController } = getFollowedThreads();
+      Promise.all([forumsRequest, followedRequest]).then(([forums, followed]) => {
+        this.forums = forums.data.results;
+        this.followedThreads = followed.data.results.map(r => r.id);
         batch(() => {
-          this.props.setForumsThreads(followed.results);
+          this.props.setForumsThreads(followed.data.results);
           this.setState({ refreshing: false });
         });
       });
+      return () => {
+        forumsController.abort();
+        followedController.abort();
+      };
     });
   };
 
   changePage = page => {
     if (!connection()) return;
     this.page = page;
-    this.setState({ loadingMore: true }, () =>
-      getFollowedThreads(undefined, page).then(r => {
+    this.setState({ loadingMore: true }, () => {
+      const { request: followedRequest, controller: followedController } = getFollowedThreads(
+        undefined,
+        page
+      );
+
+      followedRequest.then(r => {
         this.followedThreads = r.results.map(r => r.id);
         this.flatListRef.scrollToOffset({ offset: 0, animated: false });
         batch(() => {
           this.props.setForumsThreads(r.results);
           this.setState({ loadingMore: false });
         });
-      })
-    );
+      });
+      return () => {
+        followedController.abort();
+      };
+    });
   };
 
   render() {
     let { loadingMore, loading, refreshing } = this.state;
     let { appColor, isDark } = this.props;
     return (
-      <>
+      <SafeAreaView style={styles.fList} edges={['left', 'right']}>
         {loading ? (
           <ActivityIndicator
             size='large'
@@ -182,7 +205,7 @@ class Forums extends React.Component {
             }
           />
         )}
-      </>
+      </SafeAreaView>
     );
   }
 }
@@ -216,7 +239,7 @@ let setStyles = (isDark, appColor) => {
       alignItems: 'center',
     },
     sectionTitle: {
-      fontFamily: 'RobotoCondensed-Bold',
+      fontFamily: 'OpenSans-Bold',
       fontSize: 16,
       color: isDark ? '#445F74' : '#97AABE',
       margin: 5,

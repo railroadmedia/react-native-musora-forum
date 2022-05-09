@@ -128,7 +128,7 @@ let styles = StyleSheet.create({
     justifyContent: 'center',
   },
   userTagText: {
-    fontFamily: 'RobotoCondensed-Bold',
+    fontFamily: 'BebasNeuePro-Bold',
     fontSize: 7,
     color: '#FFFFFF',
   },

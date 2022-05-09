@@ -380,7 +380,7 @@ let setStyles = (isDark, appColor) =>
     },
     deleteBtnText: {
       textAlign: 'center',
-      fontFamily: 'RobotoCondensed-Bold',
+      fontFamily: 'BebasNeuePro-Bold',
       fontSize: 15,
       color: 'white',
       textTransform: 'uppercase',
