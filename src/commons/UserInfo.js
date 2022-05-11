@@ -114,7 +114,7 @@ let setStyles = (isDark, appColor) =>
       marginTop: 5,
       fontSize: 20,
       color: appColor,
-      fontFamily: 'RobotoCondensed-Bold',
+      fontFamily: 'BebasNeuePro-Bold',
     },
     level: {
       color: isDark ? 'white' : 'black',

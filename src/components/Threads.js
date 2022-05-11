@@ -57,17 +57,24 @@ class Threads extends React.Component {
     );
     BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
     let { forumId } = this.props.route.params;
-    Promise.all([getAllThreads(forumId), getFollowedThreads(forumId)]).then(([all, followed]) => {
-      this.all = all.results.map(r => r.id);
-      this.followed = followed.results.map(r => r.id);
-      this.followedResultsTotal = followed.total_results;
-      this.allResultsTotal = all.total_results;
+    const { request: threadRequest, controller: threadController } = getAllThreads(forumId);
+    const { request: followedThreadRequest, controller: followedThreadController } =
+      getFollowedThreads(forumId);
+    Promise.all([threadRequest, followedThreadRequest]).then(([all, followed]) => {
+      this.all = all.data.results.map(r => r.id);
+      this.followed = followed.data.results.map(r => r.id);
+      this.followedResultsTotal = followed.data.total_results;
+      this.allResultsTotal = all.data.total_results;
       batch(() => {
-        this.props.setAllThreads(all.results);
-        this.props.setFollowedThreads(followed.results);
+        this.props.setAllThreads(all.data.results);
+        this.props.setFollowedThreads(followed.data.results);
         this.setState({ loading: false });
       });
     });
+    return () => {
+      threadController.abort();
+      followedThreadController.abort();
+    };
   }
 
   componentWillUnmount() {
@@ -126,11 +133,11 @@ class Threads extends React.Component {
     let fORa = tab ? 'followed' : 'all';
     this[`${fORa}Page`] = page;
     this.setState({ [`${fORa}LoadingMore`]: true }, () =>
-      (tab ? getFollowedThreads : getAllThreads)(forumId, page).then(r => {
-        this[fORa] = r.results.map(r => r.id);
+      (tab ? getFollowedThreads : getAllThreads)(forumId, page).request.then(r => {
+        this[fORa] = r.data.results.map(r => r.id);
         this.flatListRef.scrollToOffset({ offset: 0, animated: false });
         batch(() => {
-          this.props[tab ? 'setFollowedThreads' : 'setAllThreads'](r.results);
+          this.props[tab ? 'setFollowedThreads' : 'setAllThreads'](r.data.results);
           this.setState({ [`${fORa}LoadingMore`]: false });
         });
       })
@@ -143,10 +150,10 @@ class Threads extends React.Component {
     let { forumId } = this.props.route.params;
     let fORa = tab ? 'followed' : 'all';
     this.setState({ [`${fORa}Refreshing`]: true }, () =>
-      (tab ? getFollowedThreads : getAllThreads)(forumId, this[`${fORa}Page`]).then(r => {
-        this[fORa] = r.results.map(r => r.id);
+      (tab ? getFollowedThreads : getAllThreads)(forumId, this[`${fORa}Page`]).request.then(r => {
+        this[fORa] = r.data.results.map(r => r.id);
         batch(() => {
-          this.props[tab ? 'setFollowedThreads' : 'setAllThreads'](r.results);
+          this.props[tab ? 'setFollowedThreads' : 'setAllThreads'](r.data.results);
           this.setState({ [`${fORa}Refreshing`]: false });
         });
       })
@@ -169,7 +176,7 @@ class Threads extends React.Component {
     return loading ? (
       <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
     ) : (
-      <>
+      <SafeAreaView style={styles.fList} edges={['left', 'right', 'bottom']}>
         <FlatList
           key={tab}
           overScrollMode='never'
@@ -226,7 +233,7 @@ class Threads extends React.Component {
             />
           }
         />
-        <SafeAreaView style={styles.bottomTOpacitySafeArea} mode='margin'>
+        <View>
           <TouchableOpacity
             onLayout={({ nativeEvent: { layout } }) =>
               !this.state.createForumHeight &&
@@ -243,8 +250,8 @@ class Threads extends React.Component {
           >
             {addThread({ height: 25, width: 25, fill: 'white' })}
           </TouchableOpacity>
-        </SafeAreaView>
-      </>
+        </View>
+      </SafeAreaView>
     );
   }
 }
@@ -282,16 +289,13 @@ let setStyles = (isDark, appColor) =>
       padding: 15,
     },
     bottomTOpacity: {
+      position: 'absolute',
+      bottom: 60,
+      right: 15,
+      alignSelf: 'flex-end',
       padding: 15,
-      marginBottom: 15,
-      marginRight: 15,
       borderRadius: 99,
       backgroundColor: appColor,
-    },
-    bottomTOpacitySafeArea: {
-      position: 'absolute',
-      bottom: 0,
-      alignSelf: 'flex-end',
     },
   });
 const mapDispatchToProps = dispatch =>

@@ -103,14 +103,15 @@ class Search extends React.Component {
     this.setState({ loadingMore: true }, this.searchPosts);
   };
 
-  searchPosts = (text = this.searchText) =>
-    search(text, this.page).then(searchResult => {
-      this.searchResults = searchResult.results;
+  searchPosts = (text = this.searchText) => {
+    const { request, controller } = search(text, this.page);
+    request.then(searchResult => {
+      this.searchResults = searchResult.data.results;
       this.searchText = text;
-      this.searchTotal = searchResult.total_results;
+      this.searchTotal = searchResult.data.total_results;
       this.flatListRef?.scrollToOffset({ offset: 0, animated: false });
       batch(() => {
-        this.props.setSearchThreads(searchResult.results.map(r => r.thread));
+        this.props.setSearchThreads(searchResult.data.results.map(r => r.thread));
         this.setState({
           loading: false,
           loadingMore: false,
@@ -118,6 +119,8 @@ class Search extends React.Component {
         });
       });
     });
+    return () => controller.abort();
+  };
 
   closeModal = () =>
     this.setState({ showSearchResults: false }, () =>

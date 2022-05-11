@@ -10,115 +10,78 @@ export const NetworkContext = function () {
   return this.NetworkContext;
 };
 export const getForums = function () {
-  return this.tryCall({ url: `${this.rootUrl}/forums/api/discussions/index` });
+  return this.tryCall.get(`/forums/api/discussions/index?brand=${this.brand}`);
 };
 export const getAllThreads = function (forumId, page = 1) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/thread/index?amount=10&page=${page}&category_id=${
+  return this.tryCall.get(
+    `/forums/api/thread/index?amount=10&page=${page}&brand=${this.brand}&category_id=${
       forumId || ''
-    }`,
-  });
+    }`
+  );
 };
 export const getThread = function (threadId, page = 1, isForumRules, postId) {
-  return this.tryCall({
-    url: isForumRules
-      ? `${this.rootUrl}/forums/api/rules`
+  return this.tryCall.get(
+    isForumRules
+      ? `/forums/api/rules?brand=${this.brand}`
       : postId
-      ? `${this.rootUrl}/forums/api/jump-to-post/${postId}`
-      : `${this.rootUrl}/forums/api/thread/show/${threadId}?amount=10&page=${page}`,
-  });
+      ? `/forums/api/jump-to-post/${postId}?brand=${this.brand}`
+      : `/forums/api/thread/show/${threadId}?amount=10&page=${page}&brand=${this.brand}`
+  );
 };
 export const search = function (text, page = 1) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/search?amount=10&term=${text}&page=${page}`,
-  });
+  return this.tryCall.get(
+    `/forums/api/search?amount=10&term=${text}&page=${page}&brand=${this.brand}`
+  );
 };
 export const followThread = function (id) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/thread/follow/${id}`,
-    method: 'PUT',
-  });
+  return this.tryCall.put(`/forums/api/thread/follow/${id}?brand=${this.brand}`);
 };
 export const unfollowThread = function (id) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/thread/unfollow/${id}`,
-    method: 'DELETE',
-  });
+  return this.tryCall.delete(`/forums/api/thread/unfollow/${id}?brand=${this.brand}`);
 };
 export const createThread = function (title, content, category_id) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/thread/store`,
-    method: 'PUT',
-    body: {
-      title,
-      first_post_content: content,
-      category_id,
-    },
+  return this.tryCall.put(`/forums/api/thread/store?brand=${this.brand}`, {
+    title,
+    first_post_content: content,
+    category_id,
   });
 };
 export const updateThread = function (id, body) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/thread/update/${id}`,
-    method: 'PATCH',
-    body,
-  });
+  return this.tryCall.patch(`/forums/api/thread/update/${id}?brand=${this.brand}`, body);
 };
 export const deleteThread = function (id) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/thread/delete/${id}`,
-    method: 'DELETE',
-  });
+  return this.tryCall.delete(`/forums/api/thread/delete/${id}?brand=${this.brand}`);
 };
 export const getFollowedThreads = function (forumId, page = 1) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/thread/index?amount=10&page=${page}&followed=1&category_id=${
+  return this.tryCall.get(
+    `/forums/api/thread/index?amount=10&page=${page}&brand=${this.brand}&followed=1&category_id=${
       forumId || ''
-    }`,
-  });
+    }`
+  );
 };
 export const likePost = function (id) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/post/like/${id}`,
-    method: 'PUT',
-  });
+  return this.tryCall.put(`/forums/api/post/like/${id}?brand=${this.brand}`);
 };
 export const disLikePost = function (id) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/post/unlike/${id}`,
-    method: 'DELETE',
-  });
+  return this.tryCall.delete(`/forums/api/post/unlike/${id}?brand=${this.brand}`);
 };
 export const reportPost = function (id) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/post/report/${id}`,
-    method: 'PUT',
-  });
+  return this.tryCall.put(`/forums/api/post/report/${id}?brand=${this.brand}`);
 };
 export const createPost = function (body) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/post/store`,
-    method: 'PUT',
-    body,
-  });
+  return this.tryCall.put(`/forums/api/post/store?brand=${this.brand}`, body);
 };
 export const editPost = function (id, content) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/post/update/${id}`,
-    method: 'PATCH',
-    body: {
-      content,
-    },
-  });
+  return this.tryCall.patch(`/forums/api/post/update/${id}?brand=${this.brand}`, content);
 };
 export const deletePost = function (id) {
-  return this.tryCall({
-    url: `${this.rootUrl}/forums/api/post/delete/${id}`,
-    method: 'DELETE',
-  });
+  return this.tryCall.delete(`/forums/api/post/delete/${id}?brand=${this.brand}`);
 };
 export const getRootUrl = () => {
   return this.rootUrl;
 };
 export const decideWhereToRedirect = urlToOpen => {
-  return this.decideWhereToRedirect(this.rootUrl.includes('pianote')? urlToOpen: { url: urlToOpen });
+  return this.decideWhereToRedirect(
+    this.rootUrl.includes('pianote') ? urlToOpen : { url: urlToOpen }
+  );
 };

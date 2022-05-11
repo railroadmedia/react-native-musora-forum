@@ -373,7 +373,7 @@ let setStyles = (isDark, appColor) =>
     replyText: {
       color: isDark ? '#445F74' : '#00101D',
       fontSize: 10,
-      fontFamily: 'RobotoCondensed-Bold',
+      fontFamily: 'BebasNeuePro-Bold',
     },
     signatureContainer: {
       borderTopColor: isDark ? '#445F74' : 'lightgrey',

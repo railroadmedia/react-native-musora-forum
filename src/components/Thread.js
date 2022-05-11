@@ -58,16 +58,20 @@ class Thread extends React.Component {
     );
     const { threadId, isForumRules } = this.props.route.params;
     BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
-    getThread(threadId, this.page, isForumRules, this.postId).then(thread => {
-      this.page = parseInt(thread.page);
-      this.post_count = thread.post_count;
-      this.posts = thread.posts.map(p => p.id);
+    const { request, controller } = getThread(threadId, this.page, isForumRules, this.postId);
+    request.then(thread => {
+      this.page = parseInt(thread.data.page);
+      this.post_count = thread.data.post_count;
+      this.posts = thread.data.posts.map(p => p.id);
       batch(() => {
-        if (isForumRules) this.props.setForumRules(thread);
-        this.props.setPosts(thread.posts);
+        if (isForumRules) this.props.setForumRules(thread.data);
+        this.props.setPosts(thread.data.posts);
         this.setState({ loading: false });
       });
     });
+    return () => {
+      controller.abort();
+    };
   }
 
   componentWillUnmount() {
@@ -173,18 +177,21 @@ class Thread extends React.Component {
     if (!connection()) return;
     let { threadId, isForumRules } = this.props.route.params;
     Post.clearQuoting();
-    this.setState({ refreshing: true, multiQuoting: false }, () =>
-      getThread(threadId, this.page, isForumRules, this.postId).then(thread => {
-        this.page = parseInt(thread.page);
-        this.post_count = thread.post_count;
-        this.posts = thread.posts.map(p => p.id);
+    this.setState({ refreshing: true, multiQuoting: false }, () => {
+      const { request, controller } = getThread(threadId, this.page, isForumRules, this.postId);
+
+      request.then(thread => {
+        this.page = parseInt(thread.data.page);
+        this.post_count = thread.data.post_count;
+        this.posts = thread.data.posts.map(p => p.id);
         batch(() => {
-          if (isForumRules) this.props.setForumRules(thread);
-          this.props.setPosts(thread.posts);
+          if (isForumRules) this.props.setForumRules(thread.data);
+          this.props.setPosts(thread.data.posts);
           this.setState({ refreshing: false });
         });
-      })
-    );
+      });
+      return () => controller.abort();
+    });
   };
 
   changePage = page => {
@@ -192,18 +199,20 @@ class Thread extends React.Component {
     if (!connection()) return;
     let { threadId, isForumRules } = this.props.route.params;
     this.page = page;
-    this.setState({ loadingMore: true }, () =>
-      getThread(threadId, page, isForumRules).then(thread => {
-        this.post_count = thread.post_count;
-        this.posts = thread.posts.map(p => p.id);
+    this.setState({ loadingMore: true }, () => {
+      const { request, controller } = getThread(threadId, page, isForumRules);
+      request.then(thread => {
+        this.post_count = thread.data.post_count;
+        this.posts = thread.data.posts.map(p => p.id);
         this.flatListRef.scrollToOffset({ offset: 0, animated: false });
         batch(() => {
-          if (isForumRules) this.props.setForumRules(thread);
-          this.props.setPosts(thread.posts);
+          if (isForumRules) this.props.setForumRules(thread.data);
+          this.props.setPosts(thread.data.posts);
           this.setState({ loadingMore: false });
         });
-      })
-    );
+      });
+      return () => controller.abort();
+    });
   };
 
   toggleLockedModal = () =>
@@ -221,7 +230,7 @@ class Thread extends React.Component {
     return loading ? (
       <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
     ) : (
-      <>
+      <SafeAreaView style={styles.fList} edges={['right', 'left', 'bottom']}>
         <FlatList
           overScrollMode='never'
           onScrollBeginDrag={() => delete this.postId}
@@ -249,7 +258,7 @@ class Thread extends React.Component {
             />
           }
         />
-        <SafeAreaView style={styles.bottomTOpacitySafeArea} mode='margin'>
+        <View>
           <TouchableOpacity
             onLayout={({ nativeEvent: { layout } }) =>
               !this.state.postHeight && this.setState({ postHeight: layout.height + 15 })
@@ -282,7 +291,7 @@ class Thread extends React.Component {
               </View>
             )}
           </TouchableOpacity>
-        </SafeAreaView>
+        </View>
         <Modal
           animationType={'fade'}
           onRequestClose={this.toggleLockedModal}
@@ -311,7 +320,7 @@ class Thread extends React.Component {
             </View>
           </TouchableOpacity>
         </Modal>
-      </>
+      </SafeAreaView>
     );
   }
 }
@@ -332,16 +341,13 @@ let setStyles = (isDark, appColor) =>
       padding: 15,
     },
     bottomTOpacity: {
+      position: 'absolute',
+      bottom: 60,
+      right: 15,
+      alignSelf: 'flex-end',
       padding: 15,
-      marginBottom: 15,
-      marginRight: 15,
       borderRadius: 99,
       backgroundColor: appColor,
-    },
-    bottomTOpacitySafeArea: {
-      position: 'absolute',
-      bottom: 0,
-      alignSelf: 'flex-end',
     },
     multiQuoteBadge: {
       aspectRatio: 1,
