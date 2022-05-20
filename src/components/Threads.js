@@ -24,6 +24,7 @@ import { setAllThreads, setFollowedThreads } from '../redux/ThreadActions';
 import { getFollowedThreads, getAllThreads, connection } from '../services/forum.service';
 
 import { addThread } from '../assets/svgs';
+import { IS_TABLET } from '../index';
 
 let styles;
 class Threads extends React.Component {
@@ -171,12 +172,15 @@ class Threads extends React.Component {
       followedRefreshing,
     } = this.state;
     let { isDark, appColor } = this.props;
-    let { forumId } = this.props.route.params;
+    let { forumId, bottomPadding } = this.props.route.params;
 
     return loading ? (
       <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
     ) : (
-      <SafeAreaView style={styles.fList} edges={['left', 'right', 'bottom']}>
+      <SafeAreaView
+        style={[styles.fList, { paddingBottom: bottomPadding / 2 }]}
+        edges={['left', 'right', 'bottom']}
+      >
         <FlatList
           key={tab}
           overScrollMode='never'
@@ -290,7 +294,7 @@ let setStyles = (isDark, appColor) =>
     },
     bottomTOpacity: {
       position: 'absolute',
-      bottom: 60,
+      bottom: IS_TABLET ? 50 : 30,
       right: 15,
       alignSelf: 'flex-end',
       padding: 15,

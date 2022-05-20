@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Easing, KeyboardAvoidingView, Platform } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
+import DeviceInfo from 'react-native-device-info';
 
 import { createStore, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
@@ -23,6 +24,8 @@ const timingAnim = {
   animation: 'timing',
   config: { duration: 250, easing: Easing.out(Easing.circle) },
 };
+
+export const IS_TABLET = DeviceInfo.isTablet();
 
 export default ({
   route: {
@@ -65,7 +68,7 @@ export default ({
           screenOptions={{
             gestureEnabled: true,
             transitionSpec: { open: timingAnim, close: timingAnim },
-            animationEnabled: false
+            animationEnabled: false,
           }}
         >
           <Stack.Screen

@@ -24,6 +24,7 @@ import { connection, getThread } from '../services/forum.service';
 import { post, multiQuote, lock } from '../assets/svgs';
 
 import { setPosts, setForumRules } from '../redux/ThreadActions';
+import { IS_TABLET } from '../index';
 
 let styles;
 class Thread extends React.Component {
@@ -226,11 +227,14 @@ class Thread extends React.Component {
   render() {
     let { locked, isDark, appColor } = this.props;
     let { loading, refreshing, postHeight, multiQuoting, lockedModalVisible } = this.state;
-    let { threadId } = this.props.route.params;
+    let { threadId, bottomPadding } = this.props.route.params;
     return loading ? (
       <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
     ) : (
-      <SafeAreaView style={styles.fList} edges={['right', 'left', 'bottom']}>
+      <SafeAreaView
+        style={[styles.fList, { paddingBottom: bottomPadding / 2 }]}
+        edges={['right', 'left', 'bottom']}
+      >
         <FlatList
           overScrollMode='never'
           onScrollBeginDrag={() => delete this.postId}
@@ -342,7 +346,7 @@ let setStyles = (isDark, appColor) =>
     },
     bottomTOpacity: {
       position: 'absolute',
-      bottom: 60,
+      bottom: IS_TABLET ? 50 : 30,
       right: 15,
       alignSelf: 'flex-end',
       padding: 15,
