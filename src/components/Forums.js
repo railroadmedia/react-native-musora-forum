@@ -141,8 +141,13 @@ class Forums extends React.Component {
   render() {
     let { loadingMore, loading, refreshing } = this.state;
     let { appColor, isDark } = this.props;
+    let { bottomPadding } = this.props.route.params;
+
     return (
-      <SafeAreaView style={styles.fList} edges={['left', 'right']}>
+      <SafeAreaView
+        style={[styles.fList, { paddingBottom: bottomPadding / 2 }]}
+        edges={['left', 'right', 'bottom']}
+      >
         {loading ? (
           <ActivityIndicator
             size='large'
