@@ -16,7 +16,7 @@ import ForumCard from '../commons/ForumCard';
 import ThreadCard from '../commons/ThreadCard';
 import Search from '../commons/Search';
 import Pagination from '../commons/Pagination';
-import { connection, getForums, getFollowedThreads } from '../services/forum.service';
+import { connection, getForums, getFollowedThread, getBrand } from '../services/forum.service';
 
 import { setForumsThreads } from '../redux/ThreadActions';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -141,12 +141,13 @@ class Forums extends React.Component {
   render() {
     let { loadingMore, loading, refreshing } = this.state;
     let { appColor, isDark } = this.props;
-    let { bottomPadding } = this.props.route.params;
+    let { bottomPadding, brand } = this.props.route.params;
 
     return (
       <SafeAreaView
         style={[styles.fList, { paddingBottom: bottomPadding / 2 }]}
         edges={['left', 'right', 'bottom']}
+        testID={setTestID(`${brand}ForumsScreen`)}
       >
         {loading ? (
           <ActivityIndicator

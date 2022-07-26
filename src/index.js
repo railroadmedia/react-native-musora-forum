@@ -27,6 +27,14 @@ const timingAnim = {
 
 export const IS_TABLET = DeviceInfo.isTablet();
 
+export const setTestID = (testID) => {
+  if (Platform.OS === 'ios') {
+    return testID;
+  } else {
+    return `com.musoraapp:id/${testID}`;
+  }
+};
+
 export default ({
   route: {
     params,
@@ -41,6 +49,7 @@ export default ({
       threadTitle,
       threadId,
       categoryId,
+      brand,
     },
   },
 }) => {
@@ -51,6 +60,7 @@ export default ({
     networkContext,
     NetworkContext,
     decideWhereToRedirect,
+    brand,
   });
   if (!store)
     store =
