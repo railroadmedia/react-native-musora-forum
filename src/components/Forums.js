@@ -17,6 +17,7 @@ import ThreadCard from '../commons/ThreadCard';
 import Search from '../commons/Search';
 import Pagination from '../commons/Pagination';
 import { connection, getForums, getFollowedThreads } from '../services/forum.service';
+import { setTestID } from '../index';
 
 import { setForumsThreads } from '../redux/ThreadActions';
 import { SafeAreaView } from 'react-native-safe-area-context';
