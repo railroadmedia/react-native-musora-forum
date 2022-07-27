@@ -141,12 +141,13 @@ class Forums extends React.Component {
   render() {
     let { loadingMore, loading, refreshing } = this.state;
     let { appColor, isDark } = this.props;
-    let { bottomPadding } = this.props.route.params;
+    let { bottomPadding, brand } = this.props.route.params;
 
     return (
       <SafeAreaView
         style={[styles.fList, { paddingBottom: bottomPadding / 2 }]}
         edges={['left', 'right', 'bottom']}
+        testID={setTestID(`${brand}ForumsScreen`)}
       >
         {loading ? (
           <ActivityIndicator
