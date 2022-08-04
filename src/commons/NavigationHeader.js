@@ -6,12 +6,13 @@ import { bindActionCreators } from 'redux';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { updateThreads, toggleSignShown } from '../redux/ThreadActions';
 
 import { connection, followThread, unfollowThread, updateThread } from '../services/forum.service';
 
-import { arrowLeft, lock, moderate, pin, check, unfollow } from '../assets/svgs';
+import { arrowLeft, lock, moderate, pin, check, unfollow, hideSignSvg, followThreadSvg, forumRulesSvg, pencil } from '../assets/svgs';
 
 let styles;
 class NavigationHeader extends React.Component {
@@ -37,15 +38,18 @@ class NavigationHeader extends React.Component {
       } = this.props;
       options.toggleSign = {
         text: `${signShown ? 'Hide' : 'Show'} All Signatures`,
+        icon: hideSignSvg,
         action: this.toggleSign,
       };
       if (this.props.user.permission_level === 'administrator') {
         options.toggleLock = {
           text: locked ? 'Unlock' : 'Lock',
+          icon: lock,
           action: this.toggleLock,
         };
         options.togglePin = {
           text: pinned ? 'Unpin' : 'Pin',
+          icon: pin,
           action: this.togglePin,
         };
       }
@@ -53,14 +57,16 @@ class NavigationHeader extends React.Component {
         this.props.user.permission_level === 'administrator' ||
         this.props.user.id === this.props.thread.author_id
       )
-        options.edit = { text: 'Edit', action: this.onEdit };
+        options.edit = { text: 'Edit', icon: pencil, action: this.onEdit };
       options.toggleFollow = {
         text: `${is_followed ? 'Unfollow' : 'Follow'} Thread`,
+        icon: followThreadSvg,
         action: this.toggleFollow,
       };
     }
     options.forumRules = {
       text: 'Forum Rules',
+      icon: forumRulesSvg,
       action: () =>
         this.setState({ optionsVisible: false }, () =>
           this.props.navigation.push('Thread', {
@@ -177,6 +183,10 @@ class NavigationHeader extends React.Component {
                 transparent={true}
                 visible={optionsVisible || followStateVisible}
               >
+                <LinearGradient
+                  style={styles.lgradient}
+                  colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
+                />
                 <TouchableOpacity
                   activeOpacity={1}
                   style={styles.optionsContainer}
@@ -208,12 +218,15 @@ class NavigationHeader extends React.Component {
                     </View>
                   ) : (
                     <SafeAreaView style={styles.options}>
-                      <View style={styles.pill} />
-                      {Object.values(this.options).map(({ text, action }) => (
-                        <TouchableOpacity key={text} onPress={action}>
+                      {Object.values(this.options).map(({ text, icon, action }) => (
+                        <TouchableOpacity key={text} onPress={action} style={styles.optionBtn}>
+                          {icon({ width: 15, fill: '#FFFFFF' })}
                           <Text style={styles.optionText}>{text}</Text>
                         </TouchableOpacity>
                       ))}
+                      <TouchableOpacity onPress={() => this.setState({ optionsVisible: false })}>
+                        <Text style={styles.closeText}>Close</Text>
+                      </TouchableOpacity>
                     </SafeAreaView>
                   )}
                 </TouchableOpacity>
@@ -253,28 +266,32 @@ let setStyles = isDark => {
       textTransform: 'capitalize',
       padding: 2,
     },
+    lgradient: {
+      width: '100%',
+      height: '100%',
+      position: 'absolute',
+      top: 0,
+      zIndex: 0,
+    },
     optionsContainer: {
       flex: 1,
       justifyContent: 'flex-end',
-      backgroundColor: 'rgba(0,0,0,.5)',
     },
     options: {
-      backgroundColor: isDark ? '#081825' : '#F7F9FC',
       padding: 20,
       borderTopEndRadius: 20,
       borderTopStartRadius: 20,
     },
-    pill: {
-      width: '20%',
-      height: 2,
-      backgroundColor: isDark ? 'white' : '#000000',
-      borderRadius: 1,
-      alignSelf: 'center',
+    optionBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
     },
     optionText: {
       paddingVertical: 10,
-      color: isDark ? 'white' : '#000000',
+      color: 'white',
       fontFamily: 'OpenSans',
+      fontSize: 16,
+      marginLeft: 15,
     },
     followStateContainer: {
       backgroundColor: isDark ? '#081825' : '#F7F9FC',
@@ -287,6 +304,14 @@ let setStyles = isDark => {
     followStateTitle: {
       paddingLeft: 15,
       color: isDark ? 'white' : '#000000',
+      fontFamily: 'OpenSans-Bold',
+    },
+    closeText: {
+      fontSize: 18,
+      color: '#FFFFFF',
+      padding: 10,
+      alignSelf: 'center',
+      textAlign: 'center',
       fontFamily: 'OpenSans-Bold',
     },
   });
