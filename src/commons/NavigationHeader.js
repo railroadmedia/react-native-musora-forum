@@ -33,7 +33,7 @@ class NavigationHeader extends React.Component {
       const { request, controller } = getThread(this.props.threadId);
       request.then(t => {
         this.setState({thread: t.data});
-      });
+      }).catch(err => {});
       return () => controller.abort();
     }
   }
@@ -54,12 +54,12 @@ class NavigationHeader extends React.Component {
       };
       if (this.props.user.permission_level === 'administrator') {
         options.toggleLock = {
-          text: thread.locked ? 'Unlock' : 'Lock',
+          text: thread?.locked ? 'Unlock' : 'Lock',
           icon: lock,
           action: this.toggleLock,
         };
         options.togglePin = {
-          text: thread.pinned ? 'Unpin' : 'Pin',
+          text: thread?.pinned ? 'Unpin' : 'Pin',
           icon: pin,
           action: this.togglePin,
         };
@@ -70,7 +70,7 @@ class NavigationHeader extends React.Component {
       )
         options.edit = { text: 'Edit', icon: pencil, action: this.onEdit };
       options.toggleFollow = {
-        text: `${thread.is_followed ? 'Unfollow' : 'Follow'} Thread`,
+        text: `${thread?.is_followed ? 'Unfollow' : 'Follow'} Thread`,
         icon: followThreadSvg,
         action: this.toggleFollow,
       };
@@ -100,9 +100,9 @@ class NavigationHeader extends React.Component {
   toggleLock = () => {
     if (!connection(true)) return;
     let { thread } = this.threadPropIsEmpty ? this.state : this.props;
-    updateThread(thread.id, { locked: !thread.locked });
+    updateThread(thread?.id, { locked: !thread?.locked });
     batch(() => {
-      this.props.updateThreads({ ...thread, locked: !thread.locked });
+      this.props.updateThreads({ ...thread, locked: !thread?.locked });
       this.setState({ optionsVisible: false });
     });
   };
@@ -110,9 +110,9 @@ class NavigationHeader extends React.Component {
   togglePin = () => {
     if (!connection(true)) return;
     let { thread } = this.threadPropIsEmpty ? this.state : this.props;
-    updateThread(thread.id, { pinned: !thread.pinned });
+    updateThread(thread?.id, { pinned: !thread?.pinned });
     batch(() => {
-      this.props.updateThreads({ ...thread, pinned: !thread.pinned });
+      this.props.updateThreads({ ...thread, pinned: !thread?.pinned });
       this.setState({ optionsVisible: false });
     });
   };
@@ -120,11 +120,11 @@ class NavigationHeader extends React.Component {
   toggleFollow = () => {
     if (!connection(true)) return;
     let { thread } = this.threadPropIsEmpty ? this.state : this.props;
-    (thread.is_followed ? unfollowThread : followThread)(thread.id);
+    (thread?.is_followed ? unfollowThread : followThread)(thread?.id);
     batch(() => {
-      this.props.updateThreads({ ...thread, is_followed: !thread.is_followed });
+      this.props.updateThreads({ ...thread, is_followed: !thread?.is_followed });
       this.setState({ optionsVisible: false }, () =>
-        this.setState({ followStateVisible: true, thread: {...thread, is_followed: !thread.is_followed} }, () =>
+        this.setState({ followStateVisible: true, thread: {...thread, is_followed: !thread?.is_followed} }, () =>
           setTimeout(() => this.setState({ followStateVisible: false }), 3000)
         )
       );
@@ -170,7 +170,7 @@ class NavigationHeader extends React.Component {
               </View>
             )}
             <Text style={styles.titleText} numberOfLines={2} ellipsizeMode='tail'>
-              {(title ? title : thread.title)?.replace(/-/g, ' ')}
+              {(title ? title : thread?.title)?.replace(/-/g, ' ')}
             </Text>
           </View>
           <TouchableOpacity style={{ paddingHorizontal: 15 }} onPress={navigation.goBack}>
