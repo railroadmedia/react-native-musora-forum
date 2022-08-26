@@ -51,7 +51,7 @@ class CRUD extends React.Component {
     super(props);
     let { isDark, appColor } = props;
     styles = setStyles(isDark, appColor);
-    this.richHTML = props.post?.content;
+    this.richHTML = this.props.route.params.action === 'edit' ? props.post?.content : '';
   }
 
   onInsertLink = type => this.linkModal?.toggle(type);
@@ -198,8 +198,8 @@ class CRUD extends React.Component {
               ? quotes?.length === 1
                 ? 'Reply'
                 : quotes?.length > 1
-                ? 'MultiQuote'
-                : `Create ${type}`
+                  ? 'MultiQuote'
+                  : `Create ${type}`
               : `Edit ${type}`}
           </Text>
           <TouchableOpacity onPress={this.save} disabled={loading}>
@@ -298,7 +298,7 @@ class CRUD extends React.Component {
                 ref={r => (this.richTextRef = r)}
                 style={styles.richEditor}
                 placeholder={'Write something'}
-                initialContentHTML={post?.content}
+                initialContentHTML={this.richHTML}
                 onChange={html => (this.richHTML = html)}
               />
             )}
