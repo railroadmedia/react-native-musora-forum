@@ -59,20 +59,23 @@ class Thread extends React.Component {
     );
     const { threadId, isForumRules } = this.props.route.params;
     BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
-    const { request, controller } = getThread(threadId, this.page, isForumRules, this.postId);
-    request.then(thread => {
-      this.page = parseInt(thread.data.page);
-      this.post_count = thread.data.post_count;
-      this.posts = thread.data.posts.map(p => p.id);
-      batch(() => {
-        if (isForumRules) this.props.setForumRules(thread.data);
-        this.props.setPosts(thread.data.posts);
-        this.setState({ loading: false });
+    if (threadId || isForumRules || this.postId) {
+      const { request, controller } = getThread(threadId, this.page, isForumRules, this.postId);
+      request.then(thread => {
+        this.page = parseInt(thread.data.page);
+        this.post_count = thread.data.post_count;
+        this.posts = thread.data.posts.map(p => p.id);
+        batch(() => {
+          if (isForumRules) this.props.setForumRules(thread.data);
+          this.props.setPosts(thread.data.posts);
+          this.setState({ loading: false });
+        });
       });
-    });
-    return () => {
-      controller.abort();
-    };
+      return () => {
+        controller.abort();
+      };
+    }
+    this.setState({ loading: false });
   }
 
   componentWillUnmount() {
@@ -178,6 +181,9 @@ class Thread extends React.Component {
     if (!connection()) return;
     let { threadId, isForumRules } = this.props.route.params;
     Post.clearQuoting();
+    if (!threadId && !isForumRules && !this.postId) {
+      return;
+    }
     this.setState({ refreshing: true, multiQuoting: false }, () => {
       const { request, controller } = getThread(threadId, this.page, isForumRules, this.postId);
 
@@ -272,15 +278,15 @@ class Thread extends React.Component {
               locked
                 ? this.toggleLockedModal()
                 : this.navigate('CRUD', {
-                    type: 'post',
-                    action: 'create',
-                    onPostCreated: postId => (this.postId = postId),
-                    threadId,
-                    quotes: Post.multiQuotes.map(({ props: { post } }) => ({
-                      ...post,
-                      content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`,
-                    })),
-                  });
+                  type: 'post',
+                  action: 'create',
+                  onPostCreated: postId => (this.postId = postId),
+                  threadId,
+                  quotes: Post.multiQuotes.map(({ props: { post } }) => ({
+                    ...post,
+                    content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`,
+                  })),
+                });
             }}
             style={styles.bottomTOpacity}
           >

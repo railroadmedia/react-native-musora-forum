@@ -72,7 +72,7 @@ export const createPost = function (body) {
   return this.tryCall.put(`/forums/api/post/store?brand=${this.brand}`, body);
 };
 export const editPost = function (id, content) {
-  return this.tryCall.patch(`/forums/api/post/update/${id}?brand=${this.brand}`, content);
+  return this.tryCall.patch(`/forums/api/post/update/${id}?brand=${this.brand}`, { content });
 };
 export const deletePost = function (id) {
   return this.tryCall.delete(`/forums/api/post/delete/${id}?brand=${this.brand}`);

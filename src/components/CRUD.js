@@ -111,57 +111,49 @@ class CRUD extends React.Component {
     const { action, type, forumId, threadId, postId, quotes, onPostCreated } =
       this.props.route.params;
     let response;
-    if (type === 'thread') {
-      if (action === 'create') {
-        response = await createThread(this.title, this.richHTML, forumId);
+    let html = this.richHTML.replace('<div><br></div>', '')
+    if (html === '') {
+      this.richHTML = html
+    }
+    try {
+      if (type === 'thread') {
+        if (this.title) {
+          if (action === 'create') {
+            if (!this.richHTML) throw Error('First post cannot be empty.')
+            response = await createThread(this.title, this.richHTML, forumId).request;
+          } else {
+            this.props.updateThreads({ ...this.props.thread, title: this.title });
+            response = await updateThread(threadId, { title: this.title });
+          }
+        } else throw Error('Title cannot be empty.')
       } else {
-        this.props.updateThreads({ ...this.props.thread, title: this.title });
-        response = await updateThread(threadId, { title: this.title });
+        if (this.richHTML) {
+          let content = `${quotes?.length > 0 ? quotes
+            ?.map(({ content }) => content)
+            .join('<br>')
+            .concat('<br>') : ''}${this?.richHTML}`;
+
+          if (action === 'create') {
+            response = await createPost({ content, thread_id: threadId, parent_ids: quotes.map(q => q?.id) });
+          } else {
+            this.props.updatePosts({ ...this.props.post, content });
+            response = await editPost(postId, content);
+          }
+        } else throw Error('Post cannot be empty.')
       }
-    } else {
-      if (this.richHTML) {
-        if (action === 'create') {
-          response = await createPost({
-            content: `${quotes
-              ?.map(({ content }) => content)
-              .join('<br>')
-              .concat('<br>')}${this.richHTML}`,
-            thread_id: threadId,
-            parent_ids: quotes.map(q => q.id),
-          });
-        } else {
-          this.props.updatePosts({
-            ...this.props.post,
-            content: `${quotes
-              ?.map(({ content }) => content)
-              .join('<br>')
-              .concat('<br>')}${this.richHTML}`,
-          });
-          response = await editPost(
-            postId,
-            `${quotes
-              ?.map(({ content }) => content)
-              .join('<br>')
-              .concat('<br>')}${this.richHTML}`
-          );
-        }
-      } else {
-        this.customModal.toggle('Something went wrong', 'Post cannot be empty.');
-        this.setState({ loading: false });
+
+      if (response.response) throw Error(response.response?.data?.errors?.map(m => m?.detail).join(' ') || response?.response?.data?.message)
+      else {
+        onPostCreated?.(response.id);
+        if (type === 'thread' && action === 'create') {
+          this.props.navigation.pop();
+          this.props.navigation.navigate('Thread', { threadId: response?.data?.id });
+        } else this.props.navigation.goBack()
       }
     }
-
-    if (response.errors) {
-      this.customModal.toggle('Something went wrong', response.errors.map(m => m.detail).join(' '));
+    catch (e) {
+      this.customModal.toggle('Something went wrong', e.message || 'Please try again later.');
       this.setState({ loading: false });
-    } else {
-      onPostCreated?.(response.id);
-      if (type === 'thread' && action === 'create') {
-        this.props.navigation.pop();
-        this.props.navigation.navigate('Thread', { threadId: response.id });
-      } else {
-        this.props.navigation.goBack();
-      }
     }
   };
 
@@ -170,7 +162,10 @@ class CRUD extends React.Component {
     Keyboard.dismiss();
     this.setState({ loading: true });
     const { type, threadId, postId, onDelete } = this.props.route.params;
-    if (type === 'thread') await deleteThread(threadId);
+    if (type === 'thread') {
+      await deleteThread(threadId);
+      this.props.navigation.pop();
+    }
     else await deletePost(postId);
     onDelete?.(postId);
     this.props.navigation.goBack();
@@ -180,7 +175,7 @@ class CRUD extends React.Component {
     let { loading } = this.state;
     const {
       route: {
-        params: { action, type, quotes },
+        params: { action, type, quotes, threadTitle },
       },
       post,
       thread,
@@ -251,7 +246,7 @@ class CRUD extends React.Component {
                 style={styles.titleInput}
                 placeholderTextColor={isDark ? '#445F74' : 'grey'}
                 placeholder='Title'
-                defaultValue={thread?.title || ''}
+                defaultValue={thread?.title || threadTitle || ''}
                 onChangeText={txt => (this.title = txt)}
               />
             )}
@@ -281,12 +276,14 @@ class CRUD extends React.Component {
               <RichEditor
                 editorInitializedCallback={() =>
                   this.richTextRef?.webviewBridge?.injectJavaScript(`
-                      let link = document.createElement("link");
-                      link.type = "text/css";
-                      link.rel = "stylesheet";
-                      link.href = "https://fonts.googleapis.com/css?family=Open+Sans";
-                      document.head.appendChild(link);
-                    `)
+                     setTimeout(() => {
+                       let link = document.createElement("link");
+                       link.type = "text/css";
+                       link.rel = "stylesheet";
+                       link.href = "https://fonts.googleapis.com/css?family=Open+Sans";
+                       document.head.appendChild(link);
+                     }, 10)
+                   `)
                 }
                 pasteAsPlainText={true}
                 useContainer={false}

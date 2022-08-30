@@ -23,7 +23,6 @@ export class InsertLinkModal extends React.PureComponent {
   }
 
   toggle = type => {
-    if (this.state.visible) this.props.onClose?.(this.title, this.url, this.state.type);
     this.setState(
       ({ visible }) => ({ visible: !visible, type }),
       () => {
@@ -31,7 +30,14 @@ export class InsertLinkModal extends React.PureComponent {
           setTimeout(() => this[type === 'Link' ? 'titleTInputRef' : 'urlTInputRef']?.focus(), 500);
       }
     );
+    delete this.title
+    delete this.url;
   };
+
+  onButtonPress = () => {
+    this.props.onClose?.(this.title, this.url, this.state.type);
+    this.toggle();
+  }
 
   render() {
     const { visible, type } = this.state;
@@ -75,7 +81,7 @@ export class InsertLinkModal extends React.PureComponent {
                 />
               </View>
 
-              <TouchableOpacity style={styles.btn} onPress={() => this.toggle()}>
+              <TouchableOpacity style={styles.btn} onPress={() => this.onButtonPress()}>
                 <Text style={styles.text}>OK</Text>
               </TouchableOpacity>
             </View>
