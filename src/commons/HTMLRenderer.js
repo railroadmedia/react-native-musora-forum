@@ -179,21 +179,24 @@ export default class HTMLRenderer extends React.Component {
                   </View>
                 );
               },
-              a: ({ href }, children, _, { onLinkPress, key }) => (
-                <Text
-                  onStartShouldSetResponder={() => true}
-                  key={key}
-                  onResponderGrant={() => {
-                    let brand = getRootUrl().split('.');
-                    brand = [brand.pop(), brand.pop()].reverse().join('.');
-                    brand = brand.substring(0, brand.indexOf(".com") + 4);
-                    if (href.toLowerCase()?.includes(brand)) return decideWhereToRedirect(href);
-                    onLinkPress(null, href);
-                  }}
-                >
-                  {children}
-                </Text>
-              ),
+              a: ({ href }, children, _, { onLinkPress, key }) => {
+                if (!href.includes('http')) return null;
+                return (
+                  <Text
+                    onStartShouldSetResponder={() => true}
+                    key={key}
+                    onResponderGrant={() => {
+                      let brand = getRootUrl().split('.');
+                      brand = [brand.pop(), brand.pop()].reverse().join('.');
+                      brand = brand.substring(0, brand.indexOf('.com') + 4);
+                      if (href.toLowerCase()?.includes(brand)) return decideWhereToRedirect(href);
+                      onLinkPress(null, href);
+                    }}
+                  >
+                    {children}
+                  </Text>
+                );
+              },
             }}
           />
         ) : null}
