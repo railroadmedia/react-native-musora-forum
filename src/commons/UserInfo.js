@@ -130,7 +130,6 @@ let setStyles = (isDark, appColor) =>
     tableRow: {
       borderBottomWidth: 1,
       borderBottomColor: isDark ? '#002039' : 'lightgrey',
-      height: 40,
       justifyContent: 'center',
     },
   });

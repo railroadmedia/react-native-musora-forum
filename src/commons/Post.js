@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, Modal, Pressable, Dimensions } from 'react-nati
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import AccessLevelAvatar from './AccessLevelAvatar';
@@ -16,6 +17,7 @@ import HTMLRenderer from './HTMLRenderer';
 import { like, likeOn } from '../assets/svgs';
 
 import { likePost, disLikePost, connection, reportPost } from '../services/forum.service';
+import { updatePosts } from '../redux/ThreadActions'
 
 let styles;
 let multiQuotes = [];
@@ -43,6 +45,12 @@ class Post extends React.Component {
   toggleLike = () => {
     if (!connection(true)) return;
     let { id } = this.props.post;
+    let { isLiked, likeCount } = this.state;
+    this.props.updatePosts({
+      ...this.props.post,
+      is_liked_by_viewer: !isLiked,
+      like_count: isLiked ? likeCount - 1 : likeCount + 1
+    });
     this.setState(({ isLiked, likeCount }) => {
       if (isLiked) {
         likeCount--;
@@ -264,7 +272,7 @@ class Post extends React.Component {
               {[
                 'report',
                 this.props.user.permission_level === 'administrator' ||
-                this.props.user.id === this.props.post.author_id
+                  this.props.user.id === this.props.post.author_id
                   ? 'edit'
                   : '',
                 'multiQuote',
@@ -455,4 +463,6 @@ NavigationWrapper.clearQuoting = () => {
   multiQuotes.map(mq => mq.setState({ selected: false }));
   multiQuotes.splice(0, multiQuotes.length);
 };
-export default connect(mapStateToProps)(NavigationWrapper);
+
+const mapDispatchToProps = dispatch => bindActionCreators({ updatePosts }, dispatch);
+export default connect(mapStateToProps, mapDispatchToProps)(NavigationWrapper);

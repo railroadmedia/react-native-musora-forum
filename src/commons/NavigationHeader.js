@@ -29,10 +29,10 @@ class NavigationHeader extends React.Component {
     AsyncStorage.getItem('signShown').then(
       ss => !!ss !== this.props.signShown && this.props.toggleSignShown()
     );
-    if (this.threadPropIsEmpty) {
+    if (this.threadPropIsEmpty && !this.props.route.params?.isForumRules) {
       const { request, controller } = getThread(this.props.threadId);
       request.then(t => {
-        this.setState({thread: t.data});
+        this.setState({ thread: t.data });
       }).catch(err => {});
       return () => controller.abort();
     }
@@ -66,7 +66,7 @@ class NavigationHeader extends React.Component {
       }
       if (
         this.props.user.permission_level === 'administrator' ||
-        this.props.user.id === this.props.thread.author_id
+        this.props.user.id === thread?.author_id
       )
         options.edit = { text: 'Edit', icon: pencil, action: this.onEdit };
       options.toggleFollow = {
@@ -124,7 +124,7 @@ class NavigationHeader extends React.Component {
     batch(() => {
       this.props.updateThreads({ ...thread, is_followed: !thread?.is_followed });
       this.setState({ optionsVisible: false }, () =>
-        this.setState({ followStateVisible: true, thread: {...thread, is_followed: !thread?.is_followed} }, () =>
+        this.setState({ followStateVisible: true, thread: { ...thread, is_followed: !thread?.is_followed } }, () =>
           setTimeout(() => this.setState({ followStateVisible: false }), 3000)
         )
       );
@@ -153,7 +153,7 @@ class NavigationHeader extends React.Component {
       },
       isDark,
     } = this.props;
-    let { thread, thread: {locked, pinned, is_followed} = {} } = this.threadPropIsEmpty ? this.state : this.props;
+    let { thread, thread: { locked, pinned, is_followed } = {} } = this.threadPropIsEmpty ? this.state : this.props;
     let { optionsVisible, followStateVisible } = this.state;
     return (
       <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
