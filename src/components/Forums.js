@@ -126,10 +126,10 @@ class Forums extends React.Component {
       );
 
       followedRequest.then(r => {
-        this.followedThreads = r.results.map(r => r.id);
+        this.followedThreads = r.data.results.map(r => r.id);
         this.flatListRef.scrollToOffset({ offset: 0, animated: false });
         batch(() => {
-          this.props.setForumsThreads(r.results);
+          this.props.setForumsThreads(r.data.results);
           this.setState({ loadingMore: false });
         });
       });
