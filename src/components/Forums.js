@@ -21,6 +21,7 @@ import { setTestID } from '../index';
 
 import { setForumsThreads } from '../redux/ThreadActions';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { IS_TABLET } from '../index';
 
 let styles;
 class Forums extends React.Component {
@@ -207,7 +208,7 @@ class Forums extends React.Component {
               <>
                 <Search isDark={isDark} appColor={appColor} />
                 {this.forums?.map(item => this.renderForum(item))}
-                <Text style={styles.sectionTitle}>FOLLOWED THREADS</Text>
+                <Text style={styles.sectionTitle}>Followed Threads</Text>
               </>
             }
           />
@@ -247,11 +248,11 @@ let setStyles = (isDark, appColor) => {
     },
     sectionTitle: {
       fontFamily: 'OpenSans-Bold',
-      fontSize: 16,
-      color: isDark ? '#445F74' : '#97AABE',
+      fontSize: IS_TABLET ? 24 : 20,
+      color: isDark ? '#FFFFFF' : '#97AABE',
       margin: 5,
       marginLeft: 15,
-      marginTop: 40,
+      marginVertical: 20,
     },
   });
 };

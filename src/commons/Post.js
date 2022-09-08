@@ -14,10 +14,11 @@ import { connect } from 'react-redux';
 import AccessLevelAvatar from './AccessLevelAvatar';
 import HTMLRenderer from './HTMLRenderer';
 
-import { like, likeOn } from '../assets/svgs';
+import { like, likeOn, replies } from '../assets/svgs';
 
 import { likePost, disLikePost, connection, reportPost } from '../services/forum.service';
-import { updatePosts } from '../redux/ThreadActions'
+import { updatePosts } from '../redux/ThreadActions';
+import { IS_TABLET } from '../index';
 
 let styles;
 let multiQuotes = [];
@@ -49,7 +50,7 @@ class Post extends React.Component {
     this.props.updatePosts({
       ...this.props.post,
       is_liked_by_viewer: !isLiked,
-      like_count: isLiked ? likeCount - 1 : likeCount + 1
+      like_count: isLiked ? likeCount - 1 : likeCount + 1,
     });
     this.setState(({ isLiked, likeCount }) => {
       if (isLiked) {
@@ -130,7 +131,7 @@ class Post extends React.Component {
     let { isLiked, likeCount, selected, menuTop, reportModalVisible } = this.state;
     let { post, appColor, index, isDark, signShown, locked, user } = this.props;
     let selectedColor = isDark ? '#002039' : '#E1E6EB';
-    let baseColor = isDark ? '#081825' : '#E1E6EB4D';
+    let baseColor = isDark ? '#081825' : '#FFFFFF';
     if (post && post.content.includes(`<p><img src="https://cdn.tiny.cloud`)) {
       post.content = post.content.replace(`<p><img`, `<p style="flex-direction:row;"><img `);
     }
@@ -184,6 +185,7 @@ class Post extends React.Component {
                   div: {
                     color: isDark ? 'white' : '#00101D',
                     fontFamily: 'OpenSans',
+                    fontSize: 14,
                   },
                   blockquote: {
                     padding: 10,
@@ -240,9 +242,19 @@ class Post extends React.Component {
                 <TouchableOpacity
                   onPress={this.reply}
                   disallowInterruption={true}
-                  style={{ padding: 15, paddingLeft: 7.5 }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: 15,
+                    paddingLeft: 7.5,
+                  }}
                 >
-                  <Text style={styles.replyText}>REPLY</Text>
+                  {replies({
+                    height: 15,
+                    width: 15,
+                    fill: appColor,
+                  })}
+                  <Text style={styles.likesNoText}>REPLY</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -272,7 +284,7 @@ class Post extends React.Component {
               {[
                 'report',
                 this.props.user.permission_level === 'administrator' ||
-                  this.props.user.id === this.props.post.author_id
+                this.props.user.id === this.props.post.author_id
                   ? 'edit'
                   : '',
                 'multiQuote',
@@ -343,17 +355,17 @@ let setStyles = (isDark, appColor) =>
       alignItems: 'center',
     },
     xp: {
-      fontSize: 12,
-      fontFamily: 'OpenSans',
+      fontSize: 16,
+      fontFamily: 'BebasNeue-Regular',
       color: isDark ? '#445F74' : '#00101D',
     },
     headerText: {
-      fontSize: 12,
-      fontFamily: 'OpenSans-Italic',
-      color: isDark ? '#445F74' : '#00101D',
+      fontSize: IS_TABLET ? 16 : 14,
+      fontFamily: 'OpenSans',
+      color: isDark ? '#445F74' : '#3F3F46',
     },
     name: {
-      fontSize: 14,
+      fontSize: IS_TABLET ? 18 : 16,
       fontFamily: 'OpenSans-Bold',
       color: isDark ? '#FFFFFF' : '#00101D',
     },
@@ -373,9 +385,9 @@ let setStyles = (isDark, appColor) =>
       backgroundColor: isDark ? '#001f38' : '#97AABE',
     },
     likesNoText: {
-      fontSize: 11,
-      fontFamily: 'OpenSans',
-      color: appColor,
+      fontSize: 16,
+      fontFamily: 'BebasNeuePro-Bold',
+      color: isDark ? '#FFFFFF' : '#00101D',
       paddingLeft: 5,
     },
     replyText: {
@@ -390,9 +402,9 @@ let setStyles = (isDark, appColor) =>
       paddingVertical: 5,
     },
     signature: {
-      color: isDark ? '#445F74' : '#00101D',
+      color: isDark ? '#9EC0DC' : '#00101D',
       fontFamily: 'OpenSans',
-      fontSize: 10,
+      fontSize: IS_TABLET ? 16 : 14,
     },
     selectedMenuContainer: {
       flexDirection: 'row',

@@ -96,11 +96,11 @@ class Threads extends React.Component {
     return (
       <>
         <View style={styles.headerContainer}>
-          {['All Threads', 'Followed Threads'].map((t, i) => (
+          {['ALL THREADS', 'FOLLOWED THREADS'].map((t, i) => (
             <TouchableOpacity
               key={t}
               onPress={() => this.setState({ tab: i }, this.refresh)}
-              style={[styles.headerTOpacity, tab === i ? { borderColor: appColor } : {}]}
+              style={styles.headerTOpacity}
             >
               <Text
                 style={[styles.headerText, tab === i ? { color: isDark ? 'white' : 'black' } : {}]}
@@ -274,8 +274,8 @@ let setStyles = (isDark, appColor) =>
       borderColor: isDark ? '#00101D' : 'white',
     },
     headerText: {
-      fontFamily: 'OpenSans-Bold',
-      fontSize: 14,
+      fontFamily: 'BebasNeue-Regular',
+      fontSize: IS_TABLET ? 24 : 20,
       color: '#445F74',
     },
     fList: {

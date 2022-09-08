@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 
 import { connect } from 'react-redux';
+import { IS_TABLET } from '../index';
 
 import { arrowRight, defaultForumIcon } from '../assets/svgs';
 
@@ -16,6 +17,7 @@ class ForumCard extends React.Component {
   render() {
     let {
       appColor,
+      isDark,
       data: { title, post_count, description, latest_post, icon_path },
     } = this.props;
     return (
@@ -34,12 +36,12 @@ class ForumCard extends React.Component {
           </View>
           <View style={{ marginLeft: 5 }}>
             <Text style={styles.title}>{title}</Text>
-            <Text style={styles.subtitle}>{post_count} Replies</Text>
+            <Text style={styles.subtitle}>{post_count} Threads</Text>
           </View>
         </View>
         <View style={styles.descriptionContainer}>
           <Text style={styles.description}>{description}</Text>
-          {arrowRight({ height: 10, width: 10, fill: appColor })}
+          {arrowRight({ height: 10, width: 10, fill: isDark ? '#FFFFFF' : '#000000' })}
         </View>
         {latest_post && (
           <View style={styles.tagsContainer}>
@@ -62,7 +64,7 @@ let setStyles = isDark => {
   setStyles.isDark = isDark;
   return StyleSheet.create({
     container: {
-      backgroundColor: isDark ? '#081825' : '#F7F9FC',
+      backgroundColor: isDark ? '#002039' : '#FFFFFF',
       padding: 10,
       margin: 5,
     },
@@ -81,12 +83,12 @@ let setStyles = isDark => {
     title: {
       fontFamily: 'OpenSans-Bold',
       color: isDark ? '#FFFFFF' : '#00101D',
-      fontSize: 14,
+      fontSize: IS_TABLET ? 18 : 16,
     },
     subtitle: {
       fontFamily: 'OpenSans',
-      color: isDark ? '#445F74' : '#00101D',
-      fontSize: 11,
+      color: isDark ? '#9EC0DC' : '#3F3F46',
+      fontSize: IS_TABLET ? 16 : 14,
     },
     descriptionContainer: {
       flexDirection: 'row',
@@ -96,7 +98,7 @@ let setStyles = isDark => {
     description: {
       fontFamily: 'OpenSans',
       color: isDark ? '#FFFFFF' : '#00101D',
-      fontSize: 12,
+      fontSize: IS_TABLET ? 16 : 14,
       width: '90%',
     },
     tagsContainer: {
@@ -105,8 +107,8 @@ let setStyles = isDark => {
     },
     tags: {
       fontFamily: 'OpenSans',
-      color: isDark ? '#445F74' : '#00101D',
-      fontSize: 11,
+      color: isDark ? '#9EC0DC' : '#3F3F46',
+      fontSize: IS_TABLET ? 16 : 14,
       flexShrink: 1,
     },
   });
