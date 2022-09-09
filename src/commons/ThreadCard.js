@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import AccessLevelAvatar from './AccessLevelAvatar';
 
 import { pin, arrowRight } from '../assets/svgs';
+import { IS_TABLET } from '../index';
 
 let styles;
 class ThreadCard extends React.Component {
@@ -51,8 +52,9 @@ class ThreadCard extends React.Component {
             <Text style={styles.title}>{title}</Text>
           </View>
           <Text style={styles.lastPost}>
-            Started On <Text style={{ fontFamily: 'OpenSans-Bold' }}>{published_on_formatted}</Text>{' '}
-            By <Text style={{ fontFamily: 'OpenSans-Bold' }}>{author_display_name}</Text>
+            Started On{' '}
+            <Text style={{ fontFamily: 'OpenSans-BoldItalic' }}>{published_on_formatted}</Text> By{' '}
+            <Text style={{ fontFamily: 'OpenSans-BoldItalic' }}>{author_display_name}</Text>
           </Text>
           <Text style={styles.topicName}>
             {`${post_count} Replies`} · {latest_post.created_at_diff} · By{' '}
@@ -69,7 +71,7 @@ let setStyles = isDark => {
   return StyleSheet.create({
     container: {
       flexDirection: 'row',
-      backgroundColor: isDark ? '#081825' : '#F7F9FC',
+      backgroundColor: isDark ? '#002039' : '#FFFFFF',
       alignItems: 'center',
       padding: 10,
       marginBottom: 15,
@@ -83,18 +85,18 @@ let setStyles = isDark => {
     title: {
       fontFamily: 'OpenSans-Bold',
       color: isDark ? 'white' : 'black',
-      fontSize: 14,
+      fontSize: IS_TABLET ? 18 : 16,
     },
     lastPost: {
-      fontFamily: 'OpenSans',
-      color: '#445F74',
-      fontSize: 11,
+      fontFamily: 'OpenSans-Italic',
+      color: isDark ? '#FFFFFF' : '#00000',
+      fontSize: IS_TABLET ? 16 : 14,
       paddingVertical: 5,
     },
     topicName: {
       fontFamily: 'OpenSans',
-      color: '#445F74',
-      fontSize: 11,
+      color: isDark ? '#9EC0DC' : '#3F3F46',
+      fontSize: IS_TABLET ? 16 : 14,
     },
   });
 };

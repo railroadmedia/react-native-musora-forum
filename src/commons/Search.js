@@ -65,7 +65,7 @@ class Search extends React.Component {
             {searchSvg({
               height: 15,
               width: 15,
-              fill: isDark ? '#445F74' : '#97AABE',
+              fill: '#000C17',
             })}
           </View>
           <TextInput
@@ -74,8 +74,8 @@ class Search extends React.Component {
             autoCapitalize={'none'}
             autoCorrect={false}
             spellCheck={false}
-            placeholder={'Search...'}
-            placeholderTextColor={isDark ? '#445F74' : '#97AABE'}
+            placeholder={'Search forums...'}
+            placeholderTextColor={'#000C17'}
             returnKeyType={'search'}
             onSubmitEditing={({ nativeEvent: { text } }) => {
               this.textInputRef.clear();
@@ -243,13 +243,13 @@ let setStyles = isDark => {
     },
     searchIcon: { position: 'absolute', left: 15, zIndex: 2 },
     searchInput: {
-      fontSize: 12,
+      fontSize: 14,
       fontFamily: 'OpenSans',
       flex: 1,
       height: 35,
       borderRadius: 25,
       paddingLeft: 40,
-      color: isDark ? '#445F74' : '#97AABE',
+      color: '#000C17',
       backgroundColor: isDark ? '#F7F9FC' : '#E1E6EB',
     },
     emptyList: {
