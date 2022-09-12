@@ -82,18 +82,19 @@ class Post extends React.Component {
   edit = () => {
     closeMenus();
     let { post, onDelete } = this.props;
+    const blockQuote = post.content.split('</blockquote>').slice(0, -1).join('</blockquote>');
     this.props.navigation.navigate('CRUD', {
       type: 'post',
       action: 'edit',
       postId: post.id,
       onDelete,
-      quotes: [
+      quotes: blockQuote ? [
         {
           content:
             post.content.split('</blockquote>').slice(0, -1).join('</blockquote>') +
             '</blockquote>',
         },
-      ],
+      ] : [],
     });
   };
 
