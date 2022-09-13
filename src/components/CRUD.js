@@ -111,7 +111,7 @@ class CRUD extends React.Component {
     const { action, type, forumId, threadId, postId, quotes, onPostCreated } =
       this.props.route.params;
     let response;
-    let html = this.richHTML.replace('<div><br></div>', '')
+    let html = this.richHTML?.replace('<div><br></div>', '')
     if (html === '') {
       this.richHTML = html
     }
@@ -416,10 +416,10 @@ const mapStateToProps = (
 ) => {
   let post = {
     ...threads.posts?.[postId],
-    content: threads.posts?.[postId]?.content
+    content: threads.posts?.[postId].content.split('</blockquote>').slice(0, -1).join('</blockquote>') ? threads.posts?.[postId]?.content
       .split('</blockquote>')
       .reverse()[0]
-      .replace(/<br>/g, ''),
+      .replace(/^<br>/, '') : threads.posts?.[postId]?.content,
   };
   let thread =
     threads.forums?.[threadId] ||
