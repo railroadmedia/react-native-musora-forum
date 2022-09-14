@@ -264,14 +264,14 @@ let setStyles = (isDark, appColor) =>
     headerContainer: {
       paddingHorizontal: 15,
       flexDirection: 'row',
-      backgroundColor: isDark ? '#00101D' : 'white',
+      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
       flexWrap: 'wrap',
     },
     headerTOpacity: {
       paddingVertical: 15,
       marginRight: 15,
       borderBottomWidth: 2,
-      borderColor: isDark ? '#00101D' : 'white',
+      borderColor: isDark ? '#00101D' : '#f0f1f2',
     },
     headerText: {
       fontFamily: 'BebasNeue-Regular',
@@ -280,11 +280,11 @@ let setStyles = (isDark, appColor) =>
     },
     fList: {
       flex: 1,
-      backgroundColor: isDark ? '#00101D' : 'white',
+      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
     },
     loading: {
       flex: 1,
-      backgroundColor: isDark ? '#00101D' : 'white',
+      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
       alignItems: 'center',
     },
     emptyList: {

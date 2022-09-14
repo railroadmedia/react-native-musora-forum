@@ -223,11 +223,11 @@ let setStyles = (isDark, appColor) => {
   return StyleSheet.create({
     fList: {
       flex: 1,
-      backgroundColor: isDark ? '#00101D' : 'white',
+      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
     },
     loading: {
       flex: 1,
-      backgroundColor: isDark ? '#00101D' : 'white',
+      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
       alignItems: 'center',
     },
     emptyList: {

@@ -278,15 +278,15 @@ class Thread extends React.Component {
               locked
                 ? this.toggleLockedModal()
                 : this.navigate('CRUD', {
-                  type: 'post',
-                  action: 'create',
-                  onPostCreated: postId => (this.postId = postId),
-                  threadId,
-                  quotes: Post.multiQuotes.map(({ props: { post } }) => ({
-                    ...post,
-                    content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`,
-                  })),
-                });
+                    type: 'post',
+                    action: 'create',
+                    onPostCreated: postId => (this.postId = postId),
+                    threadId,
+                    quotes: Post.multiQuotes.map(({ props: { post } }) => ({
+                      ...post,
+                      content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`,
+                    })),
+                  });
             }}
             style={styles.bottomTOpacity}
           >
@@ -338,11 +338,11 @@ let setStyles = (isDark, appColor) =>
   StyleSheet.create({
     fList: {
       flex: 1,
-      backgroundColor: isDark ? '#00101D' : 'white',
+      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
     },
     loading: {
       flex: 1,
-      backgroundColor: isDark ? '#00101D' : 'white',
+      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
       alignItems: 'center',
     },
     emptyList: {
