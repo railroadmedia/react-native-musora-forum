@@ -249,7 +249,7 @@ let setStyles = (isDark, appColor) => {
     sectionTitle: {
       fontFamily: 'OpenSans-Bold',
       fontSize: IS_TABLET ? 24 : 20,
-      color: isDark ? '#FFFFFF' : '#97AABE',
+      color: isDark ? '#FFFFFF' : '#00101D',
       margin: 5,
       marginLeft: 15,
       marginVertical: 20,

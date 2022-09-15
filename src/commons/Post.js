@@ -358,12 +358,12 @@ let setStyles = (isDark, appColor) =>
     xp: {
       fontSize: 16,
       fontFamily: 'BebasNeue-Regular',
-      color: isDark ? '#445F74' : '#00101D',
+      color: isDark ? '#FFFFFF' : '#00101D',
     },
     headerText: {
       fontSize: IS_TABLET ? 16 : 14,
       fontFamily: 'OpenSans',
-      color: isDark ? '#445F74' : '#3F3F46',
+      color: isDark ? '#9EC0DC' : '#3F3F46',
     },
     name: {
       fontSize: IS_TABLET ? 18 : 16,

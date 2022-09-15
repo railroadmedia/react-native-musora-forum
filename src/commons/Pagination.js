@@ -57,7 +57,7 @@ export default class Pagination extends React.Component {
           >
             <Text
               style={{
-                color: active === p ? appColor : isDark ? '#445F74' : 'black',
+                color: active === p ? appColor : isDark ? '#9EC0DC' : 'black',
                 fontFamily: active === p ? 'OpenSans-Bold' : 'OpenSans',
               }}
             >
