@@ -111,47 +111,58 @@ class CRUD extends React.Component {
     const { action, type, forumId, threadId, postId, quotes, onPostCreated } =
       this.props.route.params;
     let response;
-    let html = this.richHTML?.replace('<div><br></div>', '')
+    let html = this.richHTML?.replace('<div><br></div>', '');
     if (html === '') {
-      this.richHTML = html
+      this.richHTML = html;
     }
     try {
       if (type === 'thread') {
         if (this.title) {
           if (action === 'create') {
-            if (!this.richHTML) throw Error('First post cannot be empty.')
+            if (!this.richHTML) throw Error('First post cannot be empty.');
             response = await createThread(this.title, this.richHTML, forumId).request;
           } else {
             this.props.updateThreads({ ...this.props.thread, title: this.title });
             response = await updateThread(threadId, { title: this.title });
           }
-        } else throw Error('Title cannot be empty.')
+        } else throw Error('Title cannot be empty.');
       } else {
         if (this.richHTML) {
-          let content = `${quotes?.length > 0 ? quotes
-            ?.map(({ content }) => content)
-            .join('<br>')
-            .concat('<br>') : ''}${this?.richHTML}`;
+          let content = `${
+            quotes?.length > 0
+              ? quotes
+                  ?.map(({ content }) => content)
+                  .join('<br>')
+                  .concat('<br>')
+              : ''
+          }${this?.richHTML}`;
 
           if (action === 'create') {
-            response = await createPost({ content, thread_id: threadId, parent_ids: quotes.map(q => q?.id) });
+            response = await createPost({
+              content,
+              thread_id: threadId,
+              parent_ids: quotes.map(q => q?.id),
+            });
           } else {
             this.props.updatePosts({ ...this.props.post, content });
             response = await editPost(postId, content);
           }
-        } else throw Error('Post cannot be empty.')
+        } else throw Error('Post cannot be empty.');
       }
 
-      if (response.response) throw Error(response.response?.data?.errors?.map(m => m?.detail).join(' ') || response?.response?.data?.message)
+      if (response.response)
+        throw Error(
+          response.response?.data?.errors?.map(m => m?.detail).join(' ') ||
+            response?.response?.data?.message
+        );
       else {
         onPostCreated?.(response.id);
         if (type === 'thread' && action === 'create') {
           this.props.navigation.pop();
           this.props.navigation.navigate('Thread', { threadId: response?.data?.id });
-        } else this.props.navigation.goBack()
+        } else this.props.navigation.goBack();
       }
-    }
-    catch (e) {
+    } catch (e) {
       this.customModal.toggle('Something went wrong', e.message || 'Please try again later.');
       this.setState({ loading: false });
     }
@@ -165,8 +176,7 @@ class CRUD extends React.Component {
     if (type === 'thread') {
       await deleteThread(threadId);
       this.props.navigation.pop();
-    }
-    else await deletePost(postId);
+    } else await deletePost(postId);
     onDelete?.(postId);
     this.props.navigation.goBack();
   };
@@ -193,8 +203,8 @@ class CRUD extends React.Component {
               ? quotes?.length === 1
                 ? 'Reply'
                 : quotes?.length > 1
-                  ? 'MultiQuote'
-                  : `Create ${type}`
+                ? 'MultiQuote'
+                : `Create ${type}`
               : `Edit ${type}`}
           </Text>
           <TouchableOpacity onPress={this.save} disabled={loading}>
@@ -416,10 +426,12 @@ const mapStateToProps = (
 ) => {
   let post = {
     ...threads.posts?.[postId],
-    content: threads.posts?.[postId].content.split('</blockquote>').slice(0, -1).join('</blockquote>') ? threads.posts?.[postId]?.content
-      .split('</blockquote>')
-      .reverse()[0]
-      .replace(/^<br>/, '') : threads.posts?.[postId]?.content,
+    content: threads.posts?.[postId]?.content
+      ?.split('</blockquote>')
+      .slice(0, -1)
+      .join('</blockquote>')
+      ? threads.posts?.[postId]?.content.split('</blockquote>').reverse()[0].replace(/^<br>/, '')
+      : threads.posts?.[postId]?.content,
   };
   let thread =
     threads.forums?.[threadId] ||
