@@ -12,7 +12,7 @@ import { updateThreads, toggleSignShown } from '../redux/ThreadActions';
 
 import { connection, followThread, unfollowThread, updateThread, getThread } from '../services/forum.service';
 
-import { arrowLeft, lock, moderate, pin, check, unfollow, hideSignSvg, followThreadSvg, forumRulesSvg, pencil } from '../assets/svgs';
+import { arrowLeft, lockOutline, unlock, lock, moderate, pin, check, unfollow, hideSignSvg, followThreadSvg, forumRulesSvg, pencil, showSignSvg, pinOutline, unpin, unfollowThreadSvg } from '../assets/svgs';
 
 let styles;
 class NavigationHeader extends React.Component {
@@ -33,7 +33,7 @@ class NavigationHeader extends React.Component {
       const { request, controller } = getThread(this.props.threadId);
       request.then(t => {
         this.setState({ thread: t.data });
-      }).catch(err => {});
+      }).catch(err => { });
       return () => controller.abort();
     }
   }
@@ -49,18 +49,18 @@ class NavigationHeader extends React.Component {
       } = this.threadPropIsEmpty ? this.state : this.props;
       options.toggleSign = {
         text: `${signShown ? 'Hide' : 'Show'} All Signatures`,
-        icon: hideSignSvg,
+        icon: signShown ? hideSignSvg : showSignSvg,
         action: this.toggleSign,
       };
       if (this.props.user.permission_level === 'administrator') {
         options.toggleLock = {
           text: thread?.locked ? 'Unlock' : 'Lock',
-          icon: lock,
+          icon: thread?.locked ? unlock : lockOutline,
           action: this.toggleLock,
         };
         options.togglePin = {
           text: thread?.pinned ? 'Unpin' : 'Pin',
-          icon: pin,
+          icon: thread?.pinned ? unpin : pinOutline,
           action: this.togglePin,
         };
       }
@@ -71,7 +71,7 @@ class NavigationHeader extends React.Component {
         options.edit = { text: 'Edit', icon: pencil, action: this.onEdit };
       options.toggleFollow = {
         text: `${thread?.is_followed ? 'Unfollow' : 'Follow'} Thread`,
-        icon: followThreadSvg,
+        icon: thread?.is_followed ? unfollowThreadSvg : followThreadSvg,
         action: this.toggleFollow,
       };
     }
@@ -231,7 +231,7 @@ class NavigationHeader extends React.Component {
                     <SafeAreaView style={styles.options}>
                       {Object.values(this.options).map(({ text, icon, action }) => (
                         <TouchableOpacity key={text} onPress={action} style={styles.optionBtn}>
-                          {icon({ width: 15, fill: '#FFFFFF' })}
+                          {icon({ width: 20, fill: '#FFFFFF' })}
                           <Text style={styles.optionText}>{text}</Text>
                         </TouchableOpacity>
                       ))}
@@ -298,7 +298,7 @@ let setStyles = isDark => {
       alignItems: 'center',
     },
     optionText: {
-      paddingVertical: 10,
+      paddingVertical: 13,
       color: 'white',
       fontFamily: 'OpenSans',
       fontSize: 16,
