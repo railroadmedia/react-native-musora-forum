@@ -89,7 +89,7 @@ let setStyles = isDark => {
     },
     lastPost: {
       fontFamily: 'OpenSans-Italic',
-      color: isDark ? '#FFFFFF' : '#00000',
+      color: isDark ? '#FFFFFF' : '#000000',
       fontSize: IS_TABLET ? 16 : 14,
       paddingVertical: 5,
     },

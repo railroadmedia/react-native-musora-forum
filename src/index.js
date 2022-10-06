@@ -74,11 +74,11 @@ export default ({
       >
         <Stack.Navigator
           initialRouteName={categoryId ? 'Threads' : postId || threadId ? 'Thread' : 'Forums'}
-          headerMode={'screen'}
           screenOptions={{
             gestureEnabled: true,
             transitionSpec: { open: timingAnim, close: timingAnim },
             animationEnabled: false,
+            headerMode: 'screen'
           }}
         >
           <Stack.Screen
