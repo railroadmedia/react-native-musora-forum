@@ -65,10 +65,7 @@ class Post extends React.Component {
   };
 
   onNavigateToCoach = id => {
-    this.props.navigation.navigate(
-      this.props.appColor === '#0b76db' ? 'coachOverview' : 'COACHOVERVIEW',
-      { id }
-    );
+    this.props.navigation.navigate('CoachOverview', { id });
   };
 
   toggleMenu = () =>
@@ -88,13 +85,15 @@ class Post extends React.Component {
       action: 'edit',
       postId: post.id,
       onDelete,
-      quotes: blockQuote ? [
-        {
-          content:
-            post.content.split('</blockquote>').slice(0, -1).join('</blockquote>') +
-            '</blockquote>',
-        },
-      ] : [],
+      quotes: blockQuote
+        ? [
+            {
+              content:
+                post.content.split('</blockquote>').slice(0, -1).join('</blockquote>') +
+                '</blockquote>',
+            },
+          ]
+        : [],
     });
   };
 
