@@ -139,8 +139,8 @@ export default class HTMLRenderer extends React.Component {
                       {
                         ...htmlAttribs,
                         src: htmlAttribs.src + '?fs=0&modestbranding=1&rel=0',
-                        width: this.state.width,
-                        height: this.state.width * ar,
+                        width: this.state.width > 420 ? 420 : this.state.width,
+                        height: this.state.width > 420 ? 420 * ar : this.state.width * ar,
                       },
                       children,
                       convertedCSSStyles,
