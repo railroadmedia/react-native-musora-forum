@@ -182,10 +182,11 @@ export default class HTMLRenderer extends React.Component {
               a: ({ href }, children, _, { onLinkPress, key }) => {
                 if (!href.includes('http')) return null;
                 return (
-                  <Text
-                    onStartShouldSetResponder={() => true}
+                  <TouchableOpacity
                     key={key}
-                    onResponderGrant={() => {
+                    style={{ marginBottom: -3, marginRight: 2 }}
+                    disallowInterruption={true}
+                    onPress={() => {
                       let brand = getRootUrl().split('.');
                       brand = [brand.pop(), brand.pop()].reverse().join('.');
                       brand = brand.substring(0, brand.indexOf('.com') + 4);
@@ -193,8 +194,8 @@ export default class HTMLRenderer extends React.Component {
                       if (href) onLinkPress(null, href);
                     }}
                   >
-                    {children}
-                  </Text>
+                    <Text>{children}</Text>
+                  </TouchableOpacity>
                 );
               },
             }}
