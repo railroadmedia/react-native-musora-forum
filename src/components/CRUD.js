@@ -187,7 +187,7 @@ class CRUD extends React.Component {
     let { loading } = this.state;
     const {
       route: {
-        params: { action, type, quotes, threadTitle },
+        params: { action, type, quotes, threadTitle, bottomPadding },
       },
       post,
       thread,
@@ -195,7 +195,7 @@ class CRUD extends React.Component {
       appColor,
     } = this.props;
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: bottomPadding }]}>
         <SafeAreaInsetsContext.Consumer>
           {(insets) => (
             <View style={{ backgroundColor: isDark ? '#081825' : 'white', height: insets.top }}>
@@ -403,7 +403,7 @@ let setStyles = (isDark, appColor) =>
     },
     editorStyle: {
       backgroundColor: isDark ? '#00101D' : '#FFFFFF',
-      color: !isDark ? '#9EC0DC' : 'black',
+      color: isDark ? '#9EC0DC' : 'black',
     },
     deleteBtn: {
       borderRadius: 99,
