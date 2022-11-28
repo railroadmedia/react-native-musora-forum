@@ -18,12 +18,13 @@ import {
   TextInput,
   Keyboard,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context';
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
 
 import { InsertLinkModal } from '../commons/InsertLinkModal';
@@ -41,6 +42,7 @@ import {
 } from '../services/forum.service';
 
 import { updateThreads, updatePosts } from '../redux/ThreadActions';
+import { insertBulletsListSvg, insertImageSvg, insertLinkSvg, insertOrderedListSvg, insertVideoSvg, setBoldSvg, setItalicSvg, setUnderlineSvg } from '../assets/svgs';
 
 let styles;
 
@@ -193,7 +195,18 @@ class CRUD extends React.Component {
       appColor,
     } = this.props;
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <SafeAreaInsetsContext.Consumer>
+          {(insets) => (
+            <View style={{ backgroundColor: isDark ? '#081825' : 'white', height: insets.top }}>
+              <StatusBar
+                backgroundColor={isDark ? '#081825' : 'white'}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
+              />
+            </View>
+          )}
+        </SafeAreaInsetsContext.Consumer>
+
         <View style={styles.header}>
           <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
             <Text style={styles.cancelBtn}>Cancel</Text>
@@ -213,7 +226,7 @@ class CRUD extends React.Component {
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={{ flex: 1 }}>
+        <SafeAreaView edges={['bottom', 'left', 'right']} style={{ flex: 1 }}>
           <ScrollView
             ref={r => (this.scrollRef = r)}
             style={{ flex: 1, margin: 15 }}
@@ -252,13 +265,16 @@ class CRUD extends React.Component {
               </View>
             ))}
             {type === 'thread' && (
-              <TextInput
-                style={styles.titleInput}
-                placeholderTextColor={isDark ? '#445F74' : 'grey'}
-                placeholder='Title'
-                defaultValue={thread?.title || threadTitle || ''}
-                onChangeText={txt => (this.title = txt)}
-              />
+              <>
+                <Text style={styles.label}>{'Title'}</Text>
+                <TextInput
+                  style={styles.titleInput}
+                  placeholderTextColor={isDark ? '#9EC0DC' : 'black'}
+                  placeholder='Title'
+                  defaultValue={thread?.title || threadTitle || ''}
+                  onChangeText={txt => (this.title = txt)}
+                />
+              </>
             )}
             {!(type === 'thread' && action === 'edit') && (
               <RichToolbar
@@ -267,6 +283,7 @@ class CRUD extends React.Component {
                 flatContainerStyle={{ paddingHorizontal: 12 }}
                 selectedIconTint={'#2095F2'}
                 disabledIconTint={'#bfbfbf'}
+                iconTint={isDark ? '#80A0B9' : '#000000'}
                 onPressAddImage={() => this.onInsertLink('Image')}
                 onInsertLink={() => this.onInsertLink('Link')}
                 insertVideo={() => this.onInsertLink('Video')}
@@ -280,6 +297,16 @@ class CRUD extends React.Component {
                   actions.insertImage,
                   actions.insertVideo,
                 ]}
+                iconMap={{
+                  [actions.setBold]: ({ tintColor }) => (<>{setBoldSvg({ width: 25, height: 25, fill: tintColor })}</>),
+                  [actions.setItalic]: ({ tintColor }) => (<>{setItalicSvg({ width: 25, height: 25, fill: tintColor })}</>),
+                  [actions.setUnderline]: ({ tintColor }) => (<>{setUnderlineSvg({ width: 25, height: 23, fill: tintColor })}</>),
+                  [actions.insertBulletsList]: ({ tintColor }) => (<>{insertBulletsListSvg({ width: 25, height: 25, fill: tintColor })}</>),
+                  [actions.insertOrderedList]: ({ tintColor }) => (<>{insertOrderedListSvg({ width: 25, height: 25, fill: tintColor })}</>),
+                  [actions.insertLink]: ({ tintColor }) => (<>{insertLinkSvg({ width: 25, height: 25, fill: tintColor })}</>),
+                  [actions.insertImage]: ({ tintColor }) => (<>{insertImageSvg({ width: 25, height: 25, fill: tintColor })}</>),
+                  [actions.insertVideo]: ({ tintColor }) => (<>{insertVideoSvg({ width: 25, height: 25, fill: tintColor })}</>),
+                }}
               />
             )}
             {!(type === 'thread' && action === 'edit') && (
@@ -300,11 +327,12 @@ class CRUD extends React.Component {
                 editorStyle={{
                   ...styles.editorStyle,
                   contentCSSText: 'font-family: Open Sans; font-size: 10px;',
-                  placeholderColor: isDark ? '#445F74' : 'grey',
+                  placeholderColor: isDark ? '#9EC0DC' : 'black',
                 }}
                 ref={r => (this.richTextRef = r)}
                 style={styles.richEditor}
-                placeholder={'Write something'}
+                containerStyle={styles.editorContainerStyle}
+                placeholder={'Write something...'}
                 initialContentHTML={this.richHTML}
                 onChange={html => (this.richHTML = html)}
               />
@@ -323,7 +351,7 @@ class CRUD extends React.Component {
               style={styles.activityIndicator}
             />
           )}
-        </View>
+        </SafeAreaView>
         <InsertLinkModal
           appColor={appColor}
           isDark={isDark}
@@ -331,7 +359,7 @@ class CRUD extends React.Component {
           ref={ref => (this.linkModal = ref)}
         />
         <CustomModal ref={ref => (this.customModal = ref)} isDark={isDark} appColor={appColor} />
-      </SafeAreaView>
+      </View>
     );
   }
 }
@@ -344,6 +372,7 @@ let setStyles = (isDark, appColor) =>
       alignItems: 'center',
       paddingHorizontal: 15,
       paddingVertical: 10,
+      backgroundColor: isDark ? '#081825' : 'white',
     },
     cancelBtn: {
       fontFamily: 'OpenSans-Bold',
@@ -366,41 +395,51 @@ let setStyles = (isDark, appColor) =>
       backgroundColor: isDark ? '#00101D' : '#F7F9FC',
     },
     richBar: {
-      backgroundColor: '#001424',
-      borderColor: isDark ? '#002039' : '#E1E6EB',
-      borderWidth: 4,
+      backgroundColor: isDark ? '#002039' : '#E6E7E9',
       borderTopLeftRadius: 6,
       borderTopRightRadius: 6,
+      borderWidth: 1,
+      borderColor: isDark ? '#445F74' : '#D1D5DB',
     },
     editorStyle: {
-      backgroundColor: isDark ? '#002039' : '#E1E6EB',
-      color: isDark ? 'white' : 'black',
+      backgroundColor: isDark ? '#00101D' : '#FFFFFF',
+      color: !isDark ? '#9EC0DC' : 'black',
     },
     deleteBtn: {
-      backgroundColor: appColor,
       borderRadius: 99,
+      borderWidth: 2,
+      borderColor: isDark ? '#FFFFFF' : '#000000',
       justifyContent: 'center',
       alignSelf: 'center',
-      padding: 20,
-      paddingHorizontal: 80,
+      padding: 12,
+      paddingHorizontal: 50,
       marginBottom: 15,
     },
     deleteBtnText: {
       textAlign: 'center',
       fontFamily: 'BebasNeuePro-Bold',
-      fontSize: 15,
-      color: 'white',
+      fontSize: 18,
+      color: isDark ? '#FFFFFF' : '#000000',
       textTransform: 'uppercase',
     },
     titleInput: {
       marginBottom: 15,
-      backgroundColor: isDark ? '#002039' : '#E1E6EB',
-      borderRadius: 5,
-      color: isDark ? 'white' : 'black',
+      backgroundColor: isDark ? '#00101D' : '#FFFFFF',
+      borderRadius: 60,
+      borderColor: isDark ? '#445F74' : '#D1D5DB',
+      borderWidth: 1,
+      color: isDark ? '#9EC0DC' : 'black',
       padding: 15,
       paddingHorizontal: 10,
       fontFamily: 'OpenSans',
       fontSize: 12,
+    },
+    editorContainerStyle: {
+      borderWidth: 1,
+      borderTopWidth: 0,
+      borderColor: isDark ? '#445F74' : '#D1D5DB',
+      borderBottomLeftRadius: 6,
+      borderBottomRightRadius: 6,
     },
     richEditor: {
       borderBottomLeftRadius: 6,
@@ -415,6 +454,13 @@ let setStyles = (isDark, appColor) =>
       left: 0,
       right: 0,
     },
+    label: {
+      fontFamily: 'OpenSans',
+      fontSize: 14,
+      color: isDark ? '#9EC0DC' : 'black',
+      marginBottom: 5,
+      marginLeft: 10,
+    }
   });
 const mapStateToProps = (
   { threads, themeState },
