@@ -195,7 +195,7 @@ class CRUD extends React.Component {
       appColor,
     } = this.props;
     return (
-      <View style={[styles.container, { paddingBottom: bottomPadding }]}>
+      <SafeAreaView edges={['bottom', 'left', 'right']} style={[styles.container, { paddingBottom: bottomPadding }]}>
         <SafeAreaInsetsContext.Consumer>
           {(insets) => (
             <View style={{ backgroundColor: isDark ? '#081825' : 'white', height: insets.top }}>
@@ -226,7 +226,7 @@ class CRUD extends React.Component {
             </Text>
           </TouchableOpacity>
         </View>
-        <SafeAreaView edges={['bottom', 'left', 'right']} style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
           <ScrollView
             ref={r => (this.scrollRef = r)}
             style={{ flex: 1, margin: 15 }}
@@ -351,7 +351,7 @@ class CRUD extends React.Component {
               style={styles.activityIndicator}
             />
           )}
-        </SafeAreaView>
+        </View>
         <InsertLinkModal
           appColor={appColor}
           isDark={isDark}
@@ -359,7 +359,7 @@ class CRUD extends React.Component {
           ref={ref => (this.linkModal = ref)}
         />
         <CustomModal ref={ref => (this.customModal = ref)} isDark={isDark} appColor={appColor} />
-      </View>
+      </SafeAreaView>
     );
   }
 }
