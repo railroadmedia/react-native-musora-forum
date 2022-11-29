@@ -253,7 +253,7 @@ let setStyles = isDark => {
   setStyles.isDark = isDark;
   return StyleSheet.create({
     container: {
-      backgroundColor: isDark ? '#00101d' : 'white',
+      backgroundColor: isDark ? '#081825' : 'white',
       paddingVertical: 10,
     },
     subContainer: {

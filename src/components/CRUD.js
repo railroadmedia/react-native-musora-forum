@@ -313,14 +313,14 @@ class CRUD extends React.Component {
               <RichEditor
                 editorInitializedCallback={() =>
                   this.richTextRef?.webviewBridge?.injectJavaScript(`
-                     setTimeout(() => {
-                       let link = document.createElement("link");
-                       link.type = "text/css";
-                       link.rel = "stylesheet";
-                       link.href = "https://fonts.googleapis.com/css?family=Open+Sans";
-                       document.head.appendChild(link);
-                     }, 10)
-                   `)
+                    setTimeout(() => {
+                      let link = document.createElement("link");
+                      link.type = "text/css";
+                      link.rel = "stylesheet";
+                      link.href = "https://fonts.googleapis.com/css?family=Open+Sans";
+                      document.head.appendChild(link);
+                    }, 10)
+                  `)
                 }
                 pasteAsPlainText={true}
                 useContainer={false}
@@ -406,14 +406,14 @@ let setStyles = (isDark, appColor) =>
       color: isDark ? '#9EC0DC' : 'black',
     },
     deleteBtn: {
-      borderRadius: 99,
+      borderRadius: 30,
       borderWidth: 2,
       borderColor: isDark ? '#FFFFFF' : '#000000',
       justifyContent: 'center',
       alignSelf: 'center',
-      padding: 12,
-      paddingHorizontal: 50,
       marginBottom: 15,
+      height: 42,
+      width: 198
     },
     deleteBtnText: {
       textAlign: 'center',
@@ -429,10 +429,10 @@ let setStyles = (isDark, appColor) =>
       borderColor: isDark ? '#445F74' : '#D1D5DB',
       borderWidth: 1,
       color: isDark ? '#9EC0DC' : 'black',
-      padding: 15,
-      paddingHorizontal: 10,
+      paddingHorizontal: 12,
       fontFamily: 'OpenSans',
       fontSize: 12,
+      height: 42
     },
     editorContainerStyle: {
       borderWidth: 1,
