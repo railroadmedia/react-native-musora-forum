@@ -182,10 +182,8 @@ export default class HTMLRenderer extends React.Component {
               a: ({ href }, children, _, { onLinkPress, key }) => {
                 if (!href.includes('http')) return null;
                 return (
-                  <TouchableOpacity
+                  <Text
                     key={key}
-                    style={{ marginBottom: -3, marginRight: 2 }}
-                    disallowInterruption={true}
                     onPress={() => {
                       let brand = getRootUrl().split('.');
                       brand = [brand.pop(), brand.pop()].reverse().join('.');
@@ -194,8 +192,8 @@ export default class HTMLRenderer extends React.Component {
                       if (href) onLinkPress(null, href);
                     }}
                   >
-                    <Text>{children}</Text>
-                  </TouchableOpacity>
+                    {children}
+                  </Text>
                 );
               },
             }}
