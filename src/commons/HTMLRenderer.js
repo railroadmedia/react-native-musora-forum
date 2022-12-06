@@ -181,21 +181,31 @@ export default class HTMLRenderer extends React.Component {
               },
               a: ({ href }, children, _, { onLinkPress, key }) => {
                 if (!href.includes('http')) return null;
+                const onPressLink = () => {
+                  let brand = getRootUrl().split('.');
+                  brand = [brand.pop(), brand.pop()].reverse().join('.');
+                  brand = brand.substring(0, brand.indexOf('.com') + 4);
+                  if (href.toLowerCase()?.includes(brand)) return decideWhereToRedirect(href);
+                  if (href) onLinkPress(null, href);
+                }
                 return (
-                  <TouchableOpacity
-                    key={key}
-                    style={{ marginBottom: -3, marginRight: 2 }}
-                    disallowInterruption={true}
-                    onPress={() => {
-                      let brand = getRootUrl().split('.');
-                      brand = [brand.pop(), brand.pop()].reverse().join('.');
-                      brand = brand.substring(0, brand.indexOf('.com') + 4);
-                      if (href.toLowerCase()?.includes(brand)) return decideWhereToRedirect(href);
-                      if (href) onLinkPress(null, href);
-                    }}
-                  >
-                    <Text>{children}</Text>
-                  </TouchableOpacity>
+                  <Text key={key}>
+                    {Platform.OS === 'ios' ? (
+                      <TouchableOpacity
+                        style={{ marginBottom: -3, marginRight: 2 }}
+                        disallowInterruption={true}
+                        onPress={onPressLink}
+                      >
+                        <Text>{children}</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <Text
+                        onPress={onPressLink}
+                      >
+                        {children}
+                      </Text>
+                    )}
+                  </Text>
                 );
               },
             }}
