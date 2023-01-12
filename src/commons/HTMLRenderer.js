@@ -180,14 +180,14 @@ export default class HTMLRenderer extends React.Component {
                 );
               },
               a: ({ href }, children, _, { onLinkPress, key }) => {
-                if (!href.includes('http')) return null;
+                if (!href?.includes('http')) return null;
                 const onPressLink = () => {
                   let brand = getRootUrl().split('.');
                   brand = [brand.pop(), brand.pop()].reverse().join('.');
                   brand = brand.substring(0, brand.indexOf('.com') + 4);
                   if (href.toLowerCase()?.includes(brand)) return decideWhereToRedirect(href);
                   if (href) onLinkPress(null, href);
-                }
+                };
                 return (
                   <Text key={key}>
                     {Platform.OS === 'ios' ? (
@@ -199,11 +199,7 @@ export default class HTMLRenderer extends React.Component {
                         <Text>{children}</Text>
                       </TouchableOpacity>
                     ) : (
-                      <Text
-                        onPress={onPressLink}
-                      >
-                        {children}
-                      </Text>
+                      <Text onPress={onPressLink}>{children}</Text>
                     )}
                   </Text>
                 );
