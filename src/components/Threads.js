@@ -190,7 +190,7 @@ class Threads extends React.Component {
           initialNumToRender={10}
           maxToRenderPerBatch={10}
           onEndReachedThreshold={0.01}
-          removeClippedSubviews={true}
+          removeClippedSubviews={false}
           keyboardShouldPersistTaps='handled'
           renderItem={this.renderFLItem}
           ListHeaderComponent={this.renderFLHeader}
