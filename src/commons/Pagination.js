@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default class Pagination extends React.Component {
   constructor(props) {
@@ -73,7 +74,7 @@ export default class Pagination extends React.Component {
           visible={showPagePicker}
         >
           <TouchableOpacity onPress={this.togglePagePicker} style={styles.pagePickerContainer}>
-            <View>
+            <SafeAreaView edges={['top']}>
               <TextInput
                 autoFocus={true}
                 style={styles.textInput}
@@ -93,7 +94,7 @@ export default class Pagination extends React.Component {
               >
                 <Text style={styles.goText}>GO</Text>
               </TouchableOpacity>
-            </View>
+            </SafeAreaView>
           </TouchableOpacity>
         </Modal>
       </View>
