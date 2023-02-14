@@ -5,6 +5,7 @@ import AccessLevelAvatar from '../commons/AccessLevelAvatar';
 
 import { reportSvg, x } from '../assets/svgs';
 import ToastAlert from '../commons/ToastAlert';
+import { reportUser } from '../services/forum.service';
 
 let styles;
 export default class UserInfo extends React.Component {
@@ -17,10 +18,19 @@ export default class UserInfo extends React.Component {
   }
 
   onReportUser = () => {
-    this.setState({showToastAlert: true});
-    setTimeout(() => {
-      this.setState({showToastAlert: false});
-    }, 2000);
+    const { request, controller } = reportUser(this.props.author.id);
+    request.then(res => {
+      if (res.data.success) {
+        this.setState({ showToastAlert: true });
+        setTimeout(() => {
+          this.setState({ showToastAlert: false });
+        }, 2000);
+      }
+    })
+    return () => {
+      controller.abort();
+    };
+
   }
 
   render = () => {
