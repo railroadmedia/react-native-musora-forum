@@ -19,12 +19,13 @@ import { bindActionCreators } from 'redux';
 import Pagination from '../commons/Pagination';
 import Post from '../commons/Post';
 
-import { connection, getThread } from '../services/forum.service';
+import { connection, getThread, reportPost } from '../services/forum.service';
 
-import { post, multiQuote, lock } from '../assets/svgs';
+import { post, multiQuote, lock, reportSvg } from '../assets/svgs';
 
 import { setPosts, setForumRules } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
+import ToastAlert from '../commons/ToastAlert';
 
 let styles;
 class Thread extends React.Component {
@@ -39,6 +40,8 @@ class Thread extends React.Component {
     multiQuoting: false,
     lockedModalVisible: false,
     postKey: false,
+    showToastAlert: false,
+    alertText:''
   };
 
   constructor(props) {
@@ -135,6 +138,7 @@ class Thread extends React.Component {
             this.posts = this.posts.filter(p => p !== postId);
             if (!this.posts.length && this.page > 1) this.changePage(--this.page);
           }}
+          reportForumPost={this.reportForumPost}
         />
       </View>
     );
@@ -229,6 +233,27 @@ class Thread extends React.Component {
         this.state.lockedModalVisible &&
         setTimeout(() => this.setState({ lockedModalVisible: false }), 3000)
     );
+
+  reportForumPost = (post, isReported) => {
+    if (isReported) {
+      this.setState({ showToastAlert: true, alertText:'You have already reported this post.' });
+      setTimeout(() => {
+        this.setState({ showToastAlert: false, alertText:'' });
+      }, 2000);
+    } else {
+      const { request, controller } = reportPost(post.id);
+      request.then((res) => {
+        console.log(res);
+        this.setState({ showToastAlert: true, alertText: 'The forum post was reported.' });
+        setTimeout(() => {
+          this.setState({ showToastAlert: false, alertText:''  });
+        }, 2000);
+      })
+      return () => {
+        controller.abort();
+      };   
+    }
+  }
 
   render() {
     let { locked, isDark, appColor } = this.props;
@@ -330,6 +355,13 @@ class Thread extends React.Component {
             </View>
           </TouchableOpacity>
         </Modal>
+        {this.state.showToastAlert && 
+          <ToastAlert
+            content={this.state.alertText}
+            icon={reportSvg({ height: 21.6, width: 21.6, fill: isDark ? 'black' : 'white' })}
+            isDark={isDark}
+          />
+        }
       </SafeAreaView>
     );
   }

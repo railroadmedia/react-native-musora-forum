@@ -77,6 +77,9 @@ export const editPost = function (id, content) {
 export const deletePost = function (id) {
   return this.tryCall.delete(`/forums/api/post/delete/${id}?brand=${this.brand}`);
 };
+export const reportUser = function (id) {
+  return this.tryCall.put(`/user-management-system/user/report/${id}?brand=${this.brand}`);
+};
 export const getRootUrl = () => {
   return this.rootUrl;
 };
