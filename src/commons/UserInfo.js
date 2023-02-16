@@ -107,6 +107,7 @@ export default class UserInfo extends React.Component {
             <ToastAlert
               content="The user profile was reported" 
               icon={reportSvg({ height: 21.6, width: 21.6, fill: isDark ? 'black' : 'white' })}
+              isDark={isDark}
             />
           }
         </View>

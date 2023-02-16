@@ -350,6 +350,7 @@ class Thread extends React.Component {
           <ToastAlert
             content="The forum post was reported" 
             icon={reportSvg({ height: 21.6, width: 21.6, fill: isDark ? 'black' : 'white' })}
+            isDark={isDark}
           />
         }
       </SafeAreaView>
