@@ -40,7 +40,8 @@ class Thread extends React.Component {
     multiQuoting: false,
     lockedModalVisible: false,
     postKey: false,
-    showToastAlert: false
+    showToastAlert: false,
+    alertText:''
   };
 
   constructor(props) {
@@ -233,17 +234,25 @@ class Thread extends React.Component {
         setTimeout(() => this.setState({ lockedModalVisible: false }), 3000)
     );
 
-  reportForumPost = (postId) => {
-    const { request, controller } = reportPost(postId);
-    request.then((res) => {
-        this.setState({ showToastAlert: true });
+  reportForumPost = (post, isReported) => {
+    if (isReported) {
+      this.setState({ showToastAlert: true, alertText:'You have already reported this post.' });
+      setTimeout(() => {
+        this.setState({ showToastAlert: false, alertText:'' });
+      }, 2000);
+    } else {
+      const { request, controller } = reportPost(post.id);
+      request.then((res) => {
+        console.log(res);
+        this.setState({ showToastAlert: true, alertText: 'The forum post was reported.' });
         setTimeout(() => {
-          this.setState({ showToastAlert: false });
+          this.setState({ showToastAlert: false, alertText:''  });
         }, 2000);
-    })
-    return () => {
-      controller.abort();
-    };   
+      })
+      return () => {
+        controller.abort();
+      };   
+    }
   }
 
   render() {
@@ -348,7 +357,7 @@ class Thread extends React.Component {
         </Modal>
         {this.state.showToastAlert && 
           <ToastAlert
-            content="The forum post was reported" 
+            content={this.state.alertText}
             icon={reportSvg({ height: 21.6, width: 21.6, fill: isDark ? 'black' : 'white' })}
             isDark={isDark}
           />

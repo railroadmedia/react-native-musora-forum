@@ -14,23 +14,30 @@ export default class UserInfo extends React.Component {
     styles = setStyles(props.isDark, props.appColor);
   }
   state = {
-    showToastAlert: false
+    showToastAlert: false,
+    userAlreadyReported: this.props.author.is_reported_by_viewer,
   }
 
   onReportUser = () => {
-    const { request, controller } = reportUser(this.props.author.id);
-    request.then(res => {
-      if (res.data.success) {
-        this.setState({ showToastAlert: true });
-        setTimeout(() => {
-          this.setState({ showToastAlert: false });
-        }, 2000);
-      }
-    })
-    return () => {
-      controller.abort();
-    };
-
+    if (this.state.userAlreadyReported) {
+      this.setState({ showToastAlert: true });
+      setTimeout(() => {
+        this.setState({ showToastAlert: false });
+      }, 2000);
+    } else {
+      const { request, controller } = reportUser(this.props.author.id);
+      request.then(res => {
+        if (res.data.success) {
+          this.setState({ showToastAlert: true });
+          setTimeout(() => {
+            this.setState({ showToastAlert: false, userAlreadyReported: true  });
+          }, 2000);
+        }
+      })
+      return () => {
+        controller.abort();
+      };
+    }
   }
 
   render = () => {
@@ -105,7 +112,7 @@ export default class UserInfo extends React.Component {
           </View>
           {this.state.showToastAlert && 
             <ToastAlert
-              content="The user profile was reported" 
+              content={this.state.userAlreadyReported ? "You have already reported this profile.":"The user profile was reported" }
               icon={reportSvg({ height: 21.6, width: 21.6, fill: isDark ? 'black' : 'white' })}
               isDark={isDark}
             />
