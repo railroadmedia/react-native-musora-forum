@@ -39,6 +39,7 @@ class Post extends React.Component {
       selected: false,
       menuTop: 0,
       reportModalVisible: false,
+      isPostReported: post?.is_reported_by_viewer
     };
     styles = setStyles(isDark, appColor);
   }
@@ -126,6 +127,17 @@ class Post extends React.Component {
       ],
     });
   };
+
+  onReport = () => {
+    this.setState({ reportModalVisible: false }, () => {
+      if (this.state.isPostReported) {
+        this.props.reportForumPost(this.props.post, true)
+      } else {
+        this.props.reportForumPost(this.props.post, false)
+        this.setState({isPostReported: true});
+      }
+    })
+  }
 
   render() {
     let { isLiked, likeCount, selected, menuTop, reportModalVisible } = this.state;
@@ -326,7 +338,7 @@ class Post extends React.Component {
               <View style={styles.reportBtnsContainer}>
                 <Pressable
                   style={{ flex: 1 }}
-                  onPress={() => this.setState({ reportModalVisible: false }, () => this.props.reportForumPost(post.id))}
+                  onPress={this.onReport}
                 >
                   <Text style={styles.reportBtnText}>Report</Text>
                 </Pressable>
