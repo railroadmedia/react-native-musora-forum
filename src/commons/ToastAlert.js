@@ -6,7 +6,7 @@ let styles;
 export default class ToastAlert extends React.Component {
 	constructor(props) {
 	  super(props);
-	  styles = setStyles(props.isDark, props.appColor);
+	  styles = setStyles(props.isDark);
 	}
 
   render = () => {

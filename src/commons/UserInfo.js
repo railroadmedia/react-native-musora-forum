@@ -114,6 +114,7 @@ export default class UserInfo extends React.Component {
             <ToastAlert
               content={this.state.userAlreadyReported ? "You have already reported this profile.":"The user profile was reported" }
               icon={reportSvg({ height: 21.6, width: 21.6, fill: isDark ? 'black' : 'white' })}
+              isDark={isDark}
             />
           }
         </View>
