@@ -33,7 +33,7 @@ const setStyles = (isDark) =>
       position: 'absolute',
       bottom: 100,
       alignSelf: 'center',
-      backgroundColor: isDark ? '#FFFFFF' : '#081825'
+      backgroundColor: isDark ? '#FFFFFF' : '#081825',
     },
     messageContainer: {
       flexDirection: 'row',

@@ -16,7 +16,7 @@ import HTMLRenderer from './HTMLRenderer';
 
 import { like, likeOn, replies } from '../assets/svgs';
 
-import { likePost, disLikePost, connection, reportPost } from '../services/forum.service';
+import { likePost, disLikePost, connection } from '../services/forum.service';
 import { updatePosts } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
 
@@ -314,7 +314,7 @@ class Post extends React.Component {
           onRequestClose={() => this.setState({ reportModalVisible: false })}
           supportedOrientations={['portrait', 'landscape']}
           transparent={true}
-          visible={reportModalVisible /*|| post.id === 282358*/}
+          visible={reportModalVisible}
         >
           <Pressable
             style={styles.reportModalBackground}
@@ -326,9 +326,7 @@ class Post extends React.Component {
               <View style={styles.reportBtnsContainer}>
                 <Pressable
                   style={{ flex: 1 }}
-                  onPress={() =>
-                    this.setState({ reportModalVisible: false }, () => reportPost(post.id))
-                  }
+                  onPress={() => this.setState({ reportModalVisible: false }, () => this.props.reportForumPost(post.id))}
                 >
                   <Text style={styles.reportBtnText}>Report</Text>
                 </Pressable>
