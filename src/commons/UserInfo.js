@@ -5,7 +5,7 @@ import AccessLevelAvatar from '../commons/AccessLevelAvatar';
 
 import { banSvg, menuHSvg, reportSvg, x } from '../assets/svgs';
 import ToastAlert from '../commons/ToastAlert';
-import { reportUser } from '../services/forum.service';
+import { blockUser, reportUser } from '../services/forum.service';
 import BlockModal from '../commons/modals/BlockModal';
 import BlockWarningModal from '../commons/modals/BlockWarningModal';
 
@@ -54,8 +54,18 @@ export default class UserInfo extends React.Component {
   }
 
   onBlockUser = () => {
-    this.setState({ showBlockAlert: true });
-
+    const { request, controller } = blockUser(this.props.author.id);
+    request.then(res => {
+      if (res.data.success) {
+        this.setState({ showBlockAlert: true });
+        setTimeout(() => {
+          this.setState({ showToastAlert: false });
+        }, 2000);
+      }
+    });
+    return () => {
+      controller.abort();
+    };
   }
 
   render = () => {
