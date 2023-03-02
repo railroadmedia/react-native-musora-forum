@@ -80,6 +80,9 @@ export const deletePost = function (id) {
 export const reportUser = function (id) {
   return this.tryCall.put(`/user-management-system/user/report/${id}?brand=${this.brand}`);
 };
+export const blockUser = function (id) {
+  return this.tryCall.put(`/user-management-system/user/block/${id}`);
+};
 export const getRootUrl = () => {
   return this.rootUrl;
 };
