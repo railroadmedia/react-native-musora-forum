@@ -21,7 +21,7 @@ import Post from '../commons/Post';
 
 import { connection, getThread, reportPost } from '../services/forum.service';
 
-import { post, multiQuote, lock, reportSvg } from '../assets/svgs';
+import { post, multiQuote, lock, reportSvg, banSvg } from '../assets/svgs';
 
 import { setPosts, setForumRules } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
@@ -41,7 +41,9 @@ class Thread extends React.Component {
     lockedModalVisible: false,
     postKey: false,
     showToastAlert: false,
-    alertText:''
+    showReportAlert: false,
+    showBlockAlert: false,
+    alertText: '',
   };
 
   constructor(props) {
@@ -139,7 +141,21 @@ class Thread extends React.Component {
             if (!this.posts.length && this.page > 1) this.changePage(--this.page);
           }}
           reportForumPost={this.reportForumPost}
-          onUserBlock={this.refresh}
+          onUserBlock={(blockedUser) => {
+            this.setState({ showBlockAlert: true, blockedUser }, () => {
+              setTimeout(() => {
+                this.setState({ showBlockAlert: false });
+              }, 2000);
+              this.refresh();
+            })
+          }}
+          onUserReport={() => {
+            this.setState({ showReportAlert: true }, () => {
+              setTimeout(() => {
+                this.setState({ showReportAlert: false });
+              }, 2000);
+            });
+          }}
         />
       </View>
     );
@@ -356,13 +372,43 @@ class Thread extends React.Component {
             </View>
           </TouchableOpacity>
         </Modal>
-        {this.state.showToastAlert && 
+        {this.state.showToastAlert && (
           <ToastAlert
             content={this.state.alertText}
-            icon={reportSvg({ height: 21.6, width: 21.6, fill: isDark ? 'black' : 'white' })}
+            icon={reportSvg({
+              height: 21.6,
+              width: 21.6,
+              fill: isDark ? 'black' : 'white',
+            })}
             isDark={isDark}
           />
-        }
+        )}
+        {this.state.showReportAlert && (
+          <ToastAlert
+            content={
+              this.state.userAlreadyReported
+                ? 'You have already reported this profile.'
+                : 'The user profile was reported'
+            }
+            icon={reportSvg({
+              height: 21.6,
+              width: 21.6,
+              fill: isDark ? 'black' : 'white',
+            })}
+            isDark={isDark}
+          />
+        )}
+        {this.state.showBlockAlert && (
+          <ToastAlert
+            content={`${this.state.blockedUser} was blocked.`}
+            icon={banSvg({
+              height: 21.6,
+              width: 21.6,
+              fill: isDark ? 'black' : 'white',
+            })}
+            isDark={isDark}
+          />
+        )}
       </SafeAreaView>
     );
   }
