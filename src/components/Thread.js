@@ -139,6 +139,7 @@ class Thread extends React.Component {
             if (!this.posts.length && this.page > 1) this.changePage(--this.page);
           }}
           reportForumPost={this.reportForumPost}
+          onUserBlock={this.refresh}
         />
       </View>
     );
