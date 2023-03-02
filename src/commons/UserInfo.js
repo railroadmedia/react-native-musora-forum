@@ -54,15 +54,11 @@ export default class UserInfo extends React.Component {
   };
 
   onBlockUser = () => {
-    const { request, controller } = blockUser(this.props.author.id);
+    const { request, controller } = blockUser(this.props.author?.id);
     request
       .then(res => {
         if (res.data.success) {
-          this.props.onUserBlock?.();
-          this.setState({ showBlockAlert: true });
-          setTimeout(() => {
-            this.setState({ showToastAlert: false });
-          }, 2000);
+            this.props.onUserBlock?.();
         }
       })
       .catch(err => console.log(err));

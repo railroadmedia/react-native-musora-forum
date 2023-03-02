@@ -109,7 +109,11 @@ export default class AccessLevelAvatar extends React.Component {
           author={author}
           isDark={isDark}
           appColor={appColor}
-          shouldRefresh={this.props.onUserBlock}
+          onUserBlock={() => {
+            this.props.onUserBlock?.(author?.display_name);
+            this.setState({showUserInfo: false});
+          }
+          }
         />
       </>
     );

@@ -225,7 +225,7 @@ class Post extends React.Component {
                   tagHeight={4}
                   showUserInfo={true}
                   onNavigateToCoach={this.onNavigateToCoach}
-                  shouldRefresh={this.props.onUserBlock}
+                  onUserBlock={this.props.onUserBlock}
                 />
                 <View style={{ marginLeft: 5 }}>
                   <Text style={styles.name} numberOfLines={2} ellipsizeMode='tail'>
