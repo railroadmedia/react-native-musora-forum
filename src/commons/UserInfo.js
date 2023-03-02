@@ -3,19 +3,32 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 
 import AccessLevelAvatar from '../commons/AccessLevelAvatar';
 
-import { reportSvg, x } from '../assets/svgs';
+import { banSvg, menuHSvg, reportSvg, x } from '../assets/svgs';
 import ToastAlert from '../commons/ToastAlert';
 import { reportUser } from '../services/forum.service';
+import BlockModal from '../commons/modals/BlockModal';
+import BlockWarningModal from '../commons/modals/BlockWarningModal';
 
 let styles;
 export default class UserInfo extends React.Component {
   constructor(props) {
     super(props);
     styles = setStyles(props.isDark, props.appColor);
+    this.blockRef = React.createRef();
+    this.warningRef = React.createRef();
   }
   state = {
     showToastAlert: false,
+    showBlockAlert: false,
     userAlreadyReported: this.props.author.is_reported_by_viewer,
+  }
+
+  showBlockModal = () => {
+    this.blockRef.current?.toggle();
+  }
+
+  showBlockWarning = () => {
+    this.warningRef.current?.toggle();
   }
 
   onReportUser = () => {
@@ -40,6 +53,11 @@ export default class UserInfo extends React.Component {
     }
   }
 
+  onBlockUser = () => {
+    this.setState({ showBlockAlert: true });
+
+  }
+
   render = () => {
     const { author, onHideUserInfo, isVisible, isDark, appColor } = this.props;
     return (
@@ -53,10 +71,22 @@ export default class UserInfo extends React.Component {
         <View style={styles.background}>
           <View style={styles.container} >
             <View style={styles.infoContainer}>
-              <TouchableOpacity style={styles.header} onPress={onHideUserInfo}>
-                {x({ width: 50, height: 20, fill: isDark ? 'white' : 'black' })}
+              <View style={{
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 30,
+                paddingHorizontal: 10,
+              }}>
+                <TouchableOpacity onPress={onHideUserInfo}>
+                  {x({ width: 20, height: 20, fill: isDark ? 'white' : 'black' })}
+                </TouchableOpacity>
                 <Text style={styles.name}>{author?.display_name}</Text>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.showBlockModal()}>
+                  {menuHSvg({ width: 23, height: 20, fill: isDark ? 'white' : 'black' })}
+                </TouchableOpacity>
+              </View>
               <AccessLevelAvatar
                 author={author}
                 height={100}
@@ -100,20 +130,20 @@ export default class UserInfo extends React.Component {
                 ))}
               </View>
             </View>
-            <TouchableOpacity style={styles.reportBtn} onPress={this.onReportUser}>
-              {reportSvg({
-                height: 14,
-                width: 14,
-                fill: isDark ? '#627F97' : '#445F74',
-              })}
-              <Text style={styles.reportText}>REPORT USER</Text>
-            </TouchableOpacity>
-            
           </View>
-          {this.state.showToastAlert && 
+          <BlockModal ref={this.blockRef} onReport={this.onReportUser} onBlock={this.showBlockWarning} />
+          <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
+          {this.state.showToastAlert &&
             <ToastAlert
               content={this.state.userAlreadyReported ? "You have already reported this profile.":"The user profile was reported" }
               icon={reportSvg({ height: 21.6, width: 21.6, fill: isDark ? 'black' : 'white' })}
+              isDark={isDark}
+            />
+          }
+          {this.state.showBlockAlert &&
+            <ToastAlert
+              content={`${author?.display_name} was blocked.`}
+              icon={banSvg({ height: 21.6, width: 21.6, fill: isDark ? 'black' : 'white' })}
               isDark={isDark}
             />
           }
