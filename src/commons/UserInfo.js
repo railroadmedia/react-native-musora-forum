@@ -71,14 +71,7 @@ export default class UserInfo extends React.Component {
         <View style={styles.background}>
           <View style={styles.container} >
             <View style={styles.infoContainer}>
-              <View style={{
-                width: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 30,
-                paddingHorizontal: 10,
-              }}>
+              <View style={styles.header}>
                 <TouchableOpacity onPress={onHideUserInfo}>
                   {x({ width: 20, height: 20, fill: isDark ? 'white' : 'black' })}
                 </TouchableOpacity>
@@ -177,15 +170,17 @@ const setStyles = (isDark, appColor) =>
       width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'space-between',
       marginBottom: 30,
+      paddingHorizontal: 10,
     },
     name: {
       fontFamily: 'OpenSans-ExtraBold',
       color: isDark ? 'white' : 'black',
       fontSize: 20,
-      position: 'absolute',
       textAlign: 'center',
-      width: '100%',
+      alignSelf: 'center',
+      flex: 1,
     },
     rank: {
       width: '100%',
