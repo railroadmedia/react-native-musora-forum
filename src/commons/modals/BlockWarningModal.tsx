@@ -51,7 +51,12 @@ const BlockModal = forwardRef<{ toggle: (user: string) => void }, IBlockModal>((
           <Text style={styles.description}>
             You will no longer see {username}’s comments or forum posts.
           </Text>
-          {/* <CustomColoredButton buttonText={'BLOCK'} onPress={blockUser} style={styles.blockButton} /> */}
+          <TouchableOpacity
+            style={styles.blockButton}
+            onPress={blockUser}
+          >
+            <Text style={styles.blockText}>BLOCK</Text>
+          </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={closeModal}>
           <Text style={styles.close}>Close</Text>
@@ -97,6 +102,14 @@ const styles: StyleProp<any> = StyleSheet.create({
       width: 165,
       height: 40,
       marginTop: 23,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    blockText: {
+      color: 'white',
+      fontSize: 18,
+      fontFamily: 'BebasNeue',
     },
     lgradient: {
       width: '100%',

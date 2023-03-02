@@ -28,7 +28,7 @@ export default class UserInfo extends React.Component {
   }
 
   showBlockWarning = () => {
-    this.warningRef.current?.toggle();
+    this.warningRef.current?.toggle(this.props.author.display_name);
   }
 
   onReportUser = () => {
