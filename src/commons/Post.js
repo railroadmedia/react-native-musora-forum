@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, Modal, Pressable, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 
@@ -14,11 +14,20 @@ import { connect } from 'react-redux';
 import AccessLevelAvatar from './AccessLevelAvatar';
 import HTMLRenderer from './HTMLRenderer';
 
-import { like, likeOn, replies } from '../assets/svgs';
+import { like, likeOn, menuHSvg, replies } from '../assets/svgs';
 
-import { likePost, disLikePost, connection } from '../services/forum.service';
+import {
+  likePost,
+  disLikePost,
+  connection,
+  reportUser,
+  blockUser,
+} from '../services/forum.service';
 import { updatePosts } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
+
+import BlockModal from '../commons/modals/BlockModal';
+import BlockWarningModal from '../commons/modals/BlockWarningModal';
 
 let styles;
 let multiQuotes = [];
@@ -42,6 +51,8 @@ class Post extends React.Component {
       isPostReported: post?.is_reported_by_viewer
     };
     styles = setStyles(isDark, appColor);
+    this.blockRef = React.createRef();
+    this.warningRef = React.createRef();
   }
 
   toggleLike = () => {
@@ -136,8 +147,45 @@ class Post extends React.Component {
         this.props.reportForumPost(this.props.post, false)
         this.setState({isPostReported: true});
       }
-    })
-  }
+    });
+  };
+
+  showBlockWarning = () => {
+    this.warningRef.current?.toggle(this.props.post.author.display_name);
+  };
+
+  onReportUser = () => {
+    if (this.state.userAlreadyReported) {
+      this.setState({ showToastAlert: true });
+      setTimeout(() => {
+        this.setState({ showToastAlert: false });
+      }, 2000);
+    } else {
+      const { request, controller } = reportUser(this.props.post.author.id);
+      request.then(res => {
+        if (res.data.success) {
+          this.props.onUserReport?.();
+        }
+      });
+      return () => {
+        controller.abort();
+      };
+    }
+  };
+
+  onBlockUser = () => {
+    const { request, controller } = blockUser(this.props.post.author.id);
+    request
+      .then(res => {
+        if (res.data.success) {
+          this.props.onUserBlock?.(this.props.post.author.display_name);
+        }
+      })
+      .catch(err => console.log(err));
+    return () => {
+      controller.abort();
+    };
+  };
 
   render() {
     let { isLiked, likeCount, selected, menuTop, reportModalVisible } = this.state;
@@ -177,6 +225,7 @@ class Post extends React.Component {
                   tagHeight={4}
                   showUserInfo={true}
                   onNavigateToCoach={this.onNavigateToCoach}
+                  onUserBlock={this.props.onUserBlock}
                 />
                 <View style={{ marginLeft: 5 }}>
                   <Text style={styles.name} numberOfLines={2} ellipsizeMode='tail'>
@@ -269,6 +318,17 @@ class Post extends React.Component {
                   <Text style={styles.likesNoText}>REPLY</Text>
                 </TouchableOpacity>
               )}
+              <View style={styles.menuContainer}>
+                <TouchableOpacity
+                  onPress={() => this.blockRef.current.toggle()}
+                >
+                  {menuHSvg({
+                    width: 23,
+                    height: 20,
+                    fill: isDark ? 'white' : 'black',
+                  })}
+                </TouchableOpacity>
+              </View>
             </View>
             {signShown && !!post.author.signature && (
               <View style={styles.signatureContainer}>
@@ -346,6 +406,13 @@ class Post extends React.Component {
             </View>
           </Pressable>
         </Modal>
+
+        <BlockModal
+          ref={this.blockRef}
+          onReport={this.onReportUser}
+          onBlock={this.showBlockWarning}
+        />
+        <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
       </>
     );
   }
@@ -399,6 +466,12 @@ let setStyles = (isDark, appColor) =>
       fontFamily: 'BebasNeuePro-Bold',
       color: isDark ? '#FFFFFF' : '#00101D',
       paddingLeft: 5,
+    },
+    menuContainer: {
+      flex: 1,
+      justifyContent: 'flex-end',
+      flexDirection: 'row',
+      padding: 15,
     },
     replyText: {
       color: isDark ? '#445F74' : '#00101D',
