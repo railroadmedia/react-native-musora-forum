@@ -326,7 +326,7 @@ class Thread extends React.Component {
                     threadId,
                     quotes: Post.multiQuotes.map(({ props: { post } }) => ({
                       ...post,
-                      content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`,
+                      content: `<blockquote><b>${post?.author?.display_name}</b>:<br>${post?.content}</blockquote>`,
                     })),
                   });
             }}

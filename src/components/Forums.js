@@ -50,11 +50,13 @@ class Forums extends React.Component {
     const { request: followedRequest, controller: followedController } = getFollowedThreads();
 
     Promise.all([forumsRequest, followedRequest]).then(([forums, followed]) => {
-      this.forums = forums.data.results;
-      this.followedThreads = followed.data.results.map(r => r.id);
-      this.followedThreadsTotal = followed.data.total_results;
+      this.forums = forums.data?.results;
+      this.followedThreads = followed.data?.results?.map(r => r.id);
+      this.followedThreadsTotal = followed.data?.total_results;
       batch(() => {
-        this.props.setForumsThreads(followed.data.results);
+        if (followed.data){
+          this.props.setForumsThreads(followed.data?.results);
+        }
         this.setState({ loading: false });
       });
     });
@@ -104,9 +106,9 @@ class Forums extends React.Component {
       const { request: followedRequest, controller: followedController } = getFollowedThreads();
       Promise.all([forumsRequest, followedRequest]).then(([forums, followed]) => {
         this.forums = forums.data.results;
-        this.followedThreads = followed.data.results.map(r => r.id);
+        this.followedThreads = followed.data?.results?.map(r => r.id);
         batch(() => {
-          this.props.setForumsThreads(followed.data.results);
+          this.props.setForumsThreads(followed.data?.results);
           this.setState({ refreshing: false });
         });
       });
@@ -127,7 +129,7 @@ class Forums extends React.Component {
       );
 
       followedRequest.then(r => {
-        this.followedThreads = r.data.results.map(r => r.id);
+        this.followedThreads = r.data?.results?.map(r => r.id);
         this.flatListRef.scrollToOffset({ offset: 0, animated: false });
         batch(() => {
           this.props.setForumsThreads(r.data.results);

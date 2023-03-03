@@ -43,16 +43,16 @@ class ForumCard extends React.Component {
           <Text style={styles.description}>{description}</Text>
           {arrowRight({ height: 10, width: 10, fill: isDark ? '#FFFFFF' : '#000000' })}
         </View>
-        {latest_post && (
+        {!!latest_post && (
           <View style={styles.tagsContainer}>
             <Text style={[styles.tags, { flexShrink: 0 }]} numberOfLines={1} ellipsizeMode='tail'>
-              {latest_post.created_at_diff}
+              {latest_post?.created_at_diff}
             </Text>
             <Text style={styles.tags} numberOfLines={1} ellipsizeMode='tail'>
-              - In: {latest_post.thread_title}
+              - In: {latest_post?.thread_title}
             </Text>
             <Text style={styles.tags} numberOfLines={1} ellipsizeMode='tail'>
-              - By: {latest_post.author_display_name}
+              - By: {latest_post?.author_display_name}
             </Text>
           </View>
         )}

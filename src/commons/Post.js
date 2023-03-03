@@ -91,17 +91,17 @@ class Post extends React.Component {
   edit = () => {
     closeMenus();
     let { post, onDelete } = this.props;
-    const blockQuote = post.content.split('</blockquote>').slice(0, -1).join('</blockquote>');
+    const blockQuote = post?.content?.split('</blockquote>').slice(0, -1).join('</blockquote>');
     this.props.navigation.navigate('CRUD', {
       type: 'post',
       action: 'edit',
-      postId: post.id,
+      postId: post?.id,
       onDelete,
       quotes: blockQuote
         ? [
             {
               content:
-                post.content.split('</blockquote>').slice(0, -1).join('</blockquote>') +
+                post?.content?.split('</blockquote>').slice(0, -1).join('</blockquote>') +
                 '</blockquote>',
             },
           ]
@@ -114,7 +114,7 @@ class Post extends React.Component {
     this.setState(({ selected }) => {
       if (selected)
         multiQuotes.splice(
-          multiQuotes.findIndex(mq => mq.props.post.id === this.props.post.id),
+          multiQuotes.findIndex(mq => mq.props.post?.id === this.props.post?.id),
           1
         );
       else multiQuotes.push(this);
@@ -128,12 +128,12 @@ class Post extends React.Component {
     this.props.navigation.navigate('CRUD', {
       type: 'post',
       action: 'create',
-      threadId: post.thread_id,
+      threadId: post?.thread_id,
       onPostCreated,
       quotes: [
         {
           ...post,
-          content: `<blockquote><b>${post.author.display_name}</b>:<br>${post.content}</blockquote>`,
+          content: `<blockquote><b>${post?.author?.display_name}</b>:<br>${post?.content}</blockquote>`,
         },
       ],
     });
@@ -151,7 +151,7 @@ class Post extends React.Component {
   };
 
   showBlockWarning = () => {
-    this.warningRef.current?.toggle(this.props.post.author.display_name);
+    this.warningRef.current?.toggle(this.props.post?.author?.display_name);
   };
 
   onReportUser = () => {
@@ -161,7 +161,7 @@ class Post extends React.Component {
         this.setState({ showToastAlert: false });
       }, 2000);
     } else {
-      const { request, controller } = reportUser(this.props.post.author.id);
+      const { request, controller } = reportUser(this.props.post?.author?.id);
       request.then(res => {
         if (res.data.success) {
           this.props.onUserReport?.();
@@ -174,11 +174,11 @@ class Post extends React.Component {
   };
 
   onBlockUser = () => {
-    const { request, controller } = blockUser(this.props.post.author.id);
+    const { request, controller } = blockUser(this.props.post?.author?.id);
     request
       .then(res => {
         if (res.data.success) {
-          this.props.onUserBlock?.(this.props.post.author.display_name);
+          this.props.onUserBlock?.(this.props.post?.author?.display_name);
         }
       })
       .catch(err => console.log(err));
@@ -192,12 +192,12 @@ class Post extends React.Component {
     let { post, appColor, index, isDark, signShown, locked, user } = this.props;
     let selectedColor = isDark ? '#002039' : '#E1E6EB';
     let baseColor = isDark ? '#081825' : '#FFFFFF';
-    if (post && post.content?.includes(`<p><img src="https://cdn.tiny.cloud`)) {
-      post.content = post.content.replace(`<p><img`, `<p style="flex-direction:row;"><img `);
+    if (post && post?.content?.includes(`<p><img src="https://cdn.tiny.cloud`)) {
+      post.content = post?.content?.replace(`<p><img`, `<p style="flex-direction:row;"><img `);
     }
     return (
       <>
-        {post && (
+        {!!post && (
           <View
             disabled={!!locked}
             activeOpacity={1}
@@ -213,12 +213,12 @@ class Post extends React.Component {
           >
             <View style={styles.header}>
               <Text style={styles.headerText}>#{index}</Text>
-              <Text style={styles.headerText}>{post.published_on_formatted}</Text>
+              <Text style={styles.headerText}>{post?.published_on_formatted}</Text>
             </View>
             <View style={styles.header}>
               <View style={styles.userDetails}>
                 <AccessLevelAvatar
-                  author={post.author}
+                  author={post?.author}
                   height={45}
                   appColor={appColor}
                   isDark={isDark}
@@ -229,11 +229,11 @@ class Post extends React.Component {
                 />
                 <View style={{ marginLeft: 5 }}>
                   <Text style={styles.name} numberOfLines={2} ellipsizeMode='tail'>
-                    {post.author.display_name}
+                    {post?.author?.display_name}
                   </Text>
                   <Text style={styles.xp}>
-                    {post.author.total_posts} Posts - {post.author.xp_rank} - Level{' '}
-                    {post.author.level_rank}
+                    {post?.author?.total_posts} Posts - {post?.author?.xp_rank} - Level{' '}
+                    {post?.author?.level_rank}
                   </Text>
                 </View>
               </View>
@@ -241,7 +241,7 @@ class Post extends React.Component {
             <View style={{ paddingHorizontal: 15 }}>
               <HTMLRenderer
                 appColor={appColor}
-                html={post.content}
+                html={post?.content}
                 tagsStyles={{
                   div: {
                     color: isDark ? 'white' : '#00101D',
@@ -282,7 +282,7 @@ class Post extends React.Component {
             </View>
             <View style={styles.likeContainer}>
               <TouchableOpacity
-                disabled={user.id === post.author_id}
+                disabled={user.id === post?.author_id}
                 onPress={this.toggleLike}
                 disallowInterruption={true}
                 style={{
@@ -330,9 +330,9 @@ class Post extends React.Component {
                 </TouchableOpacity>
               </View>
             </View>
-            {signShown && !!post.author.signature && (
+            {signShown && !!post?.author?.signature && (
               <View style={styles.signatureContainer}>
-                <HTMLRenderer html={post.author.signature} tagsStyles={{ div: styles.signature }} />
+                <HTMLRenderer html={post?.author?.signature} tagsStyles={{ div: styles.signature }} />
               </View>
             )}
           </View>
@@ -356,7 +356,7 @@ class Post extends React.Component {
               {[
                 'report',
                 this.props.user.permission_level === 'administrator' ||
-                this.props.user.id === this.props.post.author_id
+                this.props.user.id === this.props.post?.author_id
                   ? 'edit'
                   : '',
                 'multiQuote',

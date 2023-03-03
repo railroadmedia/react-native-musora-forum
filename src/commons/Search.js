@@ -106,12 +106,14 @@ class Search extends React.Component {
   searchPosts = (text = this.searchText) => {
     const { request, controller } = search(text, this.page);
     request.then(searchResult => {
-      this.searchResults = searchResult.data.results;
+      this.searchResults = searchResult.data?.results;
       this.searchText = text;
-      this.searchTotal = searchResult.data.total_results;
+      this.searchTotal = searchResult.data?.total_results;
       this.flatListRef?.scrollToOffset({ offset: 0, animated: false });
       batch(() => {
-        this.props.setSearchThreads(searchResult.data.results.map(r => r.thread));
+        if (searchResult.data?.results) {
+          this.props.setSearchThreads(searchResult.data?.results?.map(r => r.thread));
+        }
         this.setState({
           loading: false,
           loadingMore: false,

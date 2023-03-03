@@ -57,8 +57,8 @@ class ThreadCard extends React.Component {
             <Text style={{ fontFamily: 'OpenSans-BoldItalic' }}>{author_display_name}</Text>
           </Text>
           <Text style={styles.topicName}>
-            {`${post_count} Replies`} · {latest_post.created_at_diff} · By{' '}
-            {latest_post.author_display_name}
+            {`${post_count} Replies`} · {latest_post?.created_at_diff} · By{' '}
+            {latest_post?.author_display_name}
           </Text>
         </View>
         {arrowRight({ height: 15, fill: isDark ? 'white' : 'black' })}

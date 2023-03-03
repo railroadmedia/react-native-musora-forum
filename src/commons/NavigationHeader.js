@@ -170,7 +170,7 @@ class NavigationHeader extends React.Component {
               </View>
             )}
             <Text style={styles.titleText} numberOfLines={2} ellipsizeMode='tail'>
-              {(title ? title : thread?.title)?.replace(/-/g, ' ')}
+              {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
             </Text>
           </View>
           <TouchableOpacity style={{ paddingHorizontal: 15 }} onPress={navigation.goBack}>
@@ -179,7 +179,7 @@ class NavigationHeader extends React.Component {
               fill: isDark ? 'white' : 'black',
             })}
           </TouchableOpacity>
-          {name.match(/^(Forums|Threads|Thread)$/) && !isForumRules && (
+          {name?.match(/^(Forums|Threads|Thread)$/) && !isForumRules && (
             <>
               <TouchableOpacity
                 style={{ padding: 15 }}

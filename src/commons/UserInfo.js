@@ -20,7 +20,7 @@ export default class UserInfo extends React.Component {
   state = {
     showToastAlert: false,
     showBlockAlert: false,
-    userAlreadyReported: this.props.author.is_reported_by_viewer,
+    userAlreadyReported: this.props.author?.is_reported_by_viewer,
   };
 
   showBlockModal = () => {
@@ -28,7 +28,7 @@ export default class UserInfo extends React.Component {
   };
 
   showBlockWarning = () => {
-    this.warningRef.current?.toggle(this.props.author.display_name);
+    this.warningRef.current?.toggle(this.props.author?.display_name);
   };
 
   onReportUser = () => {
@@ -38,7 +38,7 @@ export default class UserInfo extends React.Component {
         this.setState({ showToastAlert: false });
       }, 2000);
     } else {
-      const { request, controller } = reportUser(this.props.author.id);
+      const { request, controller } = reportUser(this.props.author?.id);
       request.then(res => {
         if (res.data.success) {
           this.setState({ showToastAlert: true });
@@ -113,17 +113,17 @@ export default class UserInfo extends React.Component {
                 <Text style={styles.yearSince}>
                   MEMBER SINCE{' '}
                   {new Date(
-                    Date.now() - author.days_as_member * 86400000
+                    Date.now() - author?.days_as_member * 86400000
                   ).getUTCFullYear()}
                 </Text>
               </Text>
               <View style={styles.rowsContainer}>
                 {[
                   [
-                    author.xp,
-                    author.total_posts,
-                    author.days_as_member,
-                    author.total_post_likes,
+                    author?.xp,
+                    author?.total_posts,
+                    author?.days_as_member,
+                    author?.total_post_likes,
                   ],
                   [
                     'Total XP',
