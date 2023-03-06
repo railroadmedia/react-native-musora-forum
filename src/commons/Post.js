@@ -91,7 +91,10 @@ class Post extends React.Component {
   edit = () => {
     closeMenus();
     let { post, onDelete } = this.props;
-    const blockQuote = post?.content?.split('</blockquote>').slice(0, -1).join('</blockquote>');
+    const blockQuote = post?.content
+      ?.split('</blockquote>')
+      .slice(0, -1)
+      .join('</blockquote>');
     this.props.navigation.navigate('CRUD', {
       type: 'post',
       action: 'edit',
@@ -101,8 +104,10 @@ class Post extends React.Component {
         ? [
             {
               content:
-                post?.content?.split('</blockquote>').slice(0, -1).join('</blockquote>') +
-                '</blockquote>',
+                post?.content
+                  ?.split('</blockquote>')
+                  .slice(0, -1)
+                  .join('</blockquote>') + '</blockquote>',
             },
           ]
         : [],
@@ -114,7 +119,9 @@ class Post extends React.Component {
     this.setState(({ selected }) => {
       if (selected)
         multiQuotes.splice(
-          multiQuotes.findIndex(mq => mq.props.post?.id === this.props.post?.id),
+          multiQuotes.findIndex(
+            mq => mq.props.post?.id === this.props.post?.id
+          ),
           1
         );
       else multiQuotes.push(this);
@@ -142,10 +149,10 @@ class Post extends React.Component {
   onReport = () => {
     this.setState({ reportModalVisible: false }, () => {
       if (this.state.isPostReported) {
-        this.props.reportForumPost(this.props.post, true)
+        this.props.reportForumPost(this.props.post, true);
       } else {
-        this.props.reportForumPost(this.props.post, false)
-        this.setState({isPostReported: true});
+        this.props.reportForumPost(this.props.post, false);
+        this.setState({ isPostReported: true });
       }
     });
   };
@@ -188,12 +195,19 @@ class Post extends React.Component {
   };
 
   render() {
-    let { isLiked, likeCount, selected, menuTop, reportModalVisible } = this.state;
+    let { isLiked, likeCount, selected, menuTop, reportModalVisible } =
+      this.state;
     let { post, appColor, index, isDark, signShown, locked, user } = this.props;
     let selectedColor = isDark ? '#002039' : '#E1E6EB';
     let baseColor = isDark ? '#081825' : '#FFFFFF';
-    if (post && post?.content?.includes(`<p><img src="https://cdn.tiny.cloud`)) {
-      post.content = post?.content?.replace(`<p><img`, `<p style="flex-direction:row;"><img `);
+    if (
+      post &&
+      post?.content?.includes(`<p><img src="https://cdn.tiny.cloud`)
+    ) {
+      post.content = post?.content?.replace(
+        `<p><img`,
+        `<p style="flex-direction:row;"><img `
+      );
     }
     return (
       <>
@@ -209,11 +223,15 @@ class Post extends React.Component {
             onMoveShouldSetResponder={() => false}
             onStartShouldSetResponderCapture={() => false}
             onMoveShouldSetResponderCapture={() => false}
-            onResponderRelease={multiQuotes.length ? this.multiQuote : this.toggleMenu}
+            onResponderRelease={
+              multiQuotes.length ? this.multiQuote : this.toggleMenu
+            }
           >
             <View style={styles.header}>
               <Text style={styles.headerText}>#{index}</Text>
-              <Text style={styles.headerText}>{post?.published_on_formatted}</Text>
+              <Text style={styles.headerText}>
+                {post?.published_on_formatted}
+              </Text>
             </View>
             <View style={styles.header}>
               <View style={styles.userDetails}>
@@ -228,12 +246,16 @@ class Post extends React.Component {
                   onUserBlock={this.props.onUserBlock}
                 />
                 <View style={{ marginLeft: 5 }}>
-                  <Text style={styles.name} numberOfLines={2} ellipsizeMode='tail'>
+                  <Text
+                    style={styles.name}
+                    numberOfLines={2}
+                    ellipsizeMode='tail'
+                  >
                     {post?.author?.display_name}
                   </Text>
                   <Text style={styles.xp}>
-                    {post?.author?.total_posts} Posts - {post?.author?.xp_rank} - Level{' '}
-                    {post?.author?.level_rank}
+                    {post?.author?.total_posts} Posts - {post?.author?.xp_rank}{' '}
+                    - Level {post?.author?.level_rank}
                   </Text>
                 </View>
               </View>
@@ -269,7 +291,7 @@ class Post extends React.Component {
                   'blockquote-odd': {
                     backgroundColor: isDark ? '#002039' : '#E1E6EB',
                   },
-                  shadow: {
+                  'shadow': {
                     elevation: 5,
                     shadowColor: 'black',
                     shadowOffset: { height: 4 },
@@ -297,7 +319,9 @@ class Post extends React.Component {
                   width: 15,
                   fill: appColor,
                 })}
-                {likeCount > 0 && <Text style={styles.likesNoText}>{likeCount}</Text>}
+                {likeCount > 0 && (
+                  <Text style={styles.likesNoText}>{likeCount}</Text>
+                )}
               </TouchableOpacity>
               {!locked && (
                 <TouchableOpacity
@@ -332,7 +356,10 @@ class Post extends React.Component {
             </View>
             {signShown && !!post?.author?.signature && (
               <View style={styles.signatureContainer}>
-                <HTMLRenderer html={post?.author?.signature} tagsStyles={{ div: styles.signature }} />
+                <HTMLRenderer
+                  html={post?.author?.signature}
+                  tagsStyles={{ div: styles.signature }}
+                />
               </View>
             )}
           </View>
@@ -394,12 +421,11 @@ class Post extends React.Component {
           >
             <View style={styles.reportModalContainer}>
               <Text style={styles.reportTitle}>Report Post</Text>
-              <Text style={styles.reportMessage}>Are you sure you want to report this post?</Text>
+              <Text style={styles.reportMessage}>
+                Are you sure you want to report this post?
+              </Text>
               <View style={styles.reportBtnsContainer}>
-                <Pressable
-                  style={{ flex: 1 }}
-                  onPress={this.onReport}
-                >
+                <Pressable style={{ flex: 1 }} onPress={this.onReport}>
                   <Text style={styles.reportBtnText}>Report</Text>
                 </Pressable>
               </View>
@@ -551,7 +577,9 @@ const mapStateToProps = ({ threads: { signShown, posts } }, { id }) => ({
   signShown,
   post: posts[id],
 });
-let NavigationWrapper = props => <Post {...props} navigation={useNavigation()} />;
+let NavigationWrapper = props => (
+  <Post {...props} navigation={useNavigation()} />
+);
 NavigationWrapper.multiQuotes = multiQuotes;
 NavigationWrapper.clearQuoting = () => {
   closeMenus();
@@ -559,5 +587,6 @@ NavigationWrapper.clearQuoting = () => {
   multiQuotes.splice(0, multiQuotes.length);
 };
 
-const mapDispatchToProps = dispatch => bindActionCreators({ updatePosts }, dispatch);
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ updatePosts }, dispatch);
 export default connect(mapStateToProps, mapDispatchToProps)(NavigationWrapper);
