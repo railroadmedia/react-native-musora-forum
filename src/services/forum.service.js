@@ -14,9 +14,9 @@ export const getForums = function () {
 };
 export const getAllThreads = function (forumId, page = 1) {
   return this.tryCall.get(
-    `/forums/api/thread/index?amount=10&page=${page}&brand=${this.brand}&category_id=${
-      forumId || ''
-    }`
+    `/forums/api/thread/index?amount=10&page=${page}&brand=${
+      this.brand
+    }&category_id=${forumId || ''}`
   );
 };
 export const getThread = function (threadId, page = 1, isForumRules, postId) {
@@ -34,10 +34,14 @@ export const search = function (text, page = 1) {
   );
 };
 export const followThread = function (id) {
-  return this.tryCall.put(`/forums/api/thread/follow/${id}?brand=${this.brand}`);
+  return this.tryCall.put(
+    `/forums/api/thread/follow/${id}?brand=${this.brand}`
+  );
 };
 export const unfollowThread = function (id) {
-  return this.tryCall.delete(`/forums/api/thread/unfollow/${id}?brand=${this.brand}`);
+  return this.tryCall.delete(
+    `/forums/api/thread/unfollow/${id}?brand=${this.brand}`
+  );
 };
 export const createThread = function (title, content, category_id) {
   return this.tryCall.put(`/forums/api/thread/store?brand=${this.brand}`, {
@@ -47,23 +51,30 @@ export const createThread = function (title, content, category_id) {
   });
 };
 export const updateThread = function (id, body) {
-  return this.tryCall.patch(`/forums/api/thread/update/${id}?brand=${this.brand}`, body);
+  return this.tryCall.patch(
+    `/forums/api/thread/update/${id}?brand=${this.brand}`,
+    body
+  );
 };
 export const deleteThread = function (id) {
-  return this.tryCall.delete(`/forums/api/thread/delete/${id}?brand=${this.brand}`);
+  return this.tryCall.delete(
+    `/forums/api/thread/delete/${id}?brand=${this.brand}`
+  );
 };
 export const getFollowedThreads = function (forumId, page = 1) {
   return this.tryCall.get(
-    `/forums/api/thread/index?amount=10&page=${page}&brand=${this.brand}&followed=1&category_id=${
-      forumId || ''
-    }`
+    `/forums/api/thread/index?amount=10&page=${page}&brand=${
+      this.brand
+    }&followed=1&category_id=${forumId || ''}`
   );
 };
 export const likePost = function (id) {
   return this.tryCall.put(`/forums/api/post/like/${id}?brand=${this.brand}`);
 };
 export const disLikePost = function (id) {
-  return this.tryCall.delete(`/forums/api/post/unlike/${id}?brand=${this.brand}`);
+  return this.tryCall.delete(
+    `/forums/api/post/unlike/${id}?brand=${this.brand}`
+  );
 };
 export const reportPost = function (id) {
   return this.tryCall.put(`/forums/api/post/report/${id}?brand=${this.brand}`);
@@ -72,13 +83,20 @@ export const createPost = function (body) {
   return this.tryCall.put(`/forums/api/post/store?brand=${this.brand}`, body);
 };
 export const editPost = function (id, content) {
-  return this.tryCall.patch(`/forums/api/post/update/${id}?brand=${this.brand}`, { content });
+  return this.tryCall.patch(
+    `/forums/api/post/update/${id}?brand=${this.brand}`,
+    { content }
+  );
 };
 export const deletePost = function (id) {
-  return this.tryCall.delete(`/forums/api/post/delete/${id}?brand=${this.brand}`);
+  return this.tryCall.delete(
+    `/forums/api/post/delete/${id}?brand=${this.brand}`
+  );
 };
 export const reportUser = function (id) {
-  return this.tryCall.put(`/user-management-system/user/report/${id}?brand=${this.brand}`);
+  return this.tryCall.put(
+    `/user-management-system/user/report/${id}?brand=${this.brand}`
+  );
 };
 export const blockUser = function (id) {
   return this.tryCall.put(`/user-management-system/user/block/${id}`);
