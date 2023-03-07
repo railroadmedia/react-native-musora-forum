@@ -5,14 +5,15 @@ import LinearGradient from 'react-native-linear-gradient';
 import { banSvg, reportSvg } from '../../assets/svgs';
 
 interface IBlockModal {
-  onReport?: () => void;
+  onReportUser?: () => void;
+  onReportPost?: () => void;
   onBlock?: () => void;
 }
 
 const IS_TABLET = isTablet();
 
 const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) => {
-  const { onReport, onBlock } = props;
+  const { onReportUser, onReportPost, onBlock } = props;
   const [visible, setVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({
@@ -26,9 +27,9 @@ const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) 
   }, []);
 
   const report = useCallback(() => {
-    onReport?.();
+    onReportPost?.();
     closeModal();
-  }, [closeModal, onReport]);
+  }, [closeModal, onReportPost]);
 
   const blockUser = useCallback(() => {
     onBlock?.();

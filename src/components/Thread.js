@@ -273,8 +273,9 @@ class Thread extends React.Component {
         setTimeout(() => this.setState({ lockedModalVisible: false }), 3000)
     );
 
-  reportForumPost = (post, isReported) => {
-    if (isReported) {
+  reportForumPost = () => {
+    const post = this.state.selectedPost;
+    if (!!post.is_reported_by_viewer) {
       this.setState({
         showToastAlert: true,
         alertText: 'You have already reported this post.',
@@ -293,6 +294,7 @@ class Thread extends React.Component {
         setTimeout(() => {
           this.setState({ showToastAlert: false, alertText: '' });
         }, 2000);
+        this.refresh();
       });
       return () => {
         controller.abort();
@@ -468,7 +470,8 @@ class Thread extends React.Component {
 
         <BlockModal
           ref={this.blockRef}
-          onReport={this.onReportUser}
+          onReportUser={this.onReportUser}
+          onReportPost={this.reportForumPost}
           onBlock={this.showBlockWarning}
         />
         <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
