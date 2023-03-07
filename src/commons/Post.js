@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 
@@ -16,18 +16,9 @@ import HTMLRenderer from './HTMLRenderer';
 
 import { like, likeOn, menuHSvg, replies } from '../assets/svgs';
 
-import {
-  likePost,
-  disLikePost,
-  connection,
-  reportUser,
-  blockUser,
-} from '../services/forum.service';
+import { likePost, disLikePost, connection } from '../services/forum.service';
 import { updatePosts } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
-
-import BlockModal from '../commons/modals/BlockModal';
-import BlockWarningModal from '../commons/modals/BlockWarningModal';
 
 let styles;
 let multiQuotes = [];
@@ -50,8 +41,6 @@ class Post extends React.Component {
       isPostReported: post?.is_reported_by_viewer,
     };
     styles = setStyles(isDark, appColor);
-    this.blockRef = React.createRef();
-    this.warningRef = React.createRef();
   }
 
   toggleLike = () => {
@@ -141,43 +130,6 @@ class Post extends React.Component {
         },
       ],
     });
-  };
-
-  showBlockWarning = () => {
-    this.warningRef.current?.toggle(this.props.post?.author?.display_name);
-  };
-
-  onReportUser = () => {
-    if (this.state.userAlreadyReported) {
-      this.setState({ showToastAlert: true });
-      setTimeout(() => {
-        this.setState({ showToastAlert: false });
-      }, 2000);
-    } else {
-      const { request, controller } = reportUser(this.props.post?.author?.id);
-      request.then(res => {
-        if (res.data.success) {
-          this.props.onUserReport?.();
-        }
-      });
-      return () => {
-        controller.abort();
-      };
-    }
-  };
-
-  onBlockUser = () => {
-    const { request, controller } = blockUser(this.props.post?.author?.id);
-    request
-      .then(res => {
-        if (res.data.success) {
-          this.props.onUserBlock?.(this.props.post?.author?.display_name);
-        }
-      })
-      .catch(err => console.log(err));
-    return () => {
-      controller.abort();
-    };
   };
 
   render() {
@@ -329,7 +281,8 @@ class Post extends React.Component {
               )}
               <View style={styles.menuContainer}>
                 <TouchableOpacity
-                  onPress={() => this.blockRef.current.toggle()}
+                  onPress={() => this.props.toggleMenu(post)}
+                  disallowInterruption={true}
                 >
                   {menuHSvg({
                     width: 23,

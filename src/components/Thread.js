@@ -19,13 +19,28 @@ import { bindActionCreators } from 'redux';
 import Pagination from '../commons/Pagination';
 import Post from '../commons/Post';
 
-import { connection, getThread, reportPost } from '../services/forum.service';
+import {
+  connection,
+  getThread,
+  reportPost,
+  reportUser,
+  blockUser,
+} from '../services/forum.service';
 
-import { post, multiQuote, lock, reportSvg, banSvg } from '../assets/svgs';
+import {
+  post as PostSvg,
+  multiQuote,
+  lock,
+  reportSvg,
+  banSvg,
+} from '../assets/svgs';
 
 import { setPosts, setForumRules } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
 import ToastAlert from '../commons/ToastAlert';
+
+import BlockModal from '../commons/modals/BlockModal';
+import BlockWarningModal from '../commons/modals/BlockWarningModal';
 
 let styles;
 class Thread extends React.Component {
@@ -44,6 +59,7 @@ class Thread extends React.Component {
     showReportAlert: false,
     showBlockAlert: false,
     alertText: '',
+    selectedPost: undefined,
   };
 
   constructor(props) {
@@ -52,6 +68,8 @@ class Thread extends React.Component {
     this.postId = postId;
     styles = setStyles(props.isDark, props.appColor);
     this.page = page || 1;
+    this.blockRef = React.createRef();
+    this.warningRef = React.createRef();
   }
 
   componentDidMount() {
@@ -154,21 +172,7 @@ class Thread extends React.Component {
               this.changePage(--this.page);
           }}
           reportForumPost={this.reportForumPost}
-          onUserBlock={blockedUser => {
-            this.setState({ showBlockAlert: true, blockedUser }, () => {
-              setTimeout(() => {
-                this.setState({ showBlockAlert: false });
-              }, 2000);
-              this.refresh();
-            });
-          }}
-          onUserReport={() => {
-            this.setState({ showReportAlert: true }, () => {
-              setTimeout(() => {
-                this.setState({ showReportAlert: false });
-              }, 2000);
-            });
-          }}
+          toggleMenu={this.showBlockModal}
         />
       </View>
     );
@@ -296,6 +300,57 @@ class Thread extends React.Component {
     }
   };
 
+  showBlockModal = selectedPost => {
+    this.setState({ selectedPost });
+    this.blockRef.current.toggle();
+  };
+
+  showBlockWarning = post =>
+    this.warningRef.current?.toggle(post?.author?.display_name);
+
+  onReportUser = () => {
+    const { selectedPost } = this.state;
+    if (!selectedPost) {
+      return;
+    }
+    if (selectedPost.author.is_reported_by_viewer) {
+      this.setState({ showReportAlert: true });
+      setTimeout(() => {
+        this.setState({ showReportAlert: false });
+      }, 2000);
+    } else {
+      const { request, controller } = reportUser(selectedPost.author?.id);
+      request
+        .then(res => {
+          console.log(res);
+          if (res.data.success) {
+            this.setState({ showReportAlert: true });
+            setTimeout(() => {
+              this.setState({ showReportAlert: false });
+            }, 2000);
+          }
+        })
+        .catch(err => console.log(err));
+      return () => {
+        controller.abort();
+      };
+    }
+  };
+
+  onBlockUser = () => {
+    const { request, controller } = blockUser(this.props.post?.author?.id);
+    request
+      .then(res => {
+        if (res.data.success) {
+          this.props.onUserBlock?.(this.props.post?.author?.display_name);
+        }
+      })
+      .catch(err => console.log(err));
+    return () => {
+      controller.abort();
+    };
+  };
+
   render() {
     let { locked, isDark, appColor } = this.props;
     let { loading, refreshing, postHeight, multiQuoting, lockedModalVisible } =
@@ -365,7 +420,7 @@ class Thread extends React.Component {
             }}
             style={styles.bottomTOpacity}
           >
-            {(locked ? lock : multiQuoting ? multiQuote : post)({
+            {(locked ? lock : multiQuoting ? multiQuote : PostSvg)({
               height: 25,
               width: 25,
               fill: 'white',
@@ -407,6 +462,13 @@ class Thread extends React.Component {
             </View>
           </TouchableOpacity>
         </Modal>
+
+        <BlockModal
+          ref={this.blockRef}
+          onReport={this.onReportUser}
+          onBlock={this.showBlockWarning}
+        />
+        <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
         {this.state.showToastAlert && (
           <ToastAlert
             content={this.state.alertText}
@@ -421,9 +483,9 @@ class Thread extends React.Component {
         {this.state.showReportAlert && (
           <ToastAlert
             content={
-              this.state.userAlreadyReported
+              this.state.selectedPost.author.is_reported_by_viewer
                 ? 'You have already reported this profile.'
-                : 'The user profile was reported'
+                : `${this.state.selectedPost.author.display_name} was reported.`
             }
             icon={reportSvg({
               height: 21.6,
