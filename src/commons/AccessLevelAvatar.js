@@ -53,7 +53,8 @@ export default class AccessLevelAvatar extends React.Component {
     let { author, showUserInfo, onNavigateToCoach } = this.props;
     if (showUserInfo) {
       if (
-        (author.access_level === 'coach' || author.access_level === 'house-coach') &&
+        (author.access_level === 'coach' ||
+          author.access_level === 'house-coach') &&
         author.associated_coach?.id
       ) {
         onNavigateToCoach?.(author.associated_coach?.id);
@@ -111,9 +112,8 @@ export default class AccessLevelAvatar extends React.Component {
           appColor={appColor}
           onUserBlock={() => {
             this.props.onUserBlock?.(author?.display_name);
-            this.setState({showUserInfo: false});
-          }
-          }
+            this.setState({ showUserInfo: false });
+          }}
         />
       </>
     );
