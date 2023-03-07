@@ -305,8 +305,7 @@ class Thread extends React.Component {
     this.blockRef.current.toggle();
   };
 
-  showBlockWarning = post =>
-    this.warningRef.current?.toggle(post?.author?.display_name);
+  showBlockWarning = () => this.warningRef.current?.toggle();
 
   onReportUser = () => {
     const { selectedPost } = this.state;
@@ -338,14 +337,18 @@ class Thread extends React.Component {
   };
 
   onBlockUser = () => {
-    const { request, controller } = blockUser(this.props.post?.author?.id);
-    request
-      .then(res => {
-        if (res.data.success) {
-          this.props.onUserBlock?.(this.props.post?.author?.display_name);
-        }
-      })
-      .catch(err => console.log(err));
+    const { request, controller } = blockUser(
+      this.state.selectedPost.author?.id
+    );
+    request.then(res => {
+      if (res.data.success) {
+        this.setState({ showBlockAlert: true });
+        setTimeout(() => {
+          this.setState({ showBlockAlert: false });
+        }, 2000);
+        this.refresh();
+      }
+    });
     return () => {
       controller.abort();
     };
@@ -497,7 +500,7 @@ class Thread extends React.Component {
         )}
         {this.state.showBlockAlert && (
           <ToastAlert
-            content={`${this.state.blockedUser} was blocked.`}
+            content={`${this.state.selectedPost.author.display_name} was blocked.`}
             icon={banSvg({
               height: 21.6,
               width: 21.6,
