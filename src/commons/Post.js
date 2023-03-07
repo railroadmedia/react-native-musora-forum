@@ -47,8 +47,7 @@ class Post extends React.Component {
       likeCount: post?.like_count,
       selected: false,
       menuTop: 0,
-      reportModalVisible: false,
-      isPostReported: post?.is_reported_by_viewer
+      isPostReported: post?.is_reported_by_viewer,
     };
     styles = setStyles(isDark, appColor);
     this.blockRef = React.createRef();
@@ -85,8 +84,6 @@ class Post extends React.Component {
       ({ selected }) => ({ selected: !selected }),
       () => closeMenus(this)
     );
-
-  report = () => this.setState({ reportModalVisible: true }, closeMenus);
 
   edit = () => {
     closeMenus();
@@ -146,17 +143,6 @@ class Post extends React.Component {
     });
   };
 
-  onReport = () => {
-    this.setState({ reportModalVisible: false }, () => {
-      if (this.state.isPostReported) {
-        this.props.reportForumPost(this.props.post, true);
-      } else {
-        this.props.reportForumPost(this.props.post, false);
-        this.setState({ isPostReported: true });
-      }
-    });
-  };
-
   showBlockWarning = () => {
     this.warningRef.current?.toggle(this.props.post?.author?.display_name);
   };
@@ -195,8 +181,7 @@ class Post extends React.Component {
   };
 
   render() {
-    let { isLiked, likeCount, selected, menuTop, reportModalVisible } =
-      this.state;
+    let { isLiked, likeCount, selected, menuTop } = this.state;
     let { post, appColor, index, isDark, signShown, locked, user } = this.props;
     let selectedColor = isDark ? '#002039' : '#E1E6EB';
     let baseColor = isDark ? '#081825' : '#FFFFFF';
@@ -381,7 +366,6 @@ class Post extends React.Component {
           >
             <View style={styles.selectedMenuContainer}>
               {[
-                'report',
                 this.props.user.permission_level === 'administrator' ||
                 this.props.user.id === this.props.post?.author_id
                   ? 'edit'
@@ -408,37 +392,6 @@ class Post extends React.Component {
             <View style={styles.triangle} />
           </View>
         )}
-        <Modal
-          animationType={'slide'}
-          onRequestClose={() => this.setState({ reportModalVisible: false })}
-          supportedOrientations={['portrait', 'landscape']}
-          transparent={true}
-          visible={reportModalVisible}
-        >
-          <Pressable
-            style={styles.reportModalBackground}
-            onPress={() => this.setState({ reportModalVisible: false })}
-          >
-            <View style={styles.reportModalContainer}>
-              <Text style={styles.reportTitle}>Report Post</Text>
-              <Text style={styles.reportMessage}>
-                Are you sure you want to report this post?
-              </Text>
-              <View style={styles.reportBtnsContainer}>
-                <Pressable style={{ flex: 1 }} onPress={this.onReport}>
-                  <Text style={styles.reportBtnText}>Report</Text>
-                </Pressable>
-              </View>
-            </View>
-          </Pressable>
-        </Modal>
-
-        <BlockModal
-          ref={this.blockRef}
-          onReport={this.onReportUser}
-          onBlock={this.showBlockWarning}
-        />
-        <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
       </>
     );
   }
