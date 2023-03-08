@@ -180,7 +180,9 @@ class Post extends React.Component {
                   tagHeight={4}
                   showUserInfo={true}
                   onNavigateToCoach={this.onNavigateToCoach}
-                  onUserBlock={this.props.onUserBlock}
+                  onMenuPress={() => {
+                    this.props.toggleMenu(post, 'user');
+                  }}
                 />
                 <View style={{ marginLeft: 5 }}>
                   <Text
@@ -281,7 +283,7 @@ class Post extends React.Component {
               )}
               <View style={styles.menuContainer}>
                 <TouchableOpacity
-                  onPress={() => this.props.toggleMenu(post)}
+                  onPress={() => this.props.toggleMenu(post, 'post')}
                   disallowInterruption={true}
                 >
                   {menuHSvg({

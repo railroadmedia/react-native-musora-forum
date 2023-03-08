@@ -60,6 +60,7 @@ class Thread extends React.Component {
     showBlockAlert: false,
     alertText: '',
     selectedPost: undefined,
+    reportMode: undefined,
   };
 
   constructor(props) {
@@ -91,7 +92,7 @@ class Thread extends React.Component {
         this.postId
       );
       request.then(thread => {
-        this.page = parseInt(thread.data.page);
+        this.page = parseInt(thread.data.page, 10);
         this.post_count = thread.data.post_count;
         this.posts = thread.data.posts.map(p => p.id);
         batch(() => {
@@ -231,7 +232,7 @@ class Thread extends React.Component {
       );
 
       request.then(thread => {
-        this.page = parseInt(thread.data.page);
+        this.page = parseInt(thread.data.page, 10);
         this.post_count = thread.data.post_count;
         this.posts = thread.data.posts.map(p => p.id);
         batch(() => {
@@ -286,7 +287,6 @@ class Thread extends React.Component {
     } else {
       const { request, controller } = reportPost(post.id);
       request.then(res => {
-        console.log(res);
         this.setState({
           showToastAlert: true,
           alertText: 'The forum post was reported.',
@@ -302,8 +302,8 @@ class Thread extends React.Component {
     }
   };
 
-  showBlockModal = selectedPost => {
-    this.setState({ selectedPost });
+  showBlockModal = (selectedPost, mode) => {
+    this.setState({ selectedPost, reportMode: mode });
     this.blockRef.current.toggle();
   };
 
@@ -321,17 +321,14 @@ class Thread extends React.Component {
       }, 2000);
     } else {
       const { request, controller } = reportUser(selectedPost.author?.id);
-      request
-        .then(res => {
-          console.log(res);
-          if (res.data.success) {
-            this.setState({ showReportAlert: true });
-            setTimeout(() => {
-              this.setState({ showReportAlert: false });
-            }, 2000);
-          }
-        })
-        .catch(err => console.log(err));
+      request.then(res => {
+        if (res.data.success) {
+          this.setState({ showReportAlert: true });
+          setTimeout(() => {
+            this.setState({ showReportAlert: false });
+          }, 2000);
+        }
+      });
       return () => {
         controller.abort();
       };
@@ -473,6 +470,7 @@ class Thread extends React.Component {
           onReportUser={this.onReportUser}
           onReportPost={this.reportForumPost}
           onBlock={this.showBlockWarning}
+          mode={this.state.reportMode}
         />
         <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
         {this.state.showToastAlert && (

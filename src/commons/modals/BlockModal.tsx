@@ -8,12 +8,13 @@ interface IBlockModal {
   onReportUser?: () => void;
   onReportPost?: () => void;
   onBlock?: () => void;
+  mode: 'user' | 'post'
 }
 
 const IS_TABLET = isTablet();
 
 const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) => {
-  const { onReportUser, onReportPost, onBlock } = props;
+  const { onReportUser, onReportPost, onBlock, mode } = props;
   const [visible, setVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({
@@ -27,9 +28,9 @@ const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) 
   }, []);
 
   const report = useCallback(() => {
-    onReportPost?.();
+    mode === 'user' ? onReportUser?.() : onReportPost?.();
     closeModal();
-  }, [closeModal, onReportPost]);
+  }, [closeModal, onReportPost, onReportUser, mode]);
 
   const blockUser = useCallback(() => {
     onBlock?.();
@@ -43,37 +44,39 @@ const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) 
       animationType={'slide'}
       supportedOrientations={['portrait', 'landscape']}
     >
-    <LinearGradient
-      style={styles.lgradient}
-      colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
-    />
-    <View style={styles.modalContent}>
+    <TouchableOpacity style={{ flex: 1 }} onPress={closeModal} >
+      <LinearGradient
+        style={styles.lgradient}
+        colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
+      />
+      <View style={styles.modalContent}>
 
-      <View style={IS_TABLET && { height: '10%' }} />
-      <TouchableOpacity onPress={report} style={styles.actionContainer}>
-        <View style={styles.iconContainer}>
-          {reportSvg({
-            height: 24,
-            width: 24,
-            fill: 'white',
-          })}
-        </View>
-        <Text style={styles.actionText}>Report</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={blockUser} style={styles.actionContainer}>
-        <View style={styles.iconContainer}>
-          {banSvg({
-            height: 24,
-            width: 24,
-            fill: 'white',
-          })}
-        </View>
-        <Text style={styles.actionText} >Block User </Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={closeModal}>
-        <Text style={styles.close}>Close</Text>
-      </TouchableOpacity>
-     </View>
+        <View style={IS_TABLET && { height: '10%' }} />
+        <TouchableOpacity onPress={report} style={styles.actionContainer}>
+          <View style={styles.iconContainer}>
+            {reportSvg({
+              height: 24,
+              width: 24,
+              fill: 'white',
+            })}
+          </View>
+          <Text style={styles.actionText}>Report</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={blockUser} style={styles.actionContainer}>
+          <View style={styles.iconContainer}>
+            {banSvg({
+              height: 24,
+              width: 24,
+              fill: 'white',
+            })}
+          </View>
+          <Text style={styles.actionText} >Block User </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={closeModal}>
+          <Text style={styles.close}>Close</Text>
+        </TouchableOpacity>
+      </View>
+     </TouchableOpacity>
     </Modal>
   );
 });

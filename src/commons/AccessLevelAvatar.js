@@ -110,8 +110,8 @@ export default class AccessLevelAvatar extends React.Component {
           author={author}
           isDark={isDark}
           appColor={appColor}
-          onUserBlock={() => {
-            this.props.onUserBlock?.(author?.display_name);
+          onMenuPress={() => {
+            this.props.onMenuPress?.();
             this.setState({ showUserInfo: false });
           }}
         />
