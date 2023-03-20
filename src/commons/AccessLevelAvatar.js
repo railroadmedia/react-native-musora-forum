@@ -74,9 +74,7 @@ export default class AccessLevelAvatar extends React.Component {
           disallowInterruption={true}
         >
           <Image
-            source={{
-              uri: `https://cdn.musora.com/image/fetch/w_200,fl_lossy,q_auto:eco,c_fill,g_face/${author.avatar_url}`,
-            }}
+            source={{  uri: author.avatar_url }}
             style={{ height, aspectRatio: 1 }}
           />
           {userTagText ? (
