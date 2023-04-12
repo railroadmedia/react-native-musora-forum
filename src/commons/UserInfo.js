@@ -3,11 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 
 import AccessLevelAvatar from '../commons/AccessLevelAvatar';
 
-import { banSvg, menuHSvg, reportSvg, x } from '../assets/svgs';
-import ToastAlert from '../commons/ToastAlert';
-import { blockUser, reportUser } from '../services/forum.service';
-import BlockModal from '../commons/modals/BlockModal';
-import BlockWarningModal from '../commons/modals/BlockWarningModal';
+import { menuHSvg, x } from '../assets/svgs';
 
 let styles;
 export default class UserInfo extends React.Component {
@@ -21,50 +17,6 @@ export default class UserInfo extends React.Component {
     showToastAlert: false,
     showBlockAlert: false,
     userAlreadyReported: this.props.author?.is_reported_by_viewer,
-  };
-
-  showBlockModal = () => {
-    this.blockRef.current?.toggle();
-  };
-
-  showBlockWarning = () => {
-    this.warningRef.current?.toggle(this.props.author?.display_name);
-  };
-
-  onReportUser = () => {
-    if (this.state.userAlreadyReported) {
-      this.setState({ showToastAlert: true });
-      setTimeout(() => {
-        this.setState({ showToastAlert: false });
-      }, 2000);
-    } else {
-      const { request, controller } = reportUser(this.props.author?.id);
-      request.then(res => {
-        if (res.data.success) {
-          this.setState({ showToastAlert: true });
-          setTimeout(() => {
-            this.setState({ showToastAlert: false, userAlreadyReported: true });
-          }, 2000);
-        }
-      });
-      return () => {
-        controller.abort();
-      };
-    }
-  };
-
-  onBlockUser = () => {
-    const { request, controller } = blockUser(this.props.author?.id);
-    request
-      .then(res => {
-        if (res.data.success) {
-            this.props.onUserBlock?.();
-        }
-      })
-      .catch(err => console.log(err));
-    return () => {
-      controller.abort();
-    };
   };
 
   render = () => {
@@ -89,7 +41,7 @@ export default class UserInfo extends React.Component {
                   })}
                 </TouchableOpacity>
                 <Text style={styles.name}>{author?.display_name}</Text>
-                <TouchableOpacity onPress={() => this.showBlockModal()}>
+                <TouchableOpacity onPress={this.props.onMenuPress}>
                   {menuHSvg({
                     width: 23,
                     height: 20,
@@ -158,38 +110,6 @@ export default class UserInfo extends React.Component {
               </View>
             </View>
           </View>
-          <BlockModal
-            ref={this.blockRef}
-            onReport={this.onReportUser}
-            onBlock={this.showBlockWarning}
-          />
-          <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
-          {this.state.showToastAlert && (
-            <ToastAlert
-              content={
-                this.state.userAlreadyReported
-                  ? 'You have already reported this profile.'
-                  : 'The user profile was reported'
-              }
-              icon={reportSvg({
-                height: 21.6,
-                width: 21.6,
-                fill: isDark ? 'black' : 'white',
-              })}
-              isDark={isDark}
-            />
-          )}
-          {this.state.showBlockAlert && (
-            <ToastAlert
-              content={`${author?.display_name} was blocked.`}
-              icon={banSvg({
-                height: 21.6,
-                width: 21.6,
-                fill: isDark ? 'black' : 'white',
-              })}
-              isDark={isDark}
-            />
-          )}
         </View>
       </Modal>
     );

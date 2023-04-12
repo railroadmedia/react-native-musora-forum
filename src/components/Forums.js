@@ -16,7 +16,11 @@ import ForumCard from '../commons/ForumCard';
 import ThreadCard from '../commons/ThreadCard';
 import Search from '../commons/Search';
 import Pagination from '../commons/Pagination';
-import { connection, getForums, getFollowedThreads } from '../services/forum.service';
+import {
+  connection,
+  getForums,
+  getFollowedThreads,
+} from '../services/forum.service';
 import { setTestID } from '../index';
 
 import { setForumsThreads } from '../redux/ThreadActions';
@@ -42,19 +46,22 @@ class Forums extends React.Component {
 
   componentDidMount() {
     let reFocused;
-    this.refreshOnFocusListener = this.props.navigation?.addListener('focus', () =>
-      reFocused ? this.refresh?.() : (reFocused = true)
+    this.refreshOnFocusListener = this.props.navigation?.addListener(
+      'focus',
+      () => (reFocused ? this.refresh?.() : (reFocused = true))
     );
     BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
-    const { request: forumsRequest, controller: forumsController } = getForums();
-    const { request: followedRequest, controller: followedController } = getFollowedThreads();
+    const { request: forumsRequest, controller: forumsController } =
+      getForums();
+    const { request: followedRequest, controller: followedController } =
+      getFollowedThreads();
 
     Promise.all([forumsRequest, followedRequest]).then(([forums, followed]) => {
       this.forums = forums.data?.results;
       this.followedThreads = followed.data?.results?.map(r => r.id);
       this.followedThreadsTotal = followed.data?.total_results;
       batch(() => {
-        if (followed.data){
+        if (followed.data) {
           this.props.setForumsThreads(followed.data?.results);
         }
         this.setState({ loading: false });
@@ -77,7 +84,8 @@ class Forums extends React.Component {
     return true;
   };
 
-  navigate = (route, params) => connection(true) && this.props.navigation.navigate(route, params);
+  navigate = (route, params) =>
+    connection(true) && this.props.navigation.navigate(route, params);
 
   renderFLItem = ({ item: id }) => (
     <ThreadCard
@@ -95,23 +103,29 @@ class Forums extends React.Component {
       data={item}
       appColor={this.props.appColor}
       isDark={this.props.isDark}
-      onNavigate={() => this.navigate('Threads', { title: item.title, forumId: item.id })}
+      onNavigate={() =>
+        this.navigate('Threads', { title: item.title, forumId: item.id })
+      }
     />
   );
 
   refresh = () => {
     if (!connection()) return;
     this.setState({ refreshing: true }, () => {
-      const { request: forumsRequest, controller: forumsController } = getForums();
-      const { request: followedRequest, controller: followedController } = getFollowedThreads();
-      Promise.all([forumsRequest, followedRequest]).then(([forums, followed]) => {
-        this.forums = forums.data.results;
-        this.followedThreads = followed.data?.results?.map(r => r.id);
-        batch(() => {
-          this.props.setForumsThreads(followed.data?.results);
-          this.setState({ refreshing: false });
-        });
-      });
+      const { request: forumsRequest, controller: forumsController } =
+        getForums();
+      const { request: followedRequest, controller: followedController } =
+        getFollowedThreads();
+      Promise.all([forumsRequest, followedRequest]).then(
+        ([forums, followed]) => {
+          this.forums = forums.data.results;
+          this.followedThreads = followed.data?.results?.map(r => r.id);
+          batch(() => {
+            this.props.setForumsThreads(followed.data?.results);
+            this.setState({ refreshing: false });
+          });
+        }
+      );
       return () => {
         forumsController.abort();
         followedController.abort();
@@ -123,10 +137,8 @@ class Forums extends React.Component {
     if (!connection()) return;
     this.page = page;
     this.setState({ loadingMore: true }, () => {
-      const { request: followedRequest, controller: followedController } = getFollowedThreads(
-        undefined,
-        page
-      );
+      const { request: followedRequest, controller: followedController } =
+        getFollowedThreads(undefined, page);
 
       followedRequest.then(r => {
         this.followedThreads = r.data?.results?.map(r => r.id);
@@ -181,7 +193,9 @@ class Forums extends React.Component {
                 refreshing={refreshing}
               />
             }
-            ListEmptyComponent={<Text style={styles.emptyList}>You don't follow any threads</Text>}
+            ListEmptyComponent={
+              <Text style={styles.emptyList}>You don't follow any threads</Text>
+            }
             ListFooterComponent={
               <View
                 style={{
@@ -258,7 +272,8 @@ let setStyles = (isDark, appColor) => {
     },
   });
 };
-const mapDispatchToProps = dispatch => bindActionCreators({ setForumsThreads }, dispatch);
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ setForumsThreads }, dispatch);
 const mapStateToProps = (
   { themeState },
   {

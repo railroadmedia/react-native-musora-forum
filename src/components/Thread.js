@@ -19,13 +19,28 @@ import { bindActionCreators } from 'redux';
 import Pagination from '../commons/Pagination';
 import Post from '../commons/Post';
 
-import { connection, getThread, reportPost } from '../services/forum.service';
+import {
+  connection,
+  getThread,
+  reportPost,
+  reportUser,
+  blockUser,
+} from '../services/forum.service';
 
-import { post, multiQuote, lock, reportSvg, banSvg } from '../assets/svgs';
+import {
+  post as PostSvg,
+  multiQuote,
+  lock,
+  reportSvg,
+  banSvg,
+} from '../assets/svgs';
 
 import { setPosts, setForumRules } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
 import ToastAlert from '../commons/ToastAlert';
+
+import BlockModal from '../commons/modals/BlockModal';
+import BlockWarningModal from '../commons/modals/BlockWarningModal';
 
 let styles;
 class Thread extends React.Component {
@@ -44,6 +59,8 @@ class Thread extends React.Component {
     showReportAlert: false,
     showBlockAlert: false,
     alertText: '',
+    selectedPost: undefined,
+    reportMode: undefined,
   };
 
   constructor(props) {
@@ -52,12 +69,15 @@ class Thread extends React.Component {
     this.postId = postId;
     styles = setStyles(props.isDark, props.appColor);
     this.page = page || 1;
+    this.blockRef = React.createRef();
+    this.warningRef = React.createRef();
   }
 
   componentDidMount() {
     let reFocused;
-    this.refreshOnFocusListener = this.props.navigation?.addListener('focus', () =>
-      reFocused ? this.refresh?.() : (reFocused = true)
+    this.refreshOnFocusListener = this.props.navigation?.addListener(
+      'focus',
+      () => (reFocused ? this.refresh?.() : (reFocused = true))
     );
     this.blurListener = this.props.navigation?.addListener('blur', () =>
       this.setState(({ postKey }) => ({ postKey: !postKey }))
@@ -65,9 +85,14 @@ class Thread extends React.Component {
     const { threadId, isForumRules } = this.props.route.params;
     BackHandler.addEventListener('hardwareBackPress', this.onAndroidBack);
     if (threadId || isForumRules || this.postId) {
-      const { request, controller } = getThread(threadId, this.page, isForumRules, this.postId);
+      const { request, controller } = getThread(
+        threadId,
+        this.page,
+        isForumRules,
+        this.postId
+      );
       request.then(thread => {
-        this.page = parseInt(thread.data.page);
+        this.page = parseInt(thread.data.page, 10);
         this.post_count = thread.data.post_count;
         this.posts = thread.data.posts.map(p => p.id);
         batch(() => {
@@ -94,12 +119,16 @@ class Thread extends React.Component {
     return true;
   };
 
-  navigate = (route, params) => connection(true) && this.props.navigation.navigate(route, params);
+  navigate = (route, params) =>
+    connection(true) && this.props.navigation.navigate(route, params);
 
   handleAutoScroll = (id, height) => {
     this.postLayouts[id] = height;
     let { postId } = this;
-    if (postId && this.posts.every(p => Object.keys(this.postLayouts).includes(`${p}`))) {
+    if (
+      postId &&
+      this.posts.every(p => Object.keys(this.postLayouts).includes(`${p}`))
+    ) {
       let scrollPos = this.flHeaderHeight;
       this.posts
         .slice(
@@ -133,29 +162,18 @@ class Thread extends React.Component {
           index={index + 1 + 10 * (this.page - 1)}
           appColor={appColor}
           isDark={isDark}
-          onMultiQuote={() => this.setState({ multiQuoting: !!Post.multiQuotes.length })}
+          onMultiQuote={() =>
+            this.setState({ multiQuoting: !!Post.multiQuotes.length })
+          }
           onPostCreated={postId => (this.postId = postId)}
           onDelete={postId => {
             delete this.postId;
             this.posts = this.posts.filter(p => p !== postId);
-            if (!this.posts.length && this.page > 1) this.changePage(--this.page);
+            if (!this.posts.length && this.page > 1)
+              this.changePage(--this.page);
           }}
           reportForumPost={this.reportForumPost}
-          onUserBlock={(blockedUser) => {
-            this.setState({ showBlockAlert: true, blockedUser }, () => {
-              setTimeout(() => {
-                this.setState({ showBlockAlert: false });
-              }, 2000);
-              this.refresh();
-            })
-          }}
-          onUserReport={() => {
-            this.setState({ showReportAlert: true }, () => {
-              setTimeout(() => {
-                this.setState({ showReportAlert: false });
-              }, 2000);
-            });
-          }}
+          toggleMenu={this.showBlockModal}
         />
       </View>
     );
@@ -206,10 +224,15 @@ class Thread extends React.Component {
       return;
     }
     this.setState({ refreshing: true, multiQuoting: false }, () => {
-      const { request, controller } = getThread(threadId, this.page, isForumRules, this.postId);
+      const { request, controller } = getThread(
+        threadId,
+        this.page,
+        isForumRules,
+        this.postId
+      );
 
       request.then(thread => {
-        this.page = parseInt(thread.data.page);
+        this.page = parseInt(thread.data.page, 10);
         this.post_count = thread.data.post_count;
         this.posts = thread.data.posts.map(p => p.id);
         batch(() => {
@@ -251,33 +274,97 @@ class Thread extends React.Component {
         setTimeout(() => this.setState({ lockedModalVisible: false }), 3000)
     );
 
-  reportForumPost = (post, isReported) => {
-    if (isReported) {
-      this.setState({ showToastAlert: true, alertText:'You have already reported this post.' });
+  reportForumPost = () => {
+    const post = this.state.selectedPost;
+    if (!!post.is_reported_by_viewer) {
+      this.setState({
+        showToastAlert: true,
+        alertText: 'You have already reported this post.',
+      });
       setTimeout(() => {
-        this.setState({ showToastAlert: false, alertText:'' });
+        this.setState({ showToastAlert: false, alertText: '' });
       }, 2000);
     } else {
       const { request, controller } = reportPost(post.id);
-      request.then((res) => {
-        console.log(res);
-        this.setState({ showToastAlert: true, alertText: 'The forum post was reported.' });
+      request.then(res => {
+        this.setState({
+          showToastAlert: true,
+          alertText: 'The forum post was reported.',
+        });
         setTimeout(() => {
-          this.setState({ showToastAlert: false, alertText:''  });
+          this.setState({ showToastAlert: false, alertText: '' });
         }, 2000);
-      })
+        this.refresh();
+      });
       return () => {
         controller.abort();
-      };   
+      };
     }
-  }
+  };
+
+  showBlockModal = (selectedPost, mode) => {
+    this.setState({ selectedPost, reportMode: mode });
+    this.blockRef.current.toggle();
+  };
+
+  showBlockWarning = () => this.warningRef.current?.toggle();
+
+  onReportUser = () => {
+    const { selectedPost } = this.state;
+    if (!selectedPost) {
+      return;
+    }
+    if (selectedPost.author.is_reported_by_viewer) {
+      this.setState({ showReportAlert: true });
+      setTimeout(() => {
+        this.setState({ showReportAlert: false });
+      }, 2000);
+    } else {
+      const { request, controller } = reportUser(selectedPost.author?.id);
+      request.then(res => {
+        if (res.data.success) {
+          this.setState({ showReportAlert: true });
+          setTimeout(() => {
+            this.setState({ showReportAlert: false });
+          }, 2000);
+        }
+      });
+      return () => {
+        controller.abort();
+      };
+    }
+  };
+
+  onBlockUser = () => {
+    const { request, controller } = blockUser(
+      this.state.selectedPost.author?.id
+    );
+    request.then(res => {
+      if (res.data.success) {
+        this.setState({ showBlockAlert: true });
+        setTimeout(() => {
+          this.setState({ showBlockAlert: false });
+        }, 2000);
+        this.refresh();
+      }
+    });
+    return () => {
+      controller.abort();
+    };
+  };
 
   render() {
     let { locked, isDark, appColor } = this.props;
-    let { loading, refreshing, postHeight, multiQuoting, lockedModalVisible } = this.state;
+    let { loading, refreshing, postHeight, multiQuoting, lockedModalVisible } =
+      this.state;
     let { threadId, bottomPadding } = this.props.route.params;
     return loading ? (
-      <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
+      <ActivityIndicator
+        size='large'
+        color={appColor}
+        animating={true}
+        style={styles.loading}
+      />
     ) : (
       <SafeAreaView
         style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
@@ -298,7 +385,9 @@ class Thread extends React.Component {
           ListHeaderComponent={this.renderPagination(20, 0, 1)}
           keyExtractor={id => id.toString()}
           ref={r => (this.flatListRef = r)}
-          ListEmptyComponent={<Text style={styles.emptyList}>{'No posts.'}</Text>}
+          ListEmptyComponent={
+            <Text style={styles.emptyList}>{'No posts.'}</Text>
+          }
           ListFooterComponent={this.renderPagination(postHeight, 1, 0)}
           refreshControl={
             <RefreshControl
@@ -313,7 +402,8 @@ class Thread extends React.Component {
         <View>
           <TouchableOpacity
             onLayout={({ nativeEvent: { layout } }) =>
-              !this.state.postHeight && this.setState({ postHeight: layout.height + 15 })
+              !this.state.postHeight &&
+              this.setState({ postHeight: layout.height + 15 })
             }
             onPress={() => {
               delete this.postId;
@@ -332,14 +422,16 @@ class Thread extends React.Component {
             }}
             style={styles.bottomTOpacity}
           >
-            {(locked ? lock : multiQuoting ? multiQuote : post)({
+            {(locked ? lock : multiQuoting ? multiQuote : PostSvg)({
               height: 25,
               width: 25,
               fill: 'white',
             })}
             {multiQuoting && (
               <View style={styles.multiQuoteBadge}>
-                <Text style={{ color: appColor, fontSize: 10 }}>+{Post.multiQuotes.length}</Text>
+                <Text style={{ color: appColor, fontSize: 10 }}>
+                  +{Post.multiQuotes.length}
+                </Text>
               </View>
             )}
           </TouchableOpacity>
@@ -372,6 +464,15 @@ class Thread extends React.Component {
             </View>
           </TouchableOpacity>
         </Modal>
+
+        <BlockModal
+          ref={this.blockRef}
+          onReportUser={this.onReportUser}
+          onReportPost={this.reportForumPost}
+          onBlock={this.showBlockWarning}
+          mode={this.state.reportMode}
+        />
+        <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
         {this.state.showToastAlert && (
           <ToastAlert
             content={this.state.alertText}
@@ -386,9 +487,9 @@ class Thread extends React.Component {
         {this.state.showReportAlert && (
           <ToastAlert
             content={
-              this.state.userAlreadyReported
+              this.state.selectedPost.author.is_reported_by_viewer
                 ? 'You have already reported this profile.'
-                : 'The user profile was reported'
+                : `${this.state.selectedPost.author.display_name} was reported.`
             }
             icon={reportSvg({
               height: 21.6,
@@ -400,7 +501,7 @@ class Thread extends React.Component {
         )}
         {this.state.showBlockAlert && (
           <ToastAlert
-            content={`${this.state.blockedUser} was blocked.`}
+            content={`${this.state.selectedPost.author.display_name} was blocked.`}
             icon={banSvg({
               height: 21.6,
               width: 21.6,
@@ -470,7 +571,8 @@ let setStyles = (isDark, appColor) =>
     },
   });
 
-const mapDispatchToProps = dispatch => bindActionCreators({ setPosts, setForumRules }, dispatch);
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ setPosts, setForumRules }, dispatch);
 const mapStateToProps = (
   { themeState, threads, userState },
   {

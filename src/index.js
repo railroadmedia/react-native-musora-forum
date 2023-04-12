@@ -27,7 +27,7 @@ const timingAnim = {
 
 export const IS_TABLET = DeviceInfo.isTablet();
 
-export const setTestID = (testID) => {
+export const setTestID = testID => {
   if (Platform.OS === 'ios') {
     return testID;
   } else {
@@ -73,12 +73,14 @@ export default ({
         style={{ flex: 1, backgroundColor: isDark ? '#00101d' : 'white' }}
       >
         <Stack.Navigator
-          initialRouteName={categoryId ? 'Threads' : postId || threadId ? 'Thread' : 'Forums'}
+          initialRouteName={
+            categoryId ? 'Threads' : postId || threadId ? 'Thread' : 'Forums'
+          }
           screenOptions={{
             gestureEnabled: true,
             transitionSpec: { open: timingAnim, close: timingAnim },
             animationEnabled: false,
-            headerMode: 'screen'
+            headerMode: 'screen',
           }}
         >
           <Stack.Screen
@@ -94,7 +96,10 @@ export default ({
             component={Threads}
             options={props => ({
               header: () => (
-                <NavigationHeader {...props} title={props.route.params.title || threadTitle} />
+                <NavigationHeader
+                  {...props}
+                  title={props.route.params.title || threadTitle}
+                />
               ),
             })}
             initialParams={params}
@@ -111,11 +116,18 @@ export default ({
             initialParams={params}
             options={props => ({
               header: () => (
-                <NavigationHeader {...props} title={props.route.params.title || threadTitle} />
+                <NavigationHeader
+                  {...props}
+                  title={props.route.params.title || threadTitle}
+                />
               ),
             })}
           />
-          <Stack.Screen name='Search' component={Search} initialParams={params} />
+          <Stack.Screen
+            name='Search'
+            component={Search}
+            initialParams={params}
+          />
         </Stack.Navigator>
       </KeyboardAvoidingView>
     </Provider>

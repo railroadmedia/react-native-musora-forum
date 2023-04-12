@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 
@@ -16,18 +16,9 @@ import HTMLRenderer from './HTMLRenderer';
 
 import { like, likeOn, menuHSvg, replies } from '../assets/svgs';
 
-import {
-  likePost,
-  disLikePost,
-  connection,
-  reportUser,
-  blockUser,
-} from '../services/forum.service';
+import { likePost, disLikePost, connection } from '../services/forum.service';
 import { updatePosts } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
-
-import BlockModal from '../commons/modals/BlockModal';
-import BlockWarningModal from '../commons/modals/BlockWarningModal';
 
 let styles;
 let multiQuotes = [];
@@ -47,12 +38,9 @@ class Post extends React.Component {
       likeCount: post?.like_count,
       selected: false,
       menuTop: 0,
-      reportModalVisible: false,
-      isPostReported: post?.is_reported_by_viewer
+      isPostReported: post?.is_reported_by_viewer,
     };
     styles = setStyles(isDark, appColor);
-    this.blockRef = React.createRef();
-    this.warningRef = React.createRef();
   }
 
   toggleLike = () => {
@@ -86,12 +74,13 @@ class Post extends React.Component {
       () => closeMenus(this)
     );
 
-  report = () => this.setState({ reportModalVisible: true }, closeMenus);
-
   edit = () => {
     closeMenus();
     let { post, onDelete } = this.props;
-    const blockQuote = post?.content?.split('</blockquote>').slice(0, -1).join('</blockquote>');
+    const blockQuote = post?.content
+      ?.split('</blockquote>')
+      .slice(0, -1)
+      .join('</blockquote>');
     this.props.navigation.navigate('CRUD', {
       type: 'post',
       action: 'edit',
@@ -101,8 +90,10 @@ class Post extends React.Component {
         ? [
             {
               content:
-                post?.content?.split('</blockquote>').slice(0, -1).join('</blockquote>') +
-                '</blockquote>',
+                post?.content
+                  ?.split('</blockquote>')
+                  .slice(0, -1)
+                  .join('</blockquote>') + '</blockquote>',
             },
           ]
         : [],
@@ -114,7 +105,9 @@ class Post extends React.Component {
     this.setState(({ selected }) => {
       if (selected)
         multiQuotes.splice(
-          multiQuotes.findIndex(mq => mq.props.post?.id === this.props.post?.id),
+          multiQuotes.findIndex(
+            mq => mq.props.post?.id === this.props.post?.id
+          ),
           1
         );
       else multiQuotes.push(this);
@@ -139,61 +132,19 @@ class Post extends React.Component {
     });
   };
 
-  onReport = () => {
-    this.setState({ reportModalVisible: false }, () => {
-      if (this.state.isPostReported) {
-        this.props.reportForumPost(this.props.post, true)
-      } else {
-        this.props.reportForumPost(this.props.post, false)
-        this.setState({isPostReported: true});
-      }
-    });
-  };
-
-  showBlockWarning = () => {
-    this.warningRef.current?.toggle(this.props.post?.author?.display_name);
-  };
-
-  onReportUser = () => {
-    if (this.state.userAlreadyReported) {
-      this.setState({ showToastAlert: true });
-      setTimeout(() => {
-        this.setState({ showToastAlert: false });
-      }, 2000);
-    } else {
-      const { request, controller } = reportUser(this.props.post?.author?.id);
-      request.then(res => {
-        if (res.data.success) {
-          this.props.onUserReport?.();
-        }
-      });
-      return () => {
-        controller.abort();
-      };
-    }
-  };
-
-  onBlockUser = () => {
-    const { request, controller } = blockUser(this.props.post?.author?.id);
-    request
-      .then(res => {
-        if (res.data.success) {
-          this.props.onUserBlock?.(this.props.post?.author?.display_name);
-        }
-      })
-      .catch(err => console.log(err));
-    return () => {
-      controller.abort();
-    };
-  };
-
   render() {
-    let { isLiked, likeCount, selected, menuTop, reportModalVisible } = this.state;
+    let { isLiked, likeCount, selected, menuTop } = this.state;
     let { post, appColor, index, isDark, signShown, locked, user } = this.props;
     let selectedColor = isDark ? '#002039' : '#E1E6EB';
     let baseColor = isDark ? '#081825' : '#FFFFFF';
-    if (post && post?.content?.includes(`<p><img src="https://cdn.tiny.cloud`)) {
-      post.content = post?.content?.replace(`<p><img`, `<p style="flex-direction:row;"><img `);
+    if (
+      post &&
+      post?.content?.includes(`<p><img src="https://cdn.tiny.cloud`)
+    ) {
+      post.content = post?.content?.replace(
+        `<p><img`,
+        `<p style="flex-direction:row;"><img `
+      );
     }
     return (
       <>
@@ -209,11 +160,15 @@ class Post extends React.Component {
             onMoveShouldSetResponder={() => false}
             onStartShouldSetResponderCapture={() => false}
             onMoveShouldSetResponderCapture={() => false}
-            onResponderRelease={multiQuotes.length ? this.multiQuote : this.toggleMenu}
+            onResponderRelease={
+              multiQuotes.length ? this.multiQuote : this.toggleMenu
+            }
           >
             <View style={styles.header}>
               <Text style={styles.headerText}>#{index}</Text>
-              <Text style={styles.headerText}>{post?.published_on_formatted}</Text>
+              <Text style={styles.headerText}>
+                {post?.published_on_formatted}
+              </Text>
             </View>
             <View style={styles.header}>
               <View style={styles.userDetails}>
@@ -225,15 +180,21 @@ class Post extends React.Component {
                   tagHeight={4}
                   showUserInfo={true}
                   onNavigateToCoach={this.onNavigateToCoach}
-                  onUserBlock={this.props.onUserBlock}
+                  onMenuPress={() => {
+                    this.props.toggleMenu(post, 'user');
+                  }}
                 />
                 <View style={{ marginLeft: 5 }}>
-                  <Text style={styles.name} numberOfLines={2} ellipsizeMode='tail'>
+                  <Text
+                    style={styles.name}
+                    numberOfLines={2}
+                    ellipsizeMode='tail'
+                  >
                     {post?.author?.display_name}
                   </Text>
                   <Text style={styles.xp}>
-                    {post?.author?.total_posts} Posts - {post?.author?.xp_rank} - Level{' '}
-                    {post?.author?.level_rank}
+                    {post?.author?.total_posts} Posts - {post?.author?.xp_rank}{' '}
+                    - Level {post?.author?.level_rank}
                   </Text>
                 </View>
               </View>
@@ -269,7 +230,7 @@ class Post extends React.Component {
                   'blockquote-odd': {
                     backgroundColor: isDark ? '#002039' : '#E1E6EB',
                   },
-                  shadow: {
+                  'shadow': {
                     elevation: 5,
                     shadowColor: 'black',
                     shadowOffset: { height: 4 },
@@ -297,7 +258,9 @@ class Post extends React.Component {
                   width: 15,
                   fill: appColor,
                 })}
-                {likeCount > 0 && <Text style={styles.likesNoText}>{likeCount}</Text>}
+                {likeCount > 0 && (
+                  <Text style={styles.likesNoText}>{likeCount}</Text>
+                )}
               </TouchableOpacity>
               {!locked && (
                 <TouchableOpacity
@@ -320,7 +283,8 @@ class Post extends React.Component {
               )}
               <View style={styles.menuContainer}>
                 <TouchableOpacity
-                  onPress={() => this.blockRef.current.toggle()}
+                  onPress={() => this.props.toggleMenu(post, 'post')}
+                  disallowInterruption={true}
                 >
                   {menuHSvg({
                     width: 23,
@@ -332,7 +296,10 @@ class Post extends React.Component {
             </View>
             {signShown && !!post?.author?.signature && (
               <View style={styles.signatureContainer}>
-                <HTMLRenderer html={post?.author?.signature} tagsStyles={{ div: styles.signature }} />
+                <HTMLRenderer
+                  html={post?.author?.signature}
+                  tagsStyles={{ div: styles.signature }}
+                />
               </View>
             )}
           </View>
@@ -354,7 +321,6 @@ class Post extends React.Component {
           >
             <View style={styles.selectedMenuContainer}>
               {[
-                'report',
                 this.props.user.permission_level === 'administrator' ||
                 this.props.user.id === this.props.post?.author_id
                   ? 'edit'
@@ -381,38 +347,6 @@ class Post extends React.Component {
             <View style={styles.triangle} />
           </View>
         )}
-        <Modal
-          animationType={'slide'}
-          onRequestClose={() => this.setState({ reportModalVisible: false })}
-          supportedOrientations={['portrait', 'landscape']}
-          transparent={true}
-          visible={reportModalVisible}
-        >
-          <Pressable
-            style={styles.reportModalBackground}
-            onPress={() => this.setState({ reportModalVisible: false })}
-          >
-            <View style={styles.reportModalContainer}>
-              <Text style={styles.reportTitle}>Report Post</Text>
-              <Text style={styles.reportMessage}>Are you sure you want to report this post?</Text>
-              <View style={styles.reportBtnsContainer}>
-                <Pressable
-                  style={{ flex: 1 }}
-                  onPress={this.onReport}
-                >
-                  <Text style={styles.reportBtnText}>Report</Text>
-                </Pressable>
-              </View>
-            </View>
-          </Pressable>
-        </Modal>
-
-        <BlockModal
-          ref={this.blockRef}
-          onReport={this.onReportUser}
-          onBlock={this.showBlockWarning}
-        />
-        <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
       </>
     );
   }
@@ -551,7 +485,9 @@ const mapStateToProps = ({ threads: { signShown, posts } }, { id }) => ({
   signShown,
   post: posts[id],
 });
-let NavigationWrapper = props => <Post {...props} navigation={useNavigation()} />;
+let NavigationWrapper = props => (
+  <Post {...props} navigation={useNavigation()} />
+);
 NavigationWrapper.multiQuotes = multiQuotes;
 NavigationWrapper.clearQuoting = () => {
   closeMenus();
@@ -559,5 +495,6 @@ NavigationWrapper.clearQuoting = () => {
   multiQuotes.splice(0, multiQuotes.length);
 };
 
-const mapDispatchToProps = dispatch => bindActionCreators({ updatePosts }, dispatch);
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({ updatePosts }, dispatch);
 export default connect(mapStateToProps, mapDispatchToProps)(NavigationWrapper);
