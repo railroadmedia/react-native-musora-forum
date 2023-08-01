@@ -76,12 +76,12 @@ class NavigationHeader extends React.Component {
       };
     }
     options.forumRules = {
-      text: 'Forum Rules',
+      text: 'Musora Community Guidelines',
       icon: forumRulesSvg,
       action: () =>
         this.setState({ optionsVisible: false }, () =>
           this.props.navigation.push('Thread', {
-            title: 'Forum Rules',
+            title: 'Musora Community Guidelines',
             isForumRules: true,
           })
         ),
