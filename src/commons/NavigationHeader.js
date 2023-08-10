@@ -173,7 +173,7 @@ class NavigationHeader extends React.Component {
               {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
             </Text>
           </View>
-          <TouchableOpacity style={{ paddingHorizontal: 15 }} onPress={navigation.goBack}>
+          <TouchableOpacity style={{ padding: 15 }} onPress={navigation.goBack}>
             {arrowLeft({
               height: 20,
               fill: isDark ? 'white' : 'black',
@@ -254,7 +254,6 @@ let setStyles = isDark => {
   return StyleSheet.create({
     container: {
       backgroundColor: isDark ? '#081825' : 'white',
-      paddingVertical: 10,
     },
     subContainer: {
       flexDirection: 'row',
@@ -275,7 +274,7 @@ let setStyles = isDark => {
       color: isDark ? 'white' : 'black',
       textAlign: 'center',
       textTransform: 'capitalize',
-      padding: 2,
+      marginBottom: 2,
     },
     lgradient: {
       width: '100%',
