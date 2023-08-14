@@ -15,12 +15,12 @@ export default class HTMLRenderer extends React.Component {
   render() {
     let { html, tagsStyles, classesStyles, olItemStyle, ulItemStyle, appColor } = this.props;
     let { expanderVisible, maxQuoteHeight } = this.state;
-    let lastBlockquote = html.lastIndexOf('</blockquote>');
+    let lastBlockquote = html?.lastIndexOf('</blockquote>');
     if (lastBlockquote >= 0)
       html =
-        html.substring(0, lastBlockquote) +
+        html?.substring(0, lastBlockquote) +
         '</blockquote></shadow><expander></expander>' +
-        html.substring(lastBlockquote + 13);
+        html?.substring(lastBlockquote + 13);
     return (
       <View
         onLayout={({
@@ -36,9 +36,9 @@ export default class HTMLRenderer extends React.Component {
             ignoredStyles={['font-family', 'background-color', 'line-height']}
             WebView={WebView}
             source={{
-              html: `<div>${evenOddQuoteClassification(
-                html.replace('<blockquote', '<shadow><blockquote class=""')
-              )}</div>`,
+              html: html ? `<div>${evenOddQuoteClassification(
+                html?.replace('<blockquote', '<shadow><blockquote class=""')
+              )}</div>`:`</div>`,
             }}
             tagsStyles={tagsStyles}
             classesStyles={classesStyles}
@@ -214,10 +214,10 @@ export default class HTMLRenderer extends React.Component {
 
 const evenOddQuoteClassification = html => {
   let i = 1;
-  html = html.replace(/<blockquote>/g, '<blockquote class="">');
+  html = html?.replace(/<blockquote>/g, '<blockquote class="">');
   return html
-    .split('<blockquote')
-    .map(blockquote => {
+    ?.split('<blockquote')
+    ?.map(blockquote => {
       if (i === 2) blockquote = blockquote.replace('class="', `class="blockquote-first`);
       blockquote = blockquote.replace(
         'class="',
