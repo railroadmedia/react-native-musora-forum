@@ -105,7 +105,12 @@ export const getRootUrl = () => {
   return this.rootUrl;
 };
 export const decideWhereToRedirect = urlToOpen => {
-  return this.decideWhereToRedirect(
-    this.rootUrl.includes('pianote') ? urlToOpen : { url: urlToOpen }
-  );
+  let urlBrand = urlToOpen.substring(urlToOpen.indexOf('.com') + 5);
+  if (urlBrand?.includes('/')) {
+    urlBrand = urlBrand.substring(0, urlBrand.indexOf('/'));
+  }
+  if (this.brand !== urlBrand) {
+    return this.handleOpenUrl(urlToOpen)
+  }
+  return this.decideWhereToRedirect(urlToOpen, {brandName: this.brand, color: this.appColor}, this.user, this.isDark);
 };

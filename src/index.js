@@ -42,6 +42,7 @@ export default ({
       tryCall,
       rootUrl,
       decideWhereToRedirect,
+      handleOpenUrl,
       NetworkContext,
       isDark,
       reduxStore,
@@ -50,6 +51,8 @@ export default ({
       threadId,
       categoryId,
       brand,
+      user,
+      appColor
     },
   },
 }) => {
@@ -60,7 +63,11 @@ export default ({
     networkContext,
     NetworkContext,
     decideWhereToRedirect,
+    handleOpenUrl,
     brand,
+    user,
+    isDark,
+    appColor
   });
   if (!store)
     store =
