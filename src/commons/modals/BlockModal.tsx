@@ -2,19 +2,23 @@ import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'r
 import { TouchableOpacity, StyleSheet, View, Modal, Text } from 'react-native';
 import { isTablet } from 'react-native-device-info';
 import LinearGradient from 'react-native-linear-gradient';
-import { banSvg, reportSvg } from '../../assets/svgs';
+import { banSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
 
 interface IBlockModal {
   onReportUser?: () => void;
   onReportPost?: () => void;
   onBlock?: () => void;
-  mode: 'user' | 'post'
+  onEdit?: () => void;
+  onMultiquote?: () => void;
+  mode: 'user' | 'post';
+  user: any;
+  authorId: number;
 }
 
 const IS_TABLET = isTablet();
 
 const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) => {
-  const { onReportUser, onReportPost, onBlock, mode } = props;
+  const { onReportUser, onReportPost, onBlock, onEdit, onMultiquote, mode, user, authorId } = props;
   const [visible, setVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({
@@ -37,6 +41,17 @@ const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) 
     closeModal();
   }, [closeModal, onBlock]);
 
+  const editPost = useCallback(() => {
+    console.log('editPost 1')
+    onEdit?.();
+    closeModal();
+  },[onEdit, closeModal])
+
+  const multiquote = useCallback(() => {
+    onMultiquote?.();
+    closeModal();
+  },[closeModal, onMultiquote])
+
   return (
     <Modal
       transparent={true}
@@ -52,6 +67,28 @@ const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) 
       <View style={styles.modalContent}>
 
         <View style={IS_TABLET && { height: '10%' }} />
+        {user.permission_level === 'administrator' || user.id === authorId ? (
+          <TouchableOpacity onPress={editPost} style={styles.actionContainer}>
+            <View style={styles.iconContainer}>
+              {edit({
+                height: 24,
+                width: 24,
+                fill: 'white',
+              })}
+            </View>
+            <Text style={styles.actionText}>Edit</Text>
+          </TouchableOpacity>
+        ):null}
+        <TouchableOpacity onPress={multiquote} style={styles.actionContainer}>
+          <View style={styles.iconContainer}>
+            {multiQuoteSvg({
+              height: 24,
+              width: 24,
+              fill: 'white',
+            })}
+          </View>
+          <Text style={styles.actionText}>Multiquote</Text>
+        </TouchableOpacity>
         <TouchableOpacity onPress={report} style={styles.actionContainer}>
           <View style={styles.iconContainer}>
             {reportSvg({
