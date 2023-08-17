@@ -179,7 +179,7 @@ export default class HTMLRenderer extends React.Component {
                   </View>
                 );
               },
-              a: ({ href }, children, _, { onLinkPress, key }) => {
+              a: ({ href }, children, _, { onLinkPress, key }) => {         
                 const onPressLink = () => {
                   let brand = getRootUrl().split('.');
                   brand = [brand.pop(), brand.pop()].reverse().join('.');
@@ -204,6 +204,7 @@ export default class HTMLRenderer extends React.Component {
                   </Text>
                 );
               },
+              p: (_, children, key) => <Text key={key}>{children}</Text>,
             }}
           />
         ) : null}
