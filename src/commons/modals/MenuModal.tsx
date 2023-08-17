@@ -2,9 +2,9 @@ import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'r
 import { TouchableOpacity, StyleSheet, View, Modal, Text } from 'react-native';
 import { isTablet } from 'react-native-device-info';
 import LinearGradient from 'react-native-linear-gradient';
-import { banSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
+import { banSvg, edit, multiQuoteSvg, reportSvg } from 'react-native-musora-forum/src/assets/svgs';
 
-interface IBlockModal {
+interface IMenuModal {
   onReportUser?: () => void;
   onReportPost?: () => void;
   onBlock?: () => void;
@@ -13,12 +13,13 @@ interface IBlockModal {
   mode: 'user' | 'post';
   user: any;
   authorId: number;
+  multiQuoteText: string;
 }
 
 const IS_TABLET = isTablet();
 
-const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) => {
-  const { onReportUser, onReportPost, onBlock, onEdit, onMultiquote, mode, user, authorId } = props;
+const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) => {
+  const { onReportUser, onReportPost, onBlock, onEdit, onMultiquote, mode, user, authorId, multiQuoteText } = props;
   const [visible, setVisible] = useState(false);
 
   useImperativeHandle(ref, () => ({
@@ -42,7 +43,6 @@ const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) 
   }, [closeModal, onBlock]);
 
   const editPost = useCallback(() => {
-    console.log('editPost 1')
     onEdit?.();
     closeModal();
   },[onEdit, closeModal])
@@ -87,7 +87,7 @@ const BlockModal = forwardRef<{ toggle: () => void }, IBlockModal>((props, ref) 
               fill: 'white',
             })}
           </View>
-          <Text style={styles.actionText}>Multiquote</Text>
+          <Text style={styles.actionText}>{multiQuoteText}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={report} style={styles.actionContainer}>
           <View style={styles.iconContainer}>
@@ -155,4 +155,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BlockModal;
+export default MenuModal;

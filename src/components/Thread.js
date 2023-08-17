@@ -39,7 +39,7 @@ import { setPosts, setForumRules } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
 import ToastAlert from '../commons/ToastAlert';
 
-import BlockModal from '../commons/modals/BlockModal';
+import MenuModal from '../commons/modals/MenuModal';
 import BlockWarningModal from '../commons/modals/BlockWarningModal';
 
 let styles;
@@ -392,7 +392,7 @@ class Thread extends React.Component {
 
   render() {
     let { locked, isDark, appColor, user } = this.props;
-    let { loading, refreshing, postHeight, multiQuotesArr, lockedModalVisible } =
+    let { loading, refreshing, postHeight, multiQuotesArr, lockedModalVisible, selectedPost } =
       this.state;
     let { threadId, bottomPadding } = this.props.route.params;
 
@@ -506,7 +506,7 @@ class Thread extends React.Component {
           </TouchableOpacity>
         </Modal>
 
-        <BlockModal
+        <MenuModal
           ref={this.blockRef}
           onReportUser={this.onReportUser}
           onReportPost={this.reportForumPost}
@@ -516,6 +516,7 @@ class Thread extends React.Component {
           onMultiquote={this.multiquote}
           user={user}
           authorId={this.state.selectedPost?.author_id}
+          multiQuoteText={this.state.multiQuotesArr.find(f => f.id === selectedPost.id) ? 'Remove quote' : 'Multiquote'}
         />
         <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
         {this.state.showToastAlert && (
