@@ -67,7 +67,7 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
       <View style={styles.modalContent}>
 
         <View style={IS_TABLET && { height: '10%' }} />
-        {user.permission_level === 'administrator' || user.id === authorId ? (
+        {mode === 'post' && user.permission_level === 'administrator' || user.id === authorId ? (
           <TouchableOpacity onPress={editPost} style={styles.actionContainer}>
             <View style={styles.iconContainer}>
               {edit({
@@ -78,17 +78,19 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
             </View>
             <Text style={styles.actionText}>Edit</Text>
           </TouchableOpacity>
-        ):null}
-        <TouchableOpacity onPress={multiquote} style={styles.actionContainer}>
-          <View style={styles.iconContainer}>
-            {multiQuoteSvg({
-              height: 24,
-              width: 24,
-              fill: 'white',
-            })}
-          </View>
-          <Text style={styles.actionText}>{multiQuoteText}</Text>
-        </TouchableOpacity>
+        ) : null }
+        {mode === 'post' && (
+          <TouchableOpacity onPress={multiquote} style={styles.actionContainer}>
+            <View style={styles.iconContainer}>
+              {multiQuoteSvg({
+                height: 24,
+                width: 24,
+                fill: 'white',
+              })}
+            </View>
+            <Text style={styles.actionText}>{multiQuoteText}</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity onPress={report} style={styles.actionContainer}>
           <View style={styles.iconContainer}>
             {reportSvg({
