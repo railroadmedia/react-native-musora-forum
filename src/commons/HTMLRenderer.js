@@ -179,12 +179,12 @@ export default class HTMLRenderer extends React.Component {
                   </View>
                 );
               },
-              a: ({ href }, children, _, { onLinkPress, key }) => {
-                if (!href?.includes('http')) return null;
+              a: ({ href }, children, _, { onLinkPress, key }) => {         
                 const onPressLink = () => {
                   let brand = getRootUrl().split('.');
                   brand = [brand.pop(), brand.pop()].reverse().join('.');
                   brand = brand.substring(0, brand.indexOf('.com') + 4);
+                  if (!href?.includes('http')) return null;
                   if (href.toLowerCase()?.includes(brand)) return decideWhereToRedirect(href);
                   if (href) onLinkPress(null, href);
                 };
@@ -204,6 +204,7 @@ export default class HTMLRenderer extends React.Component {
                   </Text>
                 );
               },
+              p: (_, children, key) => <Text key={key}>{children}</Text>,
             }}
           />
         ) : null}
