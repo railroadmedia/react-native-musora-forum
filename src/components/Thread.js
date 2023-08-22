@@ -39,10 +39,11 @@ import { setPosts, setForumRules } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
 import ToastAlert from '../commons/ToastAlert';
 
-import BlockModal from '../commons/modals/BlockModal';
+import MenuModal from '../commons/modals/MenuModal';
 import BlockWarningModal from '../commons/modals/BlockWarningModal';
 
 let styles;
+
 class Thread extends React.Component {
   page = 1;
   postLayouts = {};
@@ -52,7 +53,7 @@ class Thread extends React.Component {
     postHeight: 0,
     loadingMore: false,
     refreshing: false,
-    multiQuoting: false,
+    multiQuotesArr: [],
     lockedModalVisible: false,
     postKey: false,
     showToastAlert: false,
@@ -162,18 +163,11 @@ class Thread extends React.Component {
           index={index + 1 + 10 * (this.page - 1)}
           appColor={appColor}
           isDark={isDark}
-          onMultiQuote={() =>
-            this.setState({ multiQuoting: !!Post.multiQuotes.length })
-          }
           onPostCreated={postId => (this.postId = postId)}
-          onDelete={postId => {
-            delete this.postId;
-            this.posts = this.posts.filter(p => p !== postId);
-            if (!this.posts.length && this.page > 1)
-              this.changePage(--this.page);
-          }}
+          onDelete={this.deletePost}
           reportForumPost={this.reportForumPost}
           toggleMenu={this.showBlockModal}
+          selected={this.state.multiQuotesArr.find(f => f.id === id)}
         />
       </View>
     );
@@ -219,11 +213,10 @@ class Thread extends React.Component {
   refresh = () => {
     if (!connection()) return;
     let { threadId, isForumRules } = this.props.route.params;
-    Post.clearQuoting();
     if (!threadId && !isForumRules && !this.postId) {
       return;
     }
-    this.setState({ refreshing: true, multiQuoting: false }, () => {
+    this.setState({ refreshing: true, multiQuotesArr: [] }, () => {
       const { request, controller } = getThread(
         threadId,
         this.page,
@@ -273,6 +266,50 @@ class Thread extends React.Component {
         this.state.lockedModalVisible &&
         setTimeout(() => this.setState({ lockedModalVisible: false }), 3000)
     );
+
+  editPost = () => {
+    const blockQuote = this.state.selectedPost?.content
+      ?.split('</blockquote>')
+      .slice(0, -1)
+      .join('</blockquote>');
+    this.navigate('CRUD', {
+      type: 'post',
+      action: 'edit',
+      postId: this.state.selectedPost?.id,
+      onDelete: this.deletePost,
+      quotes: blockQuote
+        ? [
+            {
+              content:
+              this.state.selectedPost?.content
+                  ?.split('</blockquote>')
+                  .slice(0, -1)
+                  .join('</blockquote>') + '</blockquote>',
+            },
+          ]
+        : [],
+    });
+  }
+
+  multiquote = () => {
+    const isQuoted = this.state.multiQuotesArr.find(f => f.id === this.state.selectedPost?.id);
+    if (isQuoted) {
+      this.setState({
+        multiQuotesArr: this.state.multiQuotesArr.filter(item => item.id !== this.state.selectedPost?.id)
+      });
+    } else {
+      this.setState(prevState => ({
+        multiQuotesArr: [...prevState.multiQuotesArr, this.state.selectedPost]
+      }));
+    }
+  }
+
+  deletePost = (postId) => {
+    delete this.postId;
+    this.posts = this.posts.filter(p => p !== postId);
+    if (!this.posts.length && this.page > 1)
+      this.changePage(--this.page);
+  }
 
   reportForumPost = () => {
     const post = this.state.selectedPost;
@@ -354,10 +391,11 @@ class Thread extends React.Component {
   };
 
   render() {
-    let { locked, isDark, appColor } = this.props;
-    let { loading, refreshing, postHeight, multiQuoting, lockedModalVisible } =
+    let { locked, isDark, appColor, user } = this.props;
+    let { loading, refreshing, postHeight, multiQuotesArr, lockedModalVisible, selectedPost } =
       this.state;
     let { threadId, bottomPadding } = this.props.route.params;
+
     return loading ? (
       <ActivityIndicator
         size='large'
@@ -412,9 +450,12 @@ class Thread extends React.Component {
                 : this.navigate('CRUD', {
                     type: 'post',
                     action: 'create',
-                    onPostCreated: postId => (this.postId = postId),
+                    onPostCreated: postId => {
+                      this.postId = postId;
+                      this.refresh();
+                    },
                     threadId,
-                    quotes: Post.multiQuotes.map(({ props: { post } }) => ({
+                    quotes: multiQuotesArr.map(post => ({
                       ...post,
                       content: `<blockquote><b>${post?.author?.display_name}</b>:<br>${post?.content}</blockquote>`,
                     })),
@@ -422,15 +463,15 @@ class Thread extends React.Component {
             }}
             style={styles.bottomTOpacity}
           >
-            {(locked ? lock : multiQuoting ? multiQuote : PostSvg)({
+            {(locked ? lock : multiQuotesArr.length > 0 ? multiQuote : PostSvg)({
               height: 25,
               width: 25,
               fill: 'white',
             })}
-            {multiQuoting && (
+            {multiQuotesArr.length > 0 && (
               <View style={styles.multiQuoteBadge}>
                 <Text style={{ color: appColor, fontSize: 10 }}>
-                  +{Post.multiQuotes.length}
+                  +{multiQuotesArr.length}
                 </Text>
               </View>
             )}
@@ -465,12 +506,17 @@ class Thread extends React.Component {
           </TouchableOpacity>
         </Modal>
 
-        <BlockModal
+        <MenuModal
           ref={this.blockRef}
           onReportUser={this.onReportUser}
           onReportPost={this.reportForumPost}
           onBlock={this.showBlockWarning}
           mode={this.state.reportMode}
+          onEdit={this.editPost}
+          onMultiquote={this.multiquote}
+          user={user}
+          authorId={this.state.selectedPost?.author_id}
+          multiQuoteText={this.state.multiQuotesArr.find(f => f.id === selectedPost.id) ? 'Remove quote' : 'Multiquote'}
         />
         <BlockWarningModal ref={this.warningRef} onBlock={this.onBlockUser} />
         {this.state.showToastAlert && (

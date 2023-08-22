@@ -134,7 +134,7 @@ export default class HTMLRenderer extends React.Component {
                 let { width, height } = htmlAttribs,
                   ar = height / width || 9 / 16;
                 return (
-                  <View onStartShouldSetResponder={() => true} key={passProps.key}>
+                  <View key={passProps.key}>
                     {iframe(
                       {
                         ...htmlAttribs,

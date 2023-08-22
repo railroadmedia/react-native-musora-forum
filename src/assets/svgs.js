@@ -547,3 +547,15 @@ export const menuHSvg = props => (
     />
   </Svg>
 );
+
+export const edit = props => (
+  <Svg width={props.width} height={props.height} viewBox="0 0 36 35" fill="none">
+    <Path d="M22.7137 7.63034L27.8696 12.7863M24.9012 5.44284C26.3249 4.01905 28.6334 4.01905 30.0571 5.44284C31.4809 6.86663 31.4809 9.17504 30.0571 10.5988L9.97923 30.6767H4.87506V25.4689L24.9012 5.44284Z" stroke={props.fill} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
+export const multiQuoteSvg = props => (
+  <Svg width={props.width} height={props.height} viewBox="0 0 36 35" fill="none">
+    <Path d="M25.2917 11.6666H28.2083C29.8192 11.6666 31.125 12.9724 31.125 14.5833V23.3333C31.125 24.9441 29.8192 26.2499 28.2083 26.2499H25.2917V32.0833L19.4583 26.2499H13.625C12.8196 26.2499 12.0904 25.9235 11.5626 25.3956M11.5626 25.3956L16.5417 20.4166H22.375C23.9858 20.4166 25.2917 19.1108 25.2917 17.4999V8.74992C25.2917 7.13909 23.9858 5.83325 22.375 5.83325H7.79167C6.18084 5.83325 4.875 7.13909 4.875 8.74992V17.4999C4.875 19.1108 6.18084 20.4166 7.79167 20.4166H10.7083V26.2499L11.5626 25.3956Z" stroke={props.fill} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
