@@ -135,7 +135,7 @@ export default class HTMLRenderer extends React.Component {
                 let { width, height } = htmlAttribs,
                   ar = height / width || 9 / 16;
                 return (
-                  <View onStartShouldSetResponder={() => true} key={passProps.key}>
+                  <View key={passProps.key}>
                     {iframe(
                       {
                         ...htmlAttribs,
@@ -180,12 +180,12 @@ export default class HTMLRenderer extends React.Component {
                   </View>
                 );
               },
-              a: ({ href }, children, _, { onLinkPress, key }) => {
-                if (!href?.includes('http')) return null;
+              a: ({ href }, children, _, { onLinkPress, key }) => {         
                 const onPressLink = () => {
                   let brand = getRootUrl().split('.');
                   brand = [brand.pop(), brand.pop()].reverse().join('.');
                   brand = brand.substring(0, brand.indexOf('.com') + 4);
+                  if (!href?.includes('http')) return null;
                   if (href.toLowerCase()?.includes(brand)) {
                     let urlBrand = href.substring(href.indexOf('.com') + 5);
                     if (urlBrand?.includes('/')) {
@@ -220,6 +220,7 @@ export default class HTMLRenderer extends React.Component {
                   </Text>
                 );
               },
+              p: (_, children, key) => <Text key={key}>{children}</Text>,
             }}
           />
         ) : null}

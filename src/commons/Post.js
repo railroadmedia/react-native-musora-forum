@@ -21,13 +21,7 @@ import { updatePosts } from '../redux/ThreadActions';
 import { IS_TABLET } from '../index';
 
 let styles;
-let multiQuotes = [];
-let openedMenus = [];
-const closeMenus = menu => {
-  openedMenus.map(om => om.setState({ selected: false }));
-  openedMenus = [];
-  if (menu?.state?.selected) openedMenus.push(menu);
-};
+
 class Post extends React.Component {
   constructor(props) {
     super(props);
@@ -36,8 +30,6 @@ class Post extends React.Component {
     this.state = {
       isLiked: post?.is_liked_by_viewer,
       likeCount: post?.like_count,
-      selected: false,
-      menuTop: 0,
       isPostReported: post?.is_reported_by_viewer,
     };
     styles = setStyles(isDark, appColor);
@@ -68,55 +60,7 @@ class Post extends React.Component {
     this.props.navigation.navigate('CoachOverview', { id });
   };
 
-  toggleMenu = () =>
-    this.setState(
-      ({ selected }) => ({ selected: !selected }),
-      () => closeMenus(this)
-    );
-
-  edit = () => {
-    closeMenus();
-    let { post, onDelete } = this.props;
-    const blockQuote = post?.content
-      ?.split('</blockquote>')
-      .slice(0, -1)
-      .join('</blockquote>');
-    this.props.navigation.navigate('CRUD', {
-      type: 'post',
-      action: 'edit',
-      postId: post?.id,
-      onDelete,
-      quotes: blockQuote
-        ? [
-            {
-              content:
-                post?.content
-                  ?.split('</blockquote>')
-                  .slice(0, -1)
-                  .join('</blockquote>') + '</blockquote>',
-            },
-          ]
-        : [],
-    });
-  };
-
-  multiQuote = () => {
-    if (openedMenus.length) closeMenus();
-    this.setState(({ selected }) => {
-      if (selected)
-        multiQuotes.splice(
-          multiQuotes.findIndex(
-            mq => mq.props.post?.id === this.props.post?.id
-          ),
-          1
-        );
-      else multiQuotes.push(this);
-      return { selected: !selected };
-    }, this.props.onMultiQuote);
-  };
-
   reply = () => {
-    closeMenus();
     let { post, onPostCreated } = this.props;
     this.props.navigation.navigate('CRUD', {
       type: 'post',
@@ -133,10 +77,10 @@ class Post extends React.Component {
   };
 
   render() {
-    let { isLiked, likeCount, selected, menuTop } = this.state;
-    let { post, appColor, index, isDark, signShown, locked, user } = this.props;
-    let selectedColor = isDark ? '#002039' : '#E1E6EB';
+    let { isLiked, likeCount } = this.state;
+    let { post, appColor, index, isDark, signShown, locked, user, selected } = this.props;
     let baseColor = isDark ? '#081825' : '#FFFFFF';
+    let selectedColor = isDark ? '#002039' : '#E1E6EB';
     if (
       post &&
       post?.content?.includes(`<p><img src="https://cdn.tiny.cloud`)
@@ -156,13 +100,6 @@ class Post extends React.Component {
               marginBottom: 40,
               backgroundColor: selected ? selectedColor : baseColor,
             }}
-            onStartShouldSetResponder={() => true}
-            onMoveShouldSetResponder={() => false}
-            onStartShouldSetResponderCapture={() => false}
-            onMoveShouldSetResponderCapture={() => false}
-            onResponderRelease={
-              multiQuotes.length ? this.multiQuote : this.toggleMenu
-            }
           >
             <View style={styles.header}>
               <Text style={styles.headerText}>#{index}</Text>
@@ -246,12 +183,7 @@ class Post extends React.Component {
                 disabled={user.id === post?.author_id}
                 onPress={this.toggleLike}
                 disallowInterruption={true}
-                style={{
-                  padding: 15,
-                  paddingRight: 7.5,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
+                style={styles.interactionBtn}
               >
                 {(isLiked ? likeOn : like)({
                   height: 15,
@@ -266,12 +198,7 @@ class Post extends React.Component {
                 <TouchableOpacity
                   onPress={this.reply}
                   disallowInterruption={true}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    padding: 15,
-                    paddingLeft: 7.5,
-                  }}
+                  style={styles.interactionBtn}
                 >
                   {replies({
                     height: 15,
@@ -302,49 +229,6 @@ class Post extends React.Component {
                 />
               </View>
             )}
-          </View>
-        )}
-        {selected && !multiQuotes.length && (
-          <View
-            style={{
-              position: 'absolute',
-              alignSelf: 'center',
-              alignItems: 'center',
-              top: menuTop,
-              opacity: menuTop ? 1 : 0,
-            }}
-            onLayout={({
-              nativeEvent: {
-                layout: { height },
-              },
-            }) => !menuTop && this.setState({ menuTop: -height })}
-          >
-            <View style={styles.selectedMenuContainer}>
-              {[
-                this.props.user.permission_level === 'administrator' ||
-                this.props.user.id === this.props.post?.author_id
-                  ? 'edit'
-                  : '',
-                'multiQuote',
-              ].map((action, i) =>
-                action ? (
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    key={i}
-                    onPress={this[action]}
-                    style={{
-                      padding: 10,
-                      paddingHorizontal: 15,
-                      backgroundColor: appColor,
-                      borderLeftWidth: i ? 0.5 : 0,
-                    }}
-                  >
-                    <Text style={styles.selectedMenuActionText}>{action}</Text>
-                  </TouchableOpacity>
-                ) : null
-              )}
-            </View>
-            <View style={styles.triangle} />
           </View>
         )}
       </>
@@ -423,16 +307,6 @@ let setStyles = (isDark, appColor) =>
       fontFamily: 'OpenSans',
       fontSize: IS_TABLET ? 16 : 14,
     },
-    selectedMenuContainer: {
-      flexDirection: 'row',
-      borderRadius: 5,
-      overflow: 'hidden',
-    },
-    selectedMenuActionText: {
-      textTransform: 'capitalize',
-      color: 'white',
-      fontFamily: 'OpenSans-Bold',
-    },
     triangle: {
       width: 0,
       height: 0,
@@ -480,6 +354,12 @@ let setStyles = (isDark, appColor) =>
       textAlign: 'center',
       paddingVertical: 15,
     },
+    interactionBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 15,
+      paddingLeft: 7.5,
+    },
   });
 const mapStateToProps = ({ threads: { signShown, posts } }, { id }) => ({
   signShown,
@@ -488,12 +368,6 @@ const mapStateToProps = ({ threads: { signShown, posts } }, { id }) => ({
 let NavigationWrapper = props => (
   <Post {...props} navigation={useNavigation()} />
 );
-NavigationWrapper.multiQuotes = multiQuotes;
-NavigationWrapper.clearQuoting = () => {
-  closeMenus();
-  multiQuotes.map(mq => mq.setState({ selected: false }));
-  multiQuotes.splice(0, multiQuotes.length);
-};
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators({ updatePosts }, dispatch);
