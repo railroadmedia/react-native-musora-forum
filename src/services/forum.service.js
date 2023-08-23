@@ -104,13 +104,12 @@ export const blockUser = function (id) {
 export const getRootUrl = () => {
   return this.rootUrl;
 };
+export const getCurrentRoute = () => {
+  return this.brand;
+};
+export const handleOpenUrl = urlToOpen => {
+  return this.handleOpenUrl(urlToOpen);
+}
 export const decideWhereToRedirect = urlToOpen => {
-  let urlBrand = urlToOpen.substring(urlToOpen.indexOf('.com') + 5);
-  if (urlBrand?.includes('/')) {
-    urlBrand = urlBrand.substring(0, urlBrand.indexOf('/'));
-  }
-  if (this.brand !== urlBrand) {
-    return this.handleOpenUrl(urlToOpen)
-  }
   return this.decideWhereToRedirect(urlToOpen, {brandName: this.brand, color: this.appColor}, this.user, this.isDark);
 };
