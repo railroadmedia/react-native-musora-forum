@@ -191,13 +191,12 @@ export default class HTMLRenderer extends React.Component {
                     if (urlBrand?.includes('/')) {
                       urlBrand = urlBrand.substring(0, urlBrand.indexOf('/'));
                     }
-                    console.log(getCurrentRoute(),urlBrand)
                     if (getCurrentRoute() !== urlBrand) {
                       this.setState({ linkToOpen: href });
                       return this.customModal.toggle(
                         `This link will take you to ${urlBrand}!`,
                         `Clicking this link will take you to the ${urlBrand} members' area, and you won't be able to return directly to this post.`,
-                        `LEAVE ${urlBrand.toUpperCase()}`
+                        `GO TO ${urlBrand.toUpperCase()}`
                       );
                     }
                     return decideWhereToRedirect(href);
