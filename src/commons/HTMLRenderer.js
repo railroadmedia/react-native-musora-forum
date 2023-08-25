@@ -194,8 +194,8 @@ export default class HTMLRenderer extends React.Component {
                     if (getCurrentRoute() !== urlBrand) {
                       this.setState({ linkToOpen: href });
                       return this.customModal.toggle(
-                        `This link will take you to ${urlBrand}!`,
-                        `Clicking this link will take you to the ${urlBrand} members' area, and you won't be able to return directly to this post.`,
+                        `This link will take you to ${urlBrand.charAt(0).toUpperCase() + urlBrand.slice(1)}!`,
+                        `Clicking this link will take you to the ${urlBrand.charAt(0).toUpperCase() + urlBrand.slice(1)} members' area, and you won't be able to return directly to this post.`,
                         `GO TO ${urlBrand.toUpperCase()}`
                       );
                     }
