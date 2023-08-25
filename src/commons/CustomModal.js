@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, TouchableOpacity, Text, StyleSheet, Animated } from 'react-native';
+import { Modal, TouchableOpacity, Text, StyleSheet, Animated, View, SafeAreaView } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 let styles;
 
@@ -13,9 +14,10 @@ export default class CustomModal extends React.PureComponent {
     };
   }
 
-  toggle = (title, message) => {
+  toggle = (title, message, buttonText) => {
     this.title = title || '';
     this.message = message || '';
+    this.buttonText = buttonText || '';
     this.setState(state => ({ visible: !state.visible }));
   };
 
@@ -37,15 +39,31 @@ export default class CustomModal extends React.PureComponent {
         supportedOrientations={['portrait', 'landscape']}
         onBackButtonPress={this.toggle}
       >
-        <TouchableOpacity style={styles.modalBackground} onPress={() => this.toggle()}>
-          <Animated.View style={[styles.animatedView, { opacity: this.state.opacity }]}>
-            <Text style={styles.modalHeaderText}>{this.title}</Text>
-            <Text style={styles.modalBodyText}>{this.message}</Text>
-            <TouchableOpacity style={styles.btn} onPress={() => this.toggle()}>
-              <Text style={styles.btnText}>OK</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </TouchableOpacity>
+        <LinearGradient
+          style={styles.lgradient}
+          colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
+        />
+        <SafeAreaView style={{flex: 1}}>
+          <TouchableOpacity style={styles.modalBackground} onPress={this.toggle}>
+            <View />
+            <View style={styles.msgContainer}>
+              <Text style={styles.title}>{this.title}</Text>
+              <Text style={styles.message}>{this.message}</Text>
+              <TouchableOpacity 
+                style={styles.btn} 
+                onPress={this.props.onAction ? this.props.onAction : this.toggle}
+              >
+                <Text style={styles.btnText}>{this.buttonText || 'OK'}</Text>
+              </TouchableOpacity>
+            </View>
+    
+            {this.props.onCancel ? (
+              <TouchableOpacity onPress={this.toggle}>
+                <Text style={styles.secondaryBtnText}>Close</Text>
+              </TouchableOpacity>
+            ) : <View /> }
+          </TouchableOpacity>
+        </SafeAreaView>
       </Modal>
     );
   }
@@ -53,41 +71,58 @@ export default class CustomModal extends React.PureComponent {
 
 let setStyles = (isDark, appColor) =>
   StyleSheet.create({
+    lgradient: {
+      width: '100%',
+      height: '100%',
+      position: 'absolute',
+      top: 0,
+      zIndex: 0,
+    },
     modalBackground: {
       flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'rgba(0,0,0,.7)',
+      justifyContent: 'space-between',
     },
-    modalHeaderText: {
+    msgContainer: {
+      alignSelf: 'center',
+      paddingHorizontal: '10%',
+    },
+    title: {
       fontFamily: 'OpenSans-Bold',
       textAlign: 'center',
-      fontSize: 18,
-      color: isDark ? '#FFFFFF' : '#000000',
+      fontSize: 24,
+      color: '#FFFFFF',
+      paddingTop: 5,
     },
-    animatedView: {
-      padding: 10,
-      paddingHorizontal: 30,
-      borderRadius: 10,
-      margin: 15,
-      backgroundColor: isDark ? '#00101D' : '#F7F9FC',
-    },
-    modalBodyText: {
+    message: {
       textAlign: 'center',
       fontFamily: 'OpenSans',
-      fontSize: 12,
-      color: isDark ? '#FFFFFF' : '#000000',
-      padding: 10,
+      fontSize: 16,
+      color: '#FFFFFF',
+      paddingTop: 5,
     },
     btn: {
-      backgroundColor: appColor,
-      borderRadius: 20,
+      backgroundColor: '#FFFFFF',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      alignSelf: 'center',
+      borderRadius: 25,
+      marginTop: 10,
     },
     btnText: {
-      fontFamily: 'OpenSans',
+      fontFamily: 'BebasNeuePro-Bold',
+      fontSize: 18,
       textAlign: 'center',
       padding: 10,
-      color: '#FFFFFF',
-      paddingHorizontal: 50,
+      color: '#000000',
+      paddingHorizontal: 20,
     },
+    secondaryBtnText: {
+      fontSize: 18,
+      color: '#FFFFFF',
+      padding: 10,
+      alignSelf: 'center',
+      textAlign: 'center',
+      fontFamily: 'OpenSans-Bold',
+    }
   });

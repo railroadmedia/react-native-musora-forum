@@ -7,13 +7,14 @@ import { expandQuote } from '../assets/svgs';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { IGNORED_TAGS } from 'react-native-render-html/src/HTMLUtils';
 
-import { getRootUrl, decideWhereToRedirect } from '../services/forum.service';
+import { getRootUrl, decideWhereToRedirect, handleOpenUrl, getCurrentRoute } from '../services/forum.service';
+import CustomModal from './CustomModal';
 
 export default class HTMLRenderer extends React.Component {
-  state = { expanderVisible: false, maxQuoteHeight: undefined, width: 0 };
+  state = { expanderVisible: false, maxQuoteHeight: undefined, width: 0, linkToOpen: '' };
 
   render() {
-    let { html, tagsStyles, classesStyles, olItemStyle, ulItemStyle, appColor } = this.props;
+    let { html, tagsStyles, classesStyles, olItemStyle, ulItemStyle, appColor, isDark } = this.props;
     let { expanderVisible, maxQuoteHeight } = this.state;
     let lastBlockquote = html?.lastIndexOf('</blockquote>');
     if (lastBlockquote >= 0)
@@ -185,7 +186,21 @@ export default class HTMLRenderer extends React.Component {
                   brand = [brand.pop(), brand.pop()].reverse().join('.');
                   brand = brand.substring(0, brand.indexOf('.com') + 4);
                   if (!href?.includes('http')) return null;
-                  if (href.toLowerCase()?.includes(brand)) return decideWhereToRedirect(href);
+                  if (href.toLowerCase()?.includes(brand)) {
+                    let urlBrand = href.substring(href.indexOf('.com') + 5);
+                    if (urlBrand?.includes('/')) {
+                      urlBrand = urlBrand.substring(0, urlBrand.indexOf('/'));
+                    }
+                    if (getCurrentRoute() !== urlBrand) {
+                      this.setState({ linkToOpen: href });
+                      return this.customModal.toggle(
+                        `This link will take you to ${urlBrand.charAt(0).toUpperCase() + urlBrand.slice(1)}!`,
+                        `Clicking this link will take you to the ${urlBrand.charAt(0).toUpperCase() + urlBrand.slice(1)} members' area, and you won't be able to return directly to this post.`,
+                        `GO TO ${urlBrand.toUpperCase()}`
+                      );
+                    }
+                    return decideWhereToRedirect(href);
+                  } 
                   if (href) onLinkPress(null, href);
                 };
                 return (
@@ -208,6 +223,13 @@ export default class HTMLRenderer extends React.Component {
             }}
           />
         ) : null}
+        <CustomModal 
+          ref={ref => (this.customModal = ref)} 
+          isDark={isDark} 
+          appColor={appColor} 
+          onAction={() => handleOpenUrl(this.state.linkToOpen)}
+          onCancel={true}
+        />
       </View>
     );
   }

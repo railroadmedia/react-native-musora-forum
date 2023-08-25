@@ -104,8 +104,12 @@ export const blockUser = function (id) {
 export const getRootUrl = () => {
   return this.rootUrl;
 };
+export const getCurrentRoute = () => {
+  return this.brand;
+};
+export const handleOpenUrl = urlToOpen => {
+  return this.handleOpenUrl(urlToOpen);
+}
 export const decideWhereToRedirect = urlToOpen => {
-  return this.decideWhereToRedirect(
-    this.rootUrl.includes('pianote') ? urlToOpen : { url: urlToOpen }
-  );
+  return this.decideWhereToRedirect(urlToOpen, {brandName: this.brand, color: this.appColor}, this.user, this.isDark);
 };
