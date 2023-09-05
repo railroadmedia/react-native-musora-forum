@@ -96,6 +96,9 @@ class Thread extends React.Component {
         this.page = parseInt(thread.data.page, 10);
         this.post_count = thread.data.post_count;
         this.posts = thread.data.posts.map(p => p.id);
+        if (!threadId) {
+          this.props.route.params.threadId = thread?.data?.id;
+        }
         batch(() => {
           if (isForumRules) this.props.setForumRules(thread.data);
           this.props.setPosts(thread.data.posts);
