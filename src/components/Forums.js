@@ -26,6 +26,7 @@ import { setTestID } from '../index';
 import { setForumsThreads } from '../redux/ThreadActions';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { IS_TABLET } from '../index';
+import NavigationHeader from '../commons/NavigationHeader';
 
 let styles;
 class Forums extends React.Component {
@@ -165,6 +166,7 @@ class Forums extends React.Component {
         edges={['left', 'right', 'bottom']}
         testID={setTestID(`${brand}ForumsScreen`)}
       >
+        <NavigationHeader title={'Forums'} {...this.props} />
         {loading ? (
           <ActivityIndicator
             size='large'

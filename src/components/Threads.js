@@ -18,6 +18,7 @@ import { bindActionCreators } from 'redux';
 import Pagination from '../commons/Pagination';
 import Search from '../commons/Search';
 import ThreadCard from '../commons/ThreadCard';
+import NavigationHeader from '../commons/NavigationHeader';
 
 import { setAllThreads, setFollowedThreads } from '../redux/ThreadActions';
 
@@ -181,6 +182,7 @@ class Threads extends React.Component {
         style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
         edges={['left', 'right', 'bottom']}
       >
+        <NavigationHeader title={this.props.route.params.title} {...this.props} />
         <FlatList
           key={tab}
           overScrollMode='never'
