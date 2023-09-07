@@ -29,7 +29,7 @@ class NavigationHeader extends React.Component {
     AsyncStorage.getItem('signShown').then(
       ss => !!ss !== this.props.signShown && this.props.toggleSignShown()
     );
-    if (this.threadPropIsEmpty && !this.props.route.params?.isForumRules) {
+    if (this.threadPropIsEmpty && !this.props.route.params?.isForumRules && !this.props.route.params?.postId) {
       const { request, controller } = getThread(this.props.threadId);
       request.then(t => {
         this.setState({ thread: t.data });
