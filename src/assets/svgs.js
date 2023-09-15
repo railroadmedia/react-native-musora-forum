@@ -559,3 +559,16 @@ export const multiQuoteSvg = props => (
     <Path d="M25.2917 11.6666H28.2083C29.8192 11.6666 31.125 12.9724 31.125 14.5833V23.3333C31.125 24.9441 29.8192 26.2499 28.2083 26.2499H25.2917V32.0833L19.4583 26.2499H13.625C12.8196 26.2499 12.0904 25.9235 11.5626 25.3956M11.5626 25.3956L16.5417 20.4166H22.375C23.9858 20.4166 25.2917 19.1108 25.2917 17.4999V8.74992C25.2917 7.13909 23.9858 5.83325 22.375 5.83325H7.79167C6.18084 5.83325 4.875 7.13909 4.875 8.74992V17.4999C4.875 19.1108 6.18084 20.4166 7.79167 20.4166H10.7083V26.2499L11.5626 25.3956Z" stroke={props.fill} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </Svg>
 );
+
+export const sortSvg = props => (
+  <Svg width={props.width} height={props.height} viewBox='0 0 35 35' fill='none'>
+    <Rect x='0.5' y='0.5' width='34' height='34' rx='17' fill={props.backgroundFill} />
+    <Path
+      d='M8 10.5H21M8 14.25H17M8 18H17M22 14.25V25.5M22 25.5L18 21.75M22 25.5L26 21.75'
+      stroke={props.fill}
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+    <Rect x='0.5' y='0.5' width='34' height='34' rx='17' stroke={'#CBCBCD'} />
+  </Svg>
+);

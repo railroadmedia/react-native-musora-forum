@@ -24,7 +24,7 @@ import { setAllThreads, setFollowedThreads } from '../redux/ThreadActions';
 
 import { getFollowedThreads, getAllThreads, connection } from '../services/forum.service';
 
-import { addThread } from '../assets/svgs';
+import { addThread, sortSvg } from '../assets/svgs';
 import { IS_TABLET } from '../index';
 
 let styles;
@@ -97,19 +97,21 @@ class Threads extends React.Component {
     return (
       <>
         <View style={styles.headerContainer}>
-          {['ALL THREADS', 'FOLLOWED THREADS'].map((t, i) => (
-            <TouchableOpacity
-              key={t}
-              onPress={() => this.setState({ tab: i }, this.refresh)}
-              style={styles.headerTOpacity}
-            >
-              <Text
-                style={[styles.headerText, tab === i ? { color: isDark ? 'white' : 'black' } : {}]}
+          <View style={styles.headerBtnContainer}>
+            {['ALL THREADS', 'FOLLOWED'].map((t, i) => (
+              <TouchableOpacity
+                key={t}
+                onPress={() => this.setState({ tab: i }, this.refresh)}
+                style={[styles.headerTOpacity, tab === i ? { backgroundColor: isDark ? '#445F74' : '#000C17' } : {}]}
               >
-                {t}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text style={[styles.headerText, tab === i ? { color: 'white' } : {}]}>
+                  {t}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {sortSvg({ height: 35, width: 35, fill: isDark ? 'white' : '#000C17', backgroundFill: isDark ? '#000C17' : 'white', })}
+
         </View>
         <Search isDark={isDark} appColor={appColor} />
       </>
@@ -264,21 +266,32 @@ class Threads extends React.Component {
 let setStyles = (isDark, appColor) =>
   StyleSheet.create({
     headerContainer: {
-      paddingHorizontal: 15,
+      marginTop: 20,
+      paddingHorizontal: 10,
       flexDirection: 'row',
+      justifyContent: 'space-between',
       backgroundColor: isDark ? '#00101D' : '#f0f1f2',
       flexWrap: 'wrap',
     },
+    headerBtnContainer: {
+      flexDirection: 'row',
+      alignItems: 'center'
+    },
     headerTOpacity: {
-      paddingVertical: 15,
-      marginRight: 15,
-      borderBottomWidth: 2,
-      borderColor: isDark ? '#00101D' : '#f0f1f2',
+      height: 35,
+      width: 95,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 7,
+      borderRadius: 55,
+      borderWidth: 1.5,
+      borderColor: isDark ? '#445F74' : '#CBCBCD',
+      backgroundColor: isDark ? '#00101D' : 'white'
     },
     headerText: {
       fontFamily: 'BebasNeue-Regular',
-      fontSize: IS_TABLET ? 24 : 20,
-      color: '#445F74',
+      fontSize: IS_TABLET ? 16 : 14,
+      color: isDark ? 'white' : '#00101D',
     },
     fList: {
       flex: 1,
