@@ -59,15 +59,8 @@ class Search extends React.Component {
   renderSearchInput = () => {
     let { isDark } = this.props;
     return (
-      <View style={{ padding: 15 }}>
+      <View style={{ paddingHorizontal: 10, paddingVertical: 15 }}>
         <View style={styles.inputContainer}>
-          <View style={styles.searchIcon}>
-            {searchSvg({
-              height: 15,
-              width: 15,
-              fill: '#000C17',
-            })}
-          </View>
           <TextInput
             ref={r => (this.textInputRef = r)}
             style={styles.searchInput}
@@ -75,7 +68,7 @@ class Search extends React.Component {
             autoCorrect={false}
             spellCheck={false}
             placeholder={'Search forums...'}
-            placeholderTextColor={'#000C17'}
+            placeholderTextColor={isDark ? '#FFFFFF' : '#000C17'}
             returnKeyType={'search'}
             onSubmitEditing={({ nativeEvent: { text } }) => {
               this.textInputRef.clear();
@@ -85,6 +78,13 @@ class Search extends React.Component {
                 );
             }}
           />
+          <View style={styles.searchIcon}>
+            {searchSvg({
+              height: 15,
+              width: 15,
+              fill: isDark ? '#FFFFFF' : '#000000',
+            })}
+          </View>
         </View>
         {this.searchText && this.state.showSearchResults && (
           <Text style={styles.resultText}>
@@ -229,11 +229,6 @@ let setStyles = isDark => {
       position: 'absolute',
       alignSelf: 'center',
     },
-    headerText: {
-      fontFamily: 'OpenSans-ExtraBold',
-      fontSize: 20,
-      color: isDark ? 'white' : 'black',
-    },
     resultText: {
       fontFamily: 'OpenSans-Italic',
       color: isDark ? 'white' : 'black',
@@ -243,16 +238,19 @@ let setStyles = isDark => {
       flexDirection: 'row',
       alignItems: 'center',
     },
-    searchIcon: { position: 'absolute', left: 15, zIndex: 2 },
+    searchIcon: { position: 'absolute', right: 15, zIndex: 2 },
     searchInput: {
-      fontSize: 14,
+      fontSize: 12,
       fontFamily: 'OpenSans',
       flex: 1,
-      height: 35,
+      height: 40,
       borderRadius: 25,
-      paddingLeft: 40,
-      color: '#000C17',
-      backgroundColor: isDark ? '#F7F9FC' : '#E1E6EB',
+      paddingLeft: 10,
+      paddingRight: 40,
+      color: isDark ? '#FFFFFF': '#000C17',
+      backgroundColor: isDark ? '#000000' : '#FFFFFF',
+      borderWidth: 1,
+      borderColor: isDark ? '#445F74' : '#CBCBCD',
     },
     emptyList: {
       color: isDark ? '#445F74' : 'black',
