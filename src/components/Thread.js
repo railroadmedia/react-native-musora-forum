@@ -99,7 +99,7 @@ class Thread extends React.Component {
         this.posts = thread.data.posts.map(p => p.id);
         if (!threadId) {
           this.props.route.params.threadId = thread?.data?.id;
-          this.props.route.params.title = thread?.data?.title;
+          this.props.route.params.threadTitle = thread?.data?.title;
         }
         batch(() => {
           if (isForumRules) this.props.setForumRules(thread.data);
@@ -413,7 +413,7 @@ class Thread extends React.Component {
         style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
         edges={['right', 'left', 'bottom']}
       >
-        <NavigationHeader title={this.props.route.params.title} {...this.props} />
+        <NavigationHeader title={this.props.route.params.threadTitle} {...this.props} />
         <FlatList
           overScrollMode='never'
           onScrollBeginDrag={() => delete this.postId}
