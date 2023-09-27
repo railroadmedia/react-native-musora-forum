@@ -93,23 +93,14 @@ export default ({
           <Stack.Screen
             name='Forums'
             component={Forums}
-            options={props => ({
-              header: () => <NavigationHeader {...props} title={'Forums'} />,
-            })}
             initialParams={params}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name='Threads'
             component={Threads}
-            options={props => ({
-              header: () => (
-                <NavigationHeader
-                  {...props}
-                  title={props.route.params.title || threadTitle}
-                />
-              ),
-            })}
             initialParams={params}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name='CRUD'
@@ -121,14 +112,7 @@ export default ({
             name='Thread'
             component={Thread}
             initialParams={params}
-            options={props => ({
-              header: () => (
-                <NavigationHeader
-                  {...props}
-                  title={props.route.params.title || threadTitle}
-                />
-              ),
-            })}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name='Search'

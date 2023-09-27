@@ -18,6 +18,7 @@ import { bindActionCreators } from 'redux';
 
 import Pagination from '../commons/Pagination';
 import Post from '../commons/Post';
+import NavigationHeader from '../commons/NavigationHeader';
 
 import {
   connection,
@@ -96,6 +97,10 @@ class Thread extends React.Component {
         this.page = parseInt(thread.data.page, 10);
         this.post_count = thread.data.post_count;
         this.posts = thread.data.posts.map(p => p.id);
+        if (!threadId) {
+          this.props.route.params.threadId = thread?.data?.id;
+          this.props.route.params.threadTitle = thread?.data?.title;
+        }
         batch(() => {
           if (isForumRules) this.props.setForumRules(thread.data);
           this.props.setPosts(thread.data.posts);
@@ -408,6 +413,7 @@ class Thread extends React.Component {
         style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
         edges={['right', 'left', 'bottom']}
       >
+        <NavigationHeader title={this.props.route.params.threadTitle} {...this.props} />
         <FlatList
           overScrollMode='never'
           onScrollBeginDrag={() => delete this.postId}
