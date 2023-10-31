@@ -3,6 +3,7 @@ import { TouchableOpacity, StyleSheet, View, Modal, Text } from 'react-native';
 import { isTablet } from 'react-native-device-info';
 import LinearGradient from 'react-native-linear-gradient';
 import { banSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
+import type { IUser } from '../../entity/IForum';
 
 interface IMenuModal {
   onReportUser?: () => void;
@@ -10,9 +11,9 @@ interface IMenuModal {
   onBlock?: () => void;
   onEdit?: () => void;
   onMultiquote?: () => void;
-  mode: 'user' | 'post';
-  user: any;
-  authorId: number;
+  mode?: 'user' | 'post';
+  user: IUser;
+  authorId?: number;
   multiQuoteText: string;
 }
 
@@ -77,7 +78,7 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
         <View style={styles.modalContent}>
           <View style={IS_TABLET && { height: '10%' }} />
           {(mode === 'post' && user.permission_level === 'administrator') ||
-          user.id === authorId ? (
+          (authorId && user.id === authorId) ? (
             <TouchableOpacity onPress={editPost} style={styles.actionContainer}>
               <View style={styles.iconContainer}>
                 {edit({
