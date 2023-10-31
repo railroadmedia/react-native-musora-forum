@@ -1,28 +1,27 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { FunctionComponent, ReactElement } from 'react';
+import { StyleProp, StyleSheet, Text, View } from 'react-native';
 
-let styles;
+interface IToastAlert {
+  content: string;
+  icon: ReactElement;
+  isDark: boolean;
+}
 
-export default class ToastAlert extends React.Component {
-	constructor(props) {
-	  super(props);
-	  styles = setStyles(props.isDark);
-	}
+const ToastAlert: FunctionComponent<IToastAlert> = props => {
+  const { content, icon, isDark } = props;
+  const styles = setStyles(isDark);
 
-  render = () => {
-    const { content, icon } = this.props;
-    return (
-      <View style={styles.container}>
-        <View style={styles.messageContainer}>
-          {icon}
-          <Text style={styles.text}>{content}</Text>  
-        </View> 
+  return (
+    <View style={styles.container}>
+      <View style={styles.messageContainer}>
+        {icon}
+        <Text style={styles.text}>{content}</Text>
       </View>
-    );
-  }
+    </View>
+  );
 };
 
-const setStyles = (isDark) =>
+const setStyles: StyleProp<any> = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       width: '97%',
@@ -51,4 +50,4 @@ const setStyles = (isDark) =>
     },
   });
 
-
+export default ToastAlert;
