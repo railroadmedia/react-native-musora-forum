@@ -9,7 +9,6 @@ import {
   Keyboard,
   ActivityIndicator,
   StatusBar,
-  BackHandler,
   StyleProp,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
@@ -42,6 +41,7 @@ import {
 import InsertLinkModal from '../commons/InsertLinkModal';
 import { useAppSelector } from '../redux/Store';
 import type { ForumRootStackParamList } from '../ForumRouter';
+import { selectPost, selectThread } from '../redux/threads/ThreadSelectors';
 
 interface ICRUDProps {
   route: {
@@ -55,6 +55,9 @@ interface ICRUDProps {
       postId?: number;
       quotes?: Array<{ id: number; content: string }>;
       onPostCreated?: (postId: number) => void;
+      onDelete: (postId?: number) => void;
+      threadTitle?: string;
+      bottomPadding?: number;
     };
   };
 }
@@ -74,6 +77,7 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
         postId,
         forumId,
         onPostCreated,
+        onDelete: onDeleteProp,
       },
     },
   } = props;
@@ -85,97 +89,74 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
   const [loading, setLoading] = useState(false);
   const [richHTML, setRichHTML] = useState<string | undefined>();
   const scrollRef = useRef<ScrollView | null>(null);
-  const richTextRef = useRef();
+  const richTextRef = useRef<RichEditor>(null);
   const linkModalRef = useRef<React.ElementRef<typeof InsertLinkModal>>(null);
   const customModalRef = useRef<React.ElementRef<typeof CustomModal>>(null);
 
-  const post = useAppSelector(({ threadsState }) => ({
-    ...threadsState.posts?.[postId],
-    content: threadsState.posts?.[postId]?.content
-      ?.split('</blockquote>')
-      .slice(0, -1)
-      .join('</blockquote>')
-      ? threadsState.posts?.[postId]?.content
-          .split('</blockquote>')
-          .reverse()[0]
-          .replace(/^<br>/, '')
-      : threadsState.posts?.[postId]?.content,
-  }));
-
-  const thread = useAppSelector(
-    ({ threadsState }) =>
-      threadsState.forums?.[threadId] ||
-      threadsState.all?.[threadId] ||
-      threadsState.followed?.[threadId] ||
-      threadsState.search?.[threadId]
+  const post = useAppSelector(state => selectPost(state, postId));
+  const thread = useAppSelector(state =>
+    selectThread(state, threadId, type === 'thread' ? 'Thread' : '')
   );
 
   useEffect(() => {
     const keyboardDidChangeFrameEListener = Keyboard.addListener('keyboardDidChangeFrame', () => {
       scrollRef.current?.scrollToEnd();
     });
-
-    const keyboardBackPressed = (): boolean => {
-      goBack();
-      return true;
-    };
-    BackHandler.addEventListener('hardwareBackPress', keyboardBackPressed);
-
     return () => {
       keyboardDidChangeFrameEListener.remove();
-      BackHandler.removeEventListener('hardwareBackPress', keyboardBackPressed);
     };
-  }, [goBack]);
+  }, []);
 
   useEffect(() => {
     setRichHTML(action === 'edit' ? post?.content : '');
   }, [action, post?.content]);
 
-  const onInsertLink = useCallback(
-    (insertType: 'Image' | 'Link' | 'Video') => linkModalRef.current?.toggle(insertType),
+  const onInsertLink = (insertType: 'Image' | 'Link' | 'Video'): void =>
+    linkModalRef.current?.toggle(insertType);
+
+  const onLinkDone = useCallback(
+    (titleValue: string, urlValue: string, typeValue: string): void => {
+      if (urlValue) {
+        if (typeValue === 'Link') {
+          richTextRef.current?.insertLink(titleValue, urlValue);
+        } else if (typeValue === 'Image') {
+          richTextRef.current?.insertImage(urlValue);
+        } else {
+          if (urlValue.includes('<iframe')) {
+            richTextRef.current?.insertHTML(urlValue);
+          } else if (urlValue.includes('youtube.com')) {
+            richTextRef.current?.insertHTML(
+              `<p><iframe src="https://www.youtube.com/embed/${urlValue.slice(
+                urlValue.indexOf('watch?v=') + 8,
+                urlValue.length
+              )}" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p>`
+            );
+          } else if (urlValue.includes('youtu')) {
+            richTextRef.current?.insertHTML(
+              `<p><iframe src="https://www.youtube.com/embed/${urlValue.slice(
+                urlValue.lastIndexOf('/') + 1,
+                urlValue.length
+              )}" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p>`
+            );
+          } else if (urlValue.includes('vimeo.com')) {
+            richTextRef.current?.insertHTML(
+              `<p><iframe src="https://player.vimeo.com/video/${urlValue.slice(
+                urlValue.indexOf('.com/') + 5,
+                urlValue.length
+              )}" width="425" height="350" allowfullscreen="allowfullscreen"></iframe></p>`
+            );
+          } else {
+            richTextRef.current?.insertHTML(
+              `<video controls="controls" width="300" height="150"><source src=${urlValue} /></video>`
+            );
+          }
+        }
+      }
+    },
     []
   );
 
-  const onLinkDone = useCallback((titleValue: string, urlValue: string, typeValue: string) => {
-    if (urlValue) {
-      if (typeValue === 'Link') {
-        richTextRef.current?.insertLink(titleValue, urlValue);
-      } else if (typeValue === 'Image') {
-        richTextRef.current?.insertImage(urlValue);
-      } else {
-        if (urlValue.includes('<iframe')) {
-          richTextRef.current?.insertHTML(urlValue);
-        } else if (urlValue.includes('youtube.com')) {
-          richTextRef.current?.insertHTML(
-            `<p><iframe src="https://www.youtube.com/embed/${urlValue.slice(
-              urlValue.indexOf('watch?v=') + 8,
-              urlValue.length
-            )}" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p>`
-          );
-        } else if (urlValue.includes('youtu')) {
-          richTextRef.current?.insertHTML(
-            `<p><iframe src="https://www.youtube.com/embed/${urlValue.slice(
-              urlValue.lastIndexOf('/') + 1,
-              urlValue.length
-            )}" width="560" height="314" allowfullscreen="allowfullscreen"></iframe></p>`
-          );
-        } else if (urlValue.includes('vimeo.com')) {
-          richTextRef.current?.insertHTML(
-            `<p><iframe src="https://player.vimeo.com/video/${urlValue.slice(
-              urlValue.indexOf('.com/') + 5,
-              urlValue.length
-            )}" width="425" height="350" allowfullscreen="allowfullscreen"></iframe></p>`
-          );
-        } else {
-          richTextRef.current?.insertHTML(
-            `<video controls="controls" width="300" height="150"><source src=${urlValue} /></video>`
-          );
-        }
-      }
-    }
-  }, []);
-
-  const save = async (): Promise<void> => {
+  const save = useCallback(async (): Promise<void> => {
     if (!connection(true)) {
       return;
     }
@@ -183,27 +164,26 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
     richTextRef.current?.blurContentEditor();
     setLoading(true);
     let response;
-    const html = richHTML?.replace('<div><br></div>', '');
-    if (html === '') {
-      setRichHTML(html);
-    }
+    const htmlValue = richHTML?.replace(/<div><br><\/div>/g, '') === '' ? '' : richHTML;
     try {
       if (type === 'thread') {
         if (title) {
           if (action === 'create') {
-            if (!richHTML) {
+            if (!htmlValue) {
               throw Error('First post cannot be empty.');
             }
-            response = await createThread(title, richHTML, forumId).request;
+            response = await createThread(title, htmlValue, forumId).request;
           } else {
-            dispatch(updateThreads({ ...thread, title: title }));
-            response = await updateThread(threadId, { title: title });
+            if (thread) {
+              dispatch(updateThreads({ ...thread, title: title }));
+            }
+            response = await updateThread(threadId, { title: title }).request;
           }
         } else {
           throw Error('Title cannot be empty.');
         }
       } else {
-        if (richHTML) {
+        if (htmlValue) {
           const content = `${
             quotes && quotes?.length > 0
               ? quotes
@@ -211,17 +191,19 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
                   .join('<br>')
                   .concat('<br>')
               : ''
-          }${richHTML}`;
+          }${htmlValue}`;
 
           if (action === 'create') {
             response = await createPost({
               content,
               thread_id: threadId,
               parent_ids: quotes?.map(q => q?.id),
-            });
+            }).request;
           } else {
-            dispatch(updatePosts({ ...post, content }));
-            response = await editPost(postId, content);
+            if (post) {
+              dispatch(updatePosts({ ...post, content }));
+            }
+            response = await editPost(postId, content).request;
           }
         } else {
           throw Error('Post cannot be empty.');
@@ -234,7 +216,8 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
             response?.response?.data?.message
         );
       } else {
-        onPostCreated?.(response.id);
+        setLoading(false);
+        onPostCreated?.(response?.data?.id);
         if (type === 'thread' && action === 'create') {
           pop();
           navigate('Thread', { threadId: response?.data?.id });
@@ -242,14 +225,30 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
           goBack();
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       customModalRef.current?.toggle(
         'Something went wrong',
         e?.message || 'Please try again later.'
       );
       setLoading(false);
     }
-  };
+  }, [
+    richHTML,
+    title,
+    action,
+    dispatch,
+    forumId,
+    goBack,
+    navigate,
+    onPostCreated,
+    pop,
+    post,
+    postId,
+    quotes,
+    thread,
+    threadId,
+    type,
+  ]);
 
   const onDelete = useCallback(async () => {
     if (!connection(true)) {
@@ -263,9 +262,9 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
     } else {
       await deletePost(postId);
     }
-    onDelete?.(postId);
+    onDeleteProp?.(postId);
     goBack();
-  }, [goBack, pop, postId, threadId, type]);
+  }, [goBack, pop, postId, threadId, type, onDeleteProp]);
 
   return (
     <SafeAreaView
@@ -284,14 +283,14 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
       </SafeAreaInsetsContext.Consumer>
 
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => goBack()}>
-          <Text style={styles.cancelBtn}>Cancel</Text>
+        <TouchableOpacity onPress={goBack}>
+          <Text style={styles.cancelBtn}>{'Cancel'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {action === 'create'
             ? quotes?.length === 1
               ? 'Reply'
-              : quotes?.length > 1
+              : quotes?.length && quotes?.length > 1
               ? 'MultiQuote'
               : `Create ${type}`
             : `Edit ${type}`}
@@ -302,44 +301,47 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={{ flex: 1 }}>
+      <View style={styles.editorContainer}>
         <ScrollView
           ref={scrollRef}
-          style={{ flex: 1, margin: 15 }}
+          style={styles.scrollView}
           keyboardShouldPersistTaps='handled'
           contentInsetAdjustmentBehavior='never'
           showsVerticalScrollIndicator={false}
         >
-          {quotes?.map((p, index) => (
-            <View style={{ marginBottom: 10 }} key={index}>
-              <HTMLRenderer
-                appColor={appColor}
-                html={p.content}
-                tagsStyles={{
-                  div: { color: isDark ? 'white' : '#00101D' },
-                  blockquote: { padding: 10, borderRadius: 5 },
-                }}
-                olItemStyle={{ color: isDark ? 'white' : '#00101D' }}
-                ulItemStyle={{ color: isDark ? 'white' : '#00101D' }}
-                classesStyles={{
-                  'blockquote-even': {
-                    backgroundColor: isDark ? '#081825' : 'white',
-                  },
-                  'blockquote-odd': {
-                    backgroundColor: isDark ? '#002039' : '#E1E6EB',
-                  },
-                  shadow: {
-                    elevation: 5,
-                    shadowColor: 'black',
-                    shadowOffset: { height: 4 },
-                    shadowOpacity: 0.4,
-                    shadowRadius: 2,
-                    borderRadius: 5,
-                  },
-                }}
-              />
-            </View>
-          ))}
+          {quotes &&
+            quotes?.length > 0 &&
+            quotes?.map((p, index) => (
+              <View style={styles.htmlContainer} key={index}>
+                <HTMLRenderer
+                  isDark={isDark}
+                  appColor={appColor}
+                  html={p.content}
+                  tagsStyles={{
+                    div: { color: isDark ? 'white' : '#00101D' },
+                    blockquote: { padding: 10, borderRadius: 5 },
+                  }}
+                  olItemStyle={{ color: isDark ? 'white' : '#00101D' }}
+                  ulItemStyle={{ color: isDark ? 'white' : '#00101D' }}
+                  classesStyles={{
+                    'blockquote-even': {
+                      backgroundColor: isDark ? '#081825' : 'white',
+                    },
+                    'blockquote-odd': {
+                      backgroundColor: isDark ? '#002039' : '#E1E6EB',
+                    },
+                    shadow: {
+                      elevation: 5,
+                      shadowColor: 'black',
+                      shadowOffset: { height: 4 },
+                      shadowOpacity: 0.4,
+                      shadowRadius: 2,
+                      borderRadius: 5,
+                    },
+                  }}
+                />
+              </View>
+            ))}
           {type === 'thread' && (
             <>
               <Text style={styles.label}>{'Title'}</Text>
@@ -354,7 +356,7 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
           )}
           {!(type === 'thread' && action === 'edit') && (
             <RichToolbar
-              getEditor={richTextRef}
+              editor={richTextRef}
               style={styles.richBar}
               flatContainerStyle={{ paddingHorizontal: 12 }}
               selectedIconTint={'#2095F2'}
@@ -374,28 +376,28 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
                 actions.insertVideo,
               ]}
               iconMap={{
-                [actions.setBold]: ({ tintColor }) => (
+                [actions.setBold]: ({ tintColor }: { tintColor: string }) => (
                   <>{setBoldSvg({ width: 25, height: 25, fill: tintColor })}</>
                 ),
-                [actions.setItalic]: ({ tintColor }) => (
+                [actions.setItalic]: ({ tintColor }: { tintColor: string }) => (
                   <>{setItalicSvg({ width: 25, height: 25, fill: tintColor })}</>
                 ),
-                [actions.setUnderline]: ({ tintColor }) => (
+                [actions.setUnderline]: ({ tintColor }: { tintColor: string }) => (
                   <>{setUnderlineSvg({ width: 25, height: 23, fill: tintColor })}</>
                 ),
-                [actions.insertBulletsList]: ({ tintColor }) => (
+                [actions.insertBulletsList]: ({ tintColor }: { tintColor: string }) => (
                   <>{insertBulletsListSvg({ width: 25, height: 25, fill: tintColor })}</>
                 ),
-                [actions.insertOrderedList]: ({ tintColor }) => (
+                [actions.insertOrderedList]: ({ tintColor }: { tintColor: string }) => (
                   <>{insertOrderedListSvg({ width: 25, height: 25, fill: tintColor })}</>
                 ),
-                [actions.insertLink]: ({ tintColor }) => (
+                [actions.insertLink]: ({ tintColor }: { tintColor: string }) => (
                   <>{insertLinkSvg({ width: 25, height: 25, fill: tintColor })}</>
                 ),
-                [actions.insertImage]: ({ tintColor }) => (
+                [actions.insertImage]: ({ tintColor }: { tintColor: string }) => (
                   <>{insertImageSvg({ width: 25, height: 25, fill: tintColor })}</>
                 ),
-                [actions.insertVideo]: ({ tintColor }) => (
+                [actions.insertVideo]: ({ tintColor }: { tintColor: string }) => (
                   <>{insertVideoSvg({ width: 25, height: 25, fill: tintColor })}</>
                 ),
               }}
@@ -404,7 +406,7 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
           {!(type === 'thread' && action === 'edit') && (
             <RichEditor
               editorInitializedCallback={() =>
-                richTextRef.current?.webviewBridge?.injectJavaScript(`
+                richTextRef.current?.injectJavascript(`
                     setTimeout(() => {
                       let link = document.createElement("link");
                       link.type = "text/css";
@@ -432,7 +434,7 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
         </ScrollView>
         {action === 'edit' && (
           <TouchableOpacity style={styles.deleteBtn} onPress={onDelete}>
-            <Text style={styles.deleteBtnText}>DELETE {type}</Text>
+            <Text style={styles.deleteBtnText}>{`DELETE ${type}`}</Text>
           </TouchableOpacity>
         )}
         {loading && (
@@ -484,6 +486,16 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
     container: {
       flex: 1,
       backgroundColor: isDark ? '#00101D' : '#F7F9FC',
+    },
+    editorContainer: {
+      flex: 1,
+    },
+    scrollView: {
+      flex: 1,
+      margin: 15,
+    },
+    htmlContainer: {
+      marginBottom: 10,
     },
     richBar: {
       backgroundColor: isDark ? '#002039' : '#E6E7E9',

@@ -43,12 +43,10 @@ const Forums: FunctionComponent<IForumsProps> = props => {
   const reFocused = useRef<boolean>(false);
 
   const flatListRef = useRef<FlatList | null>(null);
-  console.log('render forum');
 
   useEffect(() => {
     const refreshOnFocusListener = addListener('focus', () => {
       if (reFocused.current) {
-        console.log('one refresh');
         refresh();
       } else {
         reFocused.current = true;
@@ -61,6 +59,7 @@ const Forums: FunctionComponent<IForumsProps> = props => {
       BackHandler.removeEventListener('hardwareBackPress', onAndroidBack);
       refreshOnFocusListener?.();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = useCallback(() => {
@@ -241,8 +240,6 @@ const Forums: FunctionComponent<IForumsProps> = props => {
     [styles.emptyList]
   );
 
-  const keyExtractor = useCallback((item: number) => item.toString(), []);
-
   return (
     <SafeAreaView
       style={[styles.fList, { paddingBottom: bottomPadding / 2 }]}
@@ -262,7 +259,7 @@ const Forums: FunctionComponent<IForumsProps> = props => {
           removeClippedSubviews={true}
           keyboardShouldPersistTaps='handled'
           renderItem={renderFLItem}
-          keyExtractor={keyExtractor}
+          keyExtractor={(item: number) => item.toString()}
           ref={flatListRef}
           refreshControl={flRefreshControl}
           ListEmptyComponent={flEmpty}
