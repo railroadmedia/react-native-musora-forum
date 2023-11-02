@@ -5,13 +5,9 @@ import HTML, { IGNORED_TAGS, StylesDictionary } from 'react-native-render-html';
 import WebView from 'react-native-webview';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { expandQuote } from '../assets/svgs';
-import {
-  getRootUrl,
-  getCurrentRoute,
-  decideWhereToRedirect,
-  handleOpenUrl,
-} from '../services/forum.service';
 import CustomModal from './CustomModal';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import type { IForumParams } from '../entity/IRouteParams';
 
 interface IHTMLRenderer {
   html: string;
@@ -19,20 +15,20 @@ interface IHTMLRenderer {
   classesStyles?: StylesDictionary | undefined;
   olItemStyle?: StylesDictionary | undefined;
   ulItemStyle?: StylesDictionary | undefined;
-  appColor: string;
-  isDark: boolean;
 }
 
 const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
+  const { html: htmlProp, tagsStyles, classesStyles, olItemStyle, ulItemStyle } = props;
+  const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
   const {
-    html: htmlProp,
-    tagsStyles,
-    classesStyles,
-    olItemStyle,
-    ulItemStyle,
-    appColor,
     isDark,
-  } = props;
+    appColor,
+    rootUrl,
+    brand: currBrand,
+    user,
+    decideWhereToRedirect,
+    handleOpenUrl,
+  } = params;
   const [html, setHtml] = useState('');
   const [expanderVisible, setExpanderVisible] = useState(false);
   const [maxQuoteHeight, setMaxQuoteHeight] = useState<number | undefined>();
@@ -238,7 +234,7 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
             },
             a: ({ href }, children, _, { onLinkPress, key }) => {
               const onPressLink = (): any => {
-                let brand = getRootUrl().split('.');
+                let brand: string | string[] = rootUrl?.split('.');
                 brand = [brand.pop(), brand.pop()].reverse().join('.');
                 brand = brand.substring(0, brand.indexOf('.com') + 4);
                 if (!(href as string)?.includes('http')) {
@@ -249,7 +245,7 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
                   if (urlBrand?.includes('/')) {
                     urlBrand = urlBrand.substring(0, urlBrand.indexOf('/'));
                   }
-                  if (getCurrentRoute() !== urlBrand) {
+                  if (currBrand !== urlBrand) {
                     setLinkToOpen(href as string);
                     return customModalRef.current?.toggle(
                       `This link will take you to ${
@@ -261,7 +257,12 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
                       `GO TO ${urlBrand.toUpperCase()}`
                     );
                   }
-                  return decideWhereToRedirect(href);
+                  return decideWhereToRedirect(
+                    href as string,
+                    { brandName: currBrand, color: appColor },
+                    user || {},
+                    isDark
+                  );
                 }
                 if (href) {
                   onLinkPress?.(_, href as string, _);

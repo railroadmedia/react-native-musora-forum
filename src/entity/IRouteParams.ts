@@ -4,7 +4,12 @@ export interface IForumParams {
   isDark: boolean;
   NetworkContext: any;
   tryCall: any;
-  decideWhereToRedirect: any;
+  decideWhereToRedirect: (
+    url: string,
+    selectedBrand: any & { brandName: 'drumeo' | 'pianote' | 'guitareo' | 'singeo'; color: string },
+    user: IUser,
+    isThemeDark: boolean
+  ) => Promise<void>;
   handleOpenUrl: any;
   reduxStore: any;
   bottomPadding: number;
