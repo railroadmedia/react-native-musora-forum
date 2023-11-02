@@ -1,5 +1,5 @@
 import Forum from './ForumRouter';
 
-declare module 'MusoraChat' {
+declare module 'react-native-musora-forum' {
   export default Forum;
 }
