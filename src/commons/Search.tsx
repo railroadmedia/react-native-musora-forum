@@ -22,8 +22,8 @@ import Pagination from './Pagination';
 import SearchCard from './SearchCard';
 import type { IThread } from '../entity/IForum';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import type { ForumRootStackParamList } from '../ForumRouter';
 import { setSearchThreads } from '../redux/threads/ThreadActions';
+import type { ForumRootStackParamList } from '../entity/IRouteParams';
 
 interface ISearch {
   isDark: boolean;
@@ -158,23 +158,23 @@ const Search: FunctionComponent<ISearch> = props => {
     ]
   );
 
+  const onNavigate = useCallback(
+    (item: any) => {
+      closeModal();
+      navigate('Thread', {
+        threadId: item.thread_id,
+        title: item.thread.title,
+        postId: item.id,
+      });
+    },
+    [navigate, closeModal]
+  );
+
   const renderFLItem = useCallback(
-    ({ item }: { item: IThread }) => (
-      <SearchCard
-        onNavigate={() => {
-          closeModal();
-          navigate('Thread', {
-            threadId: item.thread_id,
-            title: item.thread.title,
-            postId: item.id,
-          });
-        }}
-        item={item}
-        isDark={isDark}
-        appColor={appColor}
-      />
+    ({ item }: { item: any }) => (
+      <SearchCard onNavigate={onNavigate} item={item} isDark={isDark} appColor={appColor} />
     ),
-    [navigate, closeModal, appColor, isDark]
+    [appColor, isDark, onNavigate]
   );
 
   const flFooter = useMemo(

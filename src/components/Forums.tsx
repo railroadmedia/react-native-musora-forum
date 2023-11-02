@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { useRef, useState, FunctionComponent, useEffect, useCallback, useMemo } from 'react';
 import {
@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { useDispatch, batch } from 'react-redux';
-import { setTestID, IS_TABLET, ForumRootStackParamList } from '../ForumRouter';
+import { setTestID, IS_TABLET } from '../ForumRouter';
 import ForumCard from '../commons/ForumCard';
 import NavigationHeader from '../commons/NavigationHeader';
 import Pagination from '../commons/Pagination';
@@ -21,13 +21,11 @@ import ThreadCard from '../commons/ThreadCard';
 import { setForumsThreads } from '../redux/threads/ThreadActions';
 import { connection, getForums, getFollowedThreads } from '../services/forum.service';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
 
-interface IForumsProps {
-  route: any;
-}
-
-const Forums: FunctionComponent<IForumsProps> = props => {
-  const { bottomPadding, brand, isDark, appColor } = props.route.params;
+const Forums: FunctionComponent = props => {
+  const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
+  const { bottomPadding, brand, isDark, appColor } = params;
 
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
@@ -149,15 +147,9 @@ const Forums: FunctionComponent<IForumsProps> = props => {
 
   const renderFLItem = useCallback(
     ({ item }: { item: number }) => (
-      <ThreadCard
-        onNavigate={() => navigate('Thread', { threadId: item })}
-        appColor={appColor}
-        isDark={isDark}
-        id={item}
-        reduxKey='forums'
-      />
+      <ThreadCard appColor={appColor} isDark={isDark} id={item} reduxKey='forums' />
     ),
-    [appColor, isDark, navigate]
+    [appColor, isDark]
   );
 
   const renderForum = useCallback(

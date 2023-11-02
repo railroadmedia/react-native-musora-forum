@@ -31,30 +31,25 @@ import {
   connection,
 } from '../services/forum.service';
 import { useDispatch } from 'react-redux';
-import type { IThread, IUser } from '../entity/IForum';
-import { useNavigation } from '@react-navigation/native';
+import type { IThread } from '../entity/IForum';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import type { ForumRootStackParamList } from '../ForumRouter';
 import { useAppSelector } from '../redux/Store';
 import { selectThread } from '../redux/threads/ThreadSelectors';
+import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
 
 interface INavigationHeader {
   title: string;
-  route: any;
-  isDark: boolean;
-  threadId: number;
-  user: IUser;
+  isForumRules?: boolean;
 }
 
 const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
+  const { title, isForumRules } = props;
+  const route: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
   const {
-    title,
-    route: {
-      name,
-      params: { isForumRules, postId, threadId, user },
-    },
-    isDark,
-  } = props;
+    name,
+    params: { isDark, postId, user, threadId },
+  } = route;
   const styles = setStyles(isDark);
   const { navigate, goBack, push } = useNavigation<StackNavigationProp<ForumRootStackParamList>>();
   const dispatch = useDispatch();
@@ -78,6 +73,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     } else {
       setThread(threadFromState);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -157,7 +153,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
         icon: signShown ? hideSignSvg : showSignSvg,
         action: toggleSign,
       };
-      if (user.permission_level === 'administrator') {
+      if (user?.permission_level === 'administrator') {
         options.toggleLock = {
           text: thread?.locked ? 'Unlock' : 'Lock',
           icon: thread?.locked ? unlock : lockOutline,
@@ -169,7 +165,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
           action: togglePin,
         };
       }
-      if (user.permission_level === 'administrator' || user.id === thread?.author_id) {
+      if (user?.permission_level === 'administrator' || user?.id === thread?.author_id) {
         options.edit = { text: 'Edit', icon: pencil, action: onEdit };
         options.toggleFollow = {
           text: `${thread?.is_followed ? 'Unfollow' : 'Follow'} Thread`,

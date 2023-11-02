@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -17,7 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { batch, useDispatch } from 'react-redux';
-import { ForumRootStackParamList, IS_TABLET } from '../ForumRouter';
+import { IS_TABLET } from '../ForumRouter';
 import { post as PostSvg, lock, multiQuote, reportSvg, banSvg } from '../assets/svgs';
 import NavigationHeader from '../commons/NavigationHeader';
 import Pagination from '../commons/Pagination';
@@ -25,7 +25,7 @@ import Post from '../commons/Post';
 import ToastAlert from '../commons/ToastAlert';
 import BlockWarningModal from '../commons/modals/BlockWarningModal';
 import MenuModal from '../commons/modals/MenuModal';
-import type { IPost, IUser } from '../entity/IForum';
+import type { IPost } from '../entity/IForum';
 import { setForumRules, setPosts } from '../redux/threads/ThreadActions';
 import {
   getThread,
@@ -35,40 +35,21 @@ import {
   blockUser,
 } from '../services/forum.service';
 import { useAppSelector } from '../redux/Store';
+import type { ForumRootStackParamList, IForumParams, IThreadParams } from '../entity/IRouteParams';
 
-interface IThreadProps {
-  route: {
-    params: {
-      threadTitle: any;
-      action: 'create' | 'edit';
-      type: 'thread' | 'post';
-      forumId?: number;
-      threadId?: number;
-      postId?: number;
-      quotes?: Array<{ id: number; content: string }>;
-      isForumRules?: boolean;
-      page?: number;
-      user: IUser;
-    };
-  };
-}
-
-const Thread: FunctionComponent<IThreadProps> = props => {
+const Thread: FunctionComponent = props => {
+  const { params }: RouteProp<{ params: IThreadParams & IForumParams }, 'params'> = useRoute();
   const {
-    route: {
-      params: {
-        isDark,
-        appColor,
-        user,
-        threadId,
-        threadTitle,
-        bottomPadding,
-        page: pageProp,
-        postId: postIdProp,
-        isForumRules,
-      },
-    },
-  } = props;
+    isDark,
+    appColor,
+    user,
+    threadId,
+    threadTitle,
+    bottomPadding,
+    page: pageProp,
+    postId: postIdProp,
+    isForumRules,
+  } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
   const { navigate, goBack, addListener, canGoBack } =
@@ -116,7 +97,6 @@ const Thread: FunctionComponent<IThreadProps> = props => {
   useEffect(() => {
     const refreshOnFocusListener = addListener('focus', () => {
       if (reFocused.current) {
-        console.log('one refresh');
         refresh();
       } else {
         reFocused.current = true;
@@ -132,6 +112,7 @@ const Thread: FunctionComponent<IThreadProps> = props => {
       blurListener?.();
       BackHandler.removeEventListener('hardwareBackPress', onAndroidBack);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -175,7 +156,7 @@ const Thread: FunctionComponent<IThreadProps> = props => {
       const { request, controller } = getThread(threadId, pageValue, isForumRules, postId.current);
       request.then(thread => {
         setPostCount(thread.data.post_count);
-        setPosts(thread.data.posts.map(p => p.id));
+        setPostsData(thread.data.posts.map(p => p.id));
         flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
         batch(() => {
           if (isForumRules) {
@@ -204,7 +185,7 @@ const Thread: FunctionComponent<IThreadProps> = props => {
     request.then(thread => {
       setPage(parseInt(thread.data.page, 10));
       setPostCount(thread.data.post_count);
-      setPosts(thread.data.posts.map(p => p.id));
+      setPostsData(thread.data.posts.map(p => p.id));
       batch(() => {
         if (isForumRules) {
           dispatch(setForumRules(thread.data));
@@ -377,6 +358,26 @@ const Thread: FunctionComponent<IThreadProps> = props => {
     };
   }, [refresh, selectedPost?.author?.id]);
 
+  const onPressPost = useCallback(() => {
+    postId.current = undefined;
+    if (locked) {
+      toggleLockedModal();
+    } else {
+      navigate('CRUD', {
+        type: 'post',
+        action: 'create',
+        onPostCreated: pId => {
+          postId.current = pId;
+        },
+        threadId,
+        quotes: multiQuotesArr.map(post => ({
+          ...post,
+          content: `<blockquote><b>${post?.author?.display_name}</b>:<br>${post?.content}</blockquote>`,
+        })),
+      });
+    }
+  }, [locked, navigate, multiQuotesArr, threadId, toggleLockedModal]);
+
   const renderFLItem = useCallback(
     ({ item, index }: { item: number; index: number }) => (
       <View
@@ -461,7 +462,7 @@ const Thread: FunctionComponent<IThreadProps> = props => {
       style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
       edges={['right', 'left', 'bottom']}
     >
-      <NavigationHeader title={threadTitle} {...props} />
+      <NavigationHeader title={threadTitle || ''} {...props} />
       <FlatList
         overScrollMode='never'
         onScrollBeginDrag={() => (postId.current = undefined)}
@@ -494,24 +495,7 @@ const Thread: FunctionComponent<IThreadProps> = props => {
           onLayout={({ nativeEvent: { layout } }) =>
             !postHeight && setPostHeight(layout.height + 15)
           }
-          onPress={() => {
-            postId.current = undefined;
-            locked
-              ? toggleLockedModal()
-              : navigate('CRUD', {
-                  type: 'post',
-                  action: 'create',
-                  onPostCreated: (pId: number) => {
-                    postId.current = pId;
-                    refresh();
-                  },
-                  threadId,
-                  quotes: multiQuotesArr.map(post => ({
-                    ...post,
-                    content: `<blockquote><b>${post?.author?.display_name}</b>:<br>${post?.content}</blockquote>`,
-                  })),
-                });
-          }}
+          onPress={onPressPost}
           style={styles.bottomTOpacity}
         >
           {(locked ? lock : multiQuotesArr.length > 0 ? multiQuote : PostSvg)({
@@ -584,9 +568,9 @@ const Thread: FunctionComponent<IThreadProps> = props => {
       {showReportAlert && (
         <ToastAlert
           content={
-            selectedPost?.author.is_reported_by_viewer
+            selectedPost?.author?.is_reported_by_viewer
               ? 'You have already reported this profile.'
-              : `${selectedPost?.author.display_name} was reported.`
+              : `${selectedPost?.author?.display_name} was reported.`
           }
           icon={reportSvg({
             height: 21.6,
@@ -598,7 +582,7 @@ const Thread: FunctionComponent<IThreadProps> = props => {
       )}
       {showBlockAlert && (
         <ToastAlert
-          content={`${selectedPost?.author.display_name} was blocked.`}
+          content={`${selectedPost?.author?.display_name} was blocked.`}
           icon={banSvg({
             height: 21.6,
             width: 21.6,

@@ -11,7 +11,7 @@ interface ISearchCard {
   };
   isDark: boolean;
   appColor: string;
-  onNavigate: () => void;
+  onNavigate: (item: any) => void;
 }
 
 const SearchCard: FunctionComponent<ISearchCard> = props => {
@@ -40,7 +40,7 @@ const SearchCard: FunctionComponent<ISearchCard> = props => {
     <TouchableOpacity style={styles.container} onPress={onNavigate}>
       <AccessLevelAvatar
         author={{
-          id: author_id,
+          id: author_id || -1,
           avatar_url: author_avatar_url,
           access_level: author_access_level,
         }}
@@ -64,7 +64,7 @@ const SearchCard: FunctionComponent<ISearchCard> = props => {
         {arrowRight({ height: 15, fill: isDark ? 'white' : 'black' })}
       </View>
       <Text style={styles.text}>
-        {`Replied ${latest_post.created_at_diff} by ${latest_post.author_display_name} - ${category}`}
+        {`Replied ${latest_post?.created_at_diff} by ${latest_post?.author_display_name} - ${category}`}
       </Text>
     </TouchableOpacity>
   );

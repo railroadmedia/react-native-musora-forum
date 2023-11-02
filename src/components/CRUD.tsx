@@ -14,7 +14,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { SafeAreaInsetsContext, SafeAreaView } from 'react-native-safe-area-context';
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import {
   setBoldSvg,
@@ -40,47 +40,25 @@ import {
 } from '../services/forum.service';
 import InsertLinkModal from '../commons/InsertLinkModal';
 import { useAppSelector } from '../redux/Store';
-import type { ForumRootStackParamList } from '../ForumRouter';
 import { selectPost, selectThread } from '../redux/threads/ThreadSelectors';
+import type { ForumRootStackParamList, ICRUDParams, IForumParams } from '../entity/IRouteParams';
 
-interface ICRUDProps {
-  route: {
-    params: {
-      isDark: boolean;
-      appColor: string;
-      action: 'create' | 'edit';
-      type: 'thread' | 'post';
-      forumId?: number;
-      threadId?: number;
-      postId?: number;
-      quotes?: Array<{ id: number; content: string }>;
-      onPostCreated?: (postId: number) => void;
-      onDelete: (postId?: number) => void;
-      threadTitle?: string;
-      bottomPadding?: number;
-    };
-  };
-}
-
-const CRUD: FunctionComponent<ICRUDProps> = props => {
+const CRUD: FunctionComponent = () => {
+  const { params }: RouteProp<{ params: ICRUDParams & IForumParams }, 'params'> = useRoute();
   const {
-    route: {
-      params: {
-        isDark,
-        appColor,
-        action,
-        type,
-        quotes,
-        threadTitle,
-        bottomPadding,
-        threadId,
-        postId,
-        forumId,
-        onPostCreated,
-        onDelete: onDeleteProp,
-      },
-    },
-  } = props;
+    isDark,
+    appColor,
+    action,
+    type,
+    quotes,
+    threadTitle,
+    bottomPadding,
+    threadId,
+    postId,
+    forumId,
+    onPostCreated,
+    onDelete: onDeleteProp,
+  } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
   const { navigate, goBack, pop } = useNavigation<StackNavigationProp<ForumRootStackParamList>>();
@@ -259,10 +237,10 @@ const CRUD: FunctionComponent<ICRUDProps> = props => {
     if (type === 'thread') {
       await deleteThread(threadId);
       pop();
-    } else {
+    } else if (postId) {
       await deletePost(postId);
+      onDeleteProp?.(postId);
     }
-    onDeleteProp?.(postId);
     goBack();
   }, [goBack, pop, postId, threadId, type, onDeleteProp]);
 

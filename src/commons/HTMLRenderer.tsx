@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import { Platform, Text, View } from 'react-native';
 import iframe from '@native-html/iframe-plugin';
-import HTML, { IGNORED_TAGS } from 'react-native-render-html';
+import HTML, { IGNORED_TAGS, StylesDictionary } from 'react-native-render-html';
 import WebView from 'react-native-webview';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { expandQuote } from '../assets/svgs';
@@ -15,10 +15,10 @@ import CustomModal from './CustomModal';
 
 interface IHTMLRenderer {
   html: string;
-  tagsStyles: Record<string, any>;
-  classesStyles: Record<string, any>;
-  olItemStyle: any;
-  ulItemStyle: any;
+  tagsStyles: StylesDictionary | undefined;
+  classesStyles?: StylesDictionary | undefined;
+  olItemStyle?: StylesDictionary | undefined;
+  ulItemStyle?: StylesDictionary | undefined;
   appColor: string;
   isDark: boolean;
 }
@@ -121,7 +121,7 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
           }}
           renderers={{
             shadow: (_, children, __, { key }) => (
-              <View style={classesStyles.shadow} key={key}>
+              <View style={classesStyles?.shadow} key={key}>
                 {children}
               </View>
             ),
@@ -151,7 +151,7 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
                       maxHeight: maxQuoteHeight,
                       overflow: 'hidden',
                     },
-                    classesStyles[
+                    classesStyles?.[
                       (className as string)?.includes('odd') ? 'blockquote-odd' : 'blockquote-even'
                     ],
                   ]}

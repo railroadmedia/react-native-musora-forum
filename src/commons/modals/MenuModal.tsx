@@ -1,9 +1,9 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { TouchableOpacity, StyleSheet, View, Modal, Text } from 'react-native';
-import { isTablet } from 'react-native-device-info';
 import LinearGradient from 'react-native-linear-gradient';
 import { banSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
 import type { IUser } from '../../entity/IForum';
+import { IS_TABLET } from '../../ForumRouter';
 
 interface IMenuModal {
   onReportUser?: () => void;
@@ -12,12 +12,10 @@ interface IMenuModal {
   onEdit?: () => void;
   onMultiquote?: () => void;
   mode?: 'user' | 'post';
-  user: IUser;
+  user?: IUser;
   authorId?: number;
   multiQuoteText: string;
 }
-
-const IS_TABLET = isTablet();
 
 const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) => {
   const {
@@ -77,8 +75,8 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
         />
         <View style={styles.modalContent}>
           <View style={IS_TABLET && { height: '10%' }} />
-          {(mode === 'post' && user.permission_level === 'administrator') ||
-          (authorId && user.id === authorId) ? (
+          {(mode === 'post' && user?.permission_level === 'administrator') ||
+          (authorId && user?.id === authorId) ? (
             <TouchableOpacity onPress={editPost} style={styles.actionContainer}>
               <View style={styles.iconContainer}>
                 {edit({
@@ -87,7 +85,7 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
                   fill: 'white',
                 })}
               </View>
-              <Text style={styles.actionText}>Edit</Text>
+              <Text style={styles.actionText}>{'Edit'}</Text>
             </TouchableOpacity>
           ) : null}
           {mode === 'post' && (
@@ -110,7 +108,7 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
                 fill: 'white',
               })}
             </View>
-            <Text style={styles.actionText}>Report</Text>
+            <Text style={styles.actionText}>{'Report'}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={blockUser} style={styles.actionContainer}>
             <View style={styles.iconContainer}>
@@ -120,10 +118,10 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
                 fill: 'white',
               })}
             </View>
-            <Text style={styles.actionText}>Block User </Text>
+            <Text style={styles.actionText}>{'Block User '}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={closeModal}>
-            <Text style={styles.close}>Close</Text>
+            <Text style={styles.close}>{'Close'}</Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>

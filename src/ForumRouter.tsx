@@ -2,44 +2,21 @@ import React, { FunctionComponent, useContext } from 'react';
 import { Easing, KeyboardAvoidingView, Platform } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import DeviceInfo from 'react-native-device-info';
-
 import { Provider } from 'react-redux';
-import Search from './commons/Search';
 import CRUD from './components/CRUD';
 import Forums from './components/Forums';
 import Thread from './components/Thread';
 import Threads from './components/Threads';
-import type { IPost } from './entity/IForum';
 import { setForumService } from './services/forum.service';
 import { forumStore } from './redux/Store';
 import type { AnyAction, Store } from 'redux';
-
-export type ForumRootStackParamList = {
-  Forums: undefined;
-  Threads: { title: string; forumId: number };
-  CRUD: {
-    type: 'thread' | 'post';
-    action: 'edit' | 'create';
-    forumId?: number;
-    threadId?: number;
-    postId?: number;
-    quotes?: IPost[] | [];
-    onPostCreated?: (postId?: number) => void;
-    onDelete?: () => void;
-  };
-  Thread: {
-    title?: string;
-    isForumRules?: boolean;
-    threadId?: number;
-    postId?: number;
-  };
-  Search: undefined;
-  CoachOverview: { coachId: number };
-};
+import { RouteProp, useRoute } from '@react-navigation/native';
+import type { TransitionSpec } from '@react-navigation/stack/lib/typescript/src/types';
+import type { ForumRootStackParamList, IForumParams } from './entity/IRouteParams';
 
 let store: Store<unknown, AnyAction>;
 const Stack = createStackNavigator<ForumRootStackParamList>();
-const timingAnim = {
+const timingAnim: TransitionSpec = {
   animation: 'timing',
   config: { duration: 250, easing: Easing.out(Easing.circle) },
 };
@@ -54,24 +31,8 @@ export const setTestID = (testID: string): string => {
   }
 };
 
-export interface IForumParams {
-  isDark: boolean;
-  NetworkContext: any;
-  tryCall: any;
-  decideWhereToRedirect: any;
-  handleOpenUrl: any;
-  bottomPadding: number;
-  user?: any;
-  brand?: string;
-  rootUrl: string;
-  appColor: string;
-  threadTitle?: string;
-  threadId?: number;
-  postId?: number;
-  categoryId?: string;
-}
-
-const ForumRouter: FunctionComponent = ({ route: { params } }) => {
+const ForumRouter: FunctionComponent = () => {
+  const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
   const {
     tryCall,
     rootUrl,
@@ -106,7 +67,7 @@ const ForumRouter: FunctionComponent = ({ route: { params } }) => {
   return (
     <Provider store={store}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1, backgroundColor: isDark ? '#00101d' : 'white' }}
       >
         <Stack.Navigator
@@ -121,13 +82,13 @@ const ForumRouter: FunctionComponent = ({ route: { params } }) => {
           <Stack.Screen
             name='Forums'
             component={Forums}
-            initialParams={params}
+            initialParams={params as any}
             options={{ headerShown: false }}
           />
           <Stack.Screen
             name='Threads'
             component={Threads}
-            initialParams={params}
+            initialParams={params as any}
             options={{ headerShown: false }}
           />
           <Stack.Screen
@@ -142,7 +103,6 @@ const ForumRouter: FunctionComponent = ({ route: { params } }) => {
             initialParams={params}
             options={{ headerShown: false }}
           />
-          <Stack.Screen name='Search' component={Search} initialParams={params} />
         </Stack.Navigator>
       </KeyboardAvoidingView>
     </Provider>

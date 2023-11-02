@@ -4,20 +4,29 @@ import { IS_TABLET } from '../ForumRouter';
 import { pin, arrowRight } from '../assets/svgs';
 import AccessLevelAvatar from './AccessLevelAvatar';
 import { useAppSelector } from '../redux/Store';
+import { useNavigation } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
+import type { ForumRootStackParamList } from '../entity/IRouteParams';
 
 interface IThreadCard {
   id: number;
   reduxKey: 'followed' | 'all' | 'forums';
   appColor: string;
   isDark: boolean;
-  onNavigate: () => void;
 }
 
 const ThreadCard: FunctionComponent<IThreadCard> = props => {
-  const { id, reduxKey, appColor, isDark, onNavigate } = props;
+  const { id, reduxKey, appColor, isDark } = props;
+  const { navigate } = useNavigation<StackNavigationProp<ForumRootStackParamList>>();
 
   const styles = useStyles(isDark);
   const thread = useAppSelector(state => state.threadsState?.[reduxKey]?.[id]);
+
+  const onNavigate = (): void => {
+    navigate('Thread', {
+      threadId: id,
+    });
+  };
 
   return (
     <TouchableOpacity style={styles.container} onPress={onNavigate}>

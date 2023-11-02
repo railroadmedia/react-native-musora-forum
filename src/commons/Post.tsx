@@ -6,12 +6,13 @@ import HTMLRenderer from './HTMLRenderer';
 import { like, likeOn, menuHSvg, replies } from '../assets/svgs';
 import { likePost, disLikePost, connection } from '../services/forum.service';
 import { updatePosts } from '../redux/threads/ThreadActions';
-import { ForumRootStackParamList, IS_TABLET } from '../ForumRouter';
+import { IS_TABLET } from '../ForumRouter';
 import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
-import type { IPost, IUser } from '../entity/IForum';
+import type { IAuthor, IPost, IUser } from '../entity/IForum';
 import { useAppSelector } from '../redux/Store';
 import type { StackNavigationProp } from '@react-navigation/stack';
+import type { ForumRootStackParamList } from '../entity/IRouteParams';
 
 interface IPostProps {
   id: number;
@@ -19,7 +20,7 @@ interface IPostProps {
   index: number;
   isDark: boolean;
   locked: boolean;
-  user: IUser;
+  user?: IUser;
   selected: boolean;
   toggleMenu: (post: IPost, type: 'user' | 'post') => void;
   onPostCreated: (postId?: number) => void;
@@ -101,7 +102,7 @@ const Post: FunctionComponent<IPostProps> = props => {
           <View style={styles.header}>
             <View style={styles.userDetails}>
               <AccessLevelAvatar
-                author={post?.author}
+                author={post?.author || ({} as IAuthor)}
                 height={45}
                 appColor={appColor}
                 isDark={isDark}
@@ -123,6 +124,7 @@ const Post: FunctionComponent<IPostProps> = props => {
           </View>
           <View style={styles.htmlRendererCont}>
             <HTMLRenderer
+              isDark={isDark}
               appColor={appColor}
               html={post?.content}
               tagsStyles={{
@@ -165,7 +167,7 @@ const Post: FunctionComponent<IPostProps> = props => {
           </View>
           <View style={styles.likeContainer}>
             <TouchableOpacity
-              disabled={user.id === post?.author_id}
+              disabled={user?.id === post?.author_id}
               onPress={toggleLike}
               disallowInterruption={true}
               style={styles.interactionBtn}
@@ -206,7 +208,12 @@ const Post: FunctionComponent<IPostProps> = props => {
           </View>
           {signShown && !!post?.author?.signature && (
             <View style={styles.signatureContainer}>
-              <HTMLRenderer html={post?.author?.signature} tagsStyles={{ div: styles.signature }} />
+              <HTMLRenderer
+                isDark={isDark}
+                appColor={appColor}
+                html={post?.author?.signature}
+                tagsStyles={{ div: styles.signature }}
+              />
             </View>
           )}
         </View>

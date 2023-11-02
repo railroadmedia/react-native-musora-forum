@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -15,7 +15,7 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, batch } from 'react-redux';
-import { ForumRootStackParamList, IS_TABLET } from '../ForumRouter';
+import { IS_TABLET } from '../ForumRouter';
 import { addThread } from '../assets/svgs';
 import NavigationHeader from '../commons/NavigationHeader';
 import Pagination from '../commons/Pagination';
@@ -23,12 +23,16 @@ import Search from '../commons/Search';
 import ThreadCard from '../commons/ThreadCard';
 import { setAllThreads, setFollowedThreads } from '../redux/threads/ThreadActions';
 import { getAllThreads, getFollowedThreads, connection } from '../services/forum.service';
+import type { ForumRootStackParamList, IForumParams, IThreadsParams } from '../entity/IRouteParams';
 
-interface IThreadsProps {
-  route: any;
-}
+const Threads: FunctionComponent = props => {
+  const { params }: RouteProp<{ params: IThreadsParams & IForumParams }, 'params'> = useRoute();
+  const { bottomPadding, isDark, appColor, title, forumId } = params;
+  const styles = setStyles(isDark, appColor);
+  const dispatch = useDispatch();
+  const { navigate, goBack, addListener, canGoBack } =
+    useNavigation<StackNavigationProp<ForumRootStackParamList>>();
 
-const Threads: FunctionComponent<IThreadsProps> = props => {
   const [followedPage, setFollowedPage] = useState<number>(1);
   const [allPage, setAllPage] = useState<number>(1);
   const [followedResultsTotal, setFollowedResultsTotal] = useState<number>(0);
@@ -44,18 +48,16 @@ const Threads: FunctionComponent<IThreadsProps> = props => {
   const [followedRefreshing, setFollowedRefreshing] = useState<boolean>(false);
   const [allRefreshing, setAllRefreshing] = useState<boolean>(false);
   const flatListRef = useRef<FlatList | null>(null);
-
-  const { bottomPadding, isDark, appColor, title, forumId } = props.route.params;
-  const styles = setStyles(isDark, appColor);
-  const dispatch = useDispatch();
-  const { navigate, goBack, addListener, canGoBack } =
-    useNavigation<StackNavigationProp<ForumRootStackParamList>>();
+  const reFocused = useRef<boolean>(false);
 
   useEffect(() => {
-    let reFocused: boolean;
-    const refreshOnFocusListener = addListener('focus', () =>
-      reFocused ? refresh?.() : (reFocused = true)
-    );
+    const refreshOnFocusListener = addListener('focus', () => {
+      if (reFocused.current) {
+        refresh();
+      } else {
+        reFocused.current = true;
+      }
+    });
     BackHandler.addEventListener('hardwareBackPress', onAndroidBack);
 
     fetchData();
@@ -64,6 +66,7 @@ const Threads: FunctionComponent<IThreadsProps> = props => {
       refreshOnFocusListener?.();
       BackHandler.removeEventListener('hardwareBackPress', onAndroidBack);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchData = useCallback(() => {
@@ -192,16 +195,13 @@ const Threads: FunctionComponent<IThreadsProps> = props => {
   const renderFLItem = useCallback(
     ({ item }: { item: number }) => (
       <ThreadCard
-        onNavigate={() => {
-          navigate('Thread', { threadId: item });
-        }}
         appColor={appColor}
         isDark={isDark}
         id={item}
         reduxKey={tab ? 'followed' : 'all'}
       />
     ),
-    [appColor, isDark, navigate, tab]
+    [appColor, isDark, tab]
   );
 
   const flRefreshControl = useMemo(

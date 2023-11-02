@@ -28,27 +28,27 @@ const Pagination: FunctionComponent<IPagination> = props => {
 
   const pages = useMemo(() => {
     let currVal = active;
-    let pages: Array<string | number> = Array.from({ length: pagesNo }, (_, i) => i + 1);
+    const tempPages: Array<string | number> = Array.from({ length: pagesNo }, (_, i) => i + 1);
     if (currVal < 2) {
       currVal = 2;
     }
     if (currVal < pagesNo - 2) {
-      pages.splice(currVal + 1, pages.length - currVal - 2, '...');
+      tempPages.splice(currVal + 1, tempPages.length - currVal - 2, '...');
     }
     if (currVal > 3) {
-      pages.splice(1, currVal - 3, '...');
+      tempPages.splice(1, currVal - 3, '...');
     }
-    pages.unshift('<');
-    pages.push('>');
-    return pages;
-  }, [pagesNo]);
+    tempPages.unshift('<');
+    tempPages.push('>');
+    return tempPages;
+  }, [pagesNo, active]);
 
   const changePage = useCallback(
     (page: number | string) => {
       if ((page as number) < 1 || (page as number) > pagesNo) {
         return;
       }
-      let origActive = active;
+      const origActive = active;
       let currVal = active;
       if (page === '<' && active > 1) {
         currVal--;

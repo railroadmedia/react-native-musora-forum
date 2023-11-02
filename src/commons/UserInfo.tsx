@@ -58,10 +58,12 @@ const UserInfo: FunctionComponent<IUserInfo> = props => {
               <Text style={styles.level}>{`LEVEL ${author?.level_rank}`}</Text>
               {'\n'}
               {'\n'}
-              <Text style={styles.yearSince}>
-                {'MEMBER SINCE '}
-                {new Date(Date.now() - author?.days_as_member * 86400000).getUTCFullYear()}
-              </Text>
+              {author?.days_as_member && (
+                <Text style={styles.yearSince}>
+                  {'MEMBER SINCE '}
+                  {new Date(Date.now() - author?.days_as_member * 86400000).getUTCFullYear()}
+                </Text>
+              )}
             </Text>
             <View style={styles.rowsContainer}>
               {[
