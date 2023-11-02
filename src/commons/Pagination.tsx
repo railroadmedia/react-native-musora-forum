@@ -52,13 +52,10 @@ const Pagination: FunctionComponent<IPagination> = props => {
       let currVal = active;
       if (page === '<' && active > 1) {
         currVal--;
-        // setActive(active - 1);
       } else if (page === '>' && active < pagesNo) {
         currVal++;
-        // setActive(active + 1);
       } else {
         currVal = page as number;
-        // setActive(page);
       }
       if (origActive !== currVal) {
         onChangePage(currVal);
