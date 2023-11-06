@@ -380,8 +380,6 @@ const Thread: FunctionComponent = props => {
           appColor={appColor}
           isDark={isDark}
           onPostCreated={(i: number | undefined) => (postId.current = i)}
-          // onDelete={deletePost}
-          // reportForumPost={reportForumPost}
           toggleMenu={showBlockModal}
           selected={!!multiQuotesArr?.find(f => f.id === item)}
         />
@@ -389,14 +387,12 @@ const Thread: FunctionComponent = props => {
     ),
     [
       appColor,
-      // deletePost,
       handleAutoScroll,
       isDark,
       locked,
       multiQuotesArr,
       page,
       postKey,
-      // reportForumPost,
       showBlockModal,
       user,
     ]

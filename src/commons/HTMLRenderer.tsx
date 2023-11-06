@@ -111,7 +111,6 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
               webViewProps: {
                 scrollEnabled: false,
                 androidLayerType: 'hardware',
-                // containerStyle: { width: 300 }
               },
             },
           }}
@@ -259,7 +258,7 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
                   }
                   return decideWhereToRedirect(
                     href as string,
-                    { brandName: currBrand, color: appColor },
+                    { brandName: currBrand || 'drumeo', color: appColor },
                     user || {},
                     isDark
                   );
