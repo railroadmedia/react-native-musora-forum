@@ -1,12 +1,13 @@
 import type { IPost, IUser } from './IForum';
 
+type IBrand = 'drumeo' | 'pianote' | 'guitareo' | 'singeo';
 export interface IForumParams {
   isDark: boolean;
   NetworkContext: any;
   tryCall: any;
   decideWhereToRedirect: (
     url: string,
-    selectedBrand: any & { brandName: 'drumeo' | 'pianote' | 'guitareo' | 'singeo'; color: string },
+    selectedBrand: { brandName: IBrand; color: string },
     user: IUser,
     isThemeDark: boolean
   ) => Promise<void>;
@@ -14,7 +15,7 @@ export interface IForumParams {
   reduxStore: any;
   bottomPadding: number;
   user?: IUser;
-  brand?: string;
+  brand?: IBrand;
   rootUrl: string;
   appColor: string;
   threadTitle?: string;

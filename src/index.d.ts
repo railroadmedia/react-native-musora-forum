@@ -1,5 +1,5 @@
-import Forum from './ForumRouter';
+import ForumRouter from './ForumRouter';
 
 declare module 'react-native-musora-forum' {
-  export default Forum;
+  export const Forum: typeof ForumRouter;
 }

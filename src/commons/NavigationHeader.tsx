@@ -1,4 +1,11 @@
-import React, { FunctionComponent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  FunctionComponent,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { StyleSheet, TouchableOpacity, Text, View, Modal, StyleProp } from 'react-native';
 import { batch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -37,6 +44,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import { useAppSelector } from '../redux/Store';
 import { selectThread } from '../redux/threads/ThreadSelectors';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
+import type { ISvg } from '../entity/ISvg';
 
 interface INavigationHeader {
   title: string;
@@ -146,7 +154,9 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   }, [navigate, threadId]);
 
   const menuOptions = useMemo(() => {
-    const options: { [key: string]: { text: string; icon: any; action: () => void } } = {};
+    const options: {
+      [key: string]: { text: string; icon: (param: ISvg) => ReactElement; action: () => void };
+    } = {};
     if (name.match(/^(Thread)$/)) {
       options.toggleSign = {
         text: `${signShown ? 'Hide' : 'Show'} All Signatures`,
