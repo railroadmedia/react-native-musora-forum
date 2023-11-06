@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useDispatch, batch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { IS_TABLET } from '../ForumRouter';
 import { addThread } from '../assets/svgs';
 import NavigationHeader from '../commons/NavigationHeader';
@@ -37,8 +37,8 @@ const Threads: FunctionComponent = props => {
   const [allPage, setAllPage] = useState<number>(1);
   const [followedResultsTotal, setFollowedResultsTotal] = useState<number>(0);
   const [allResultsTotal, setAllResultsTotal] = useState<number>(0);
-  const [followed, setFollowed] = useState([]);
-  const [all, setAll] = useState<any[]>([]);
+  const [followed, setFollowed] = useState<number[]>([]);
+  const [all, setAll] = useState<number[]>([]);
 
   const [followedLoadingMore, setFollowedLoadingMore] = useState<boolean>(false);
   const [allLoadingMore, setAllLoadingMore] = useState<boolean>(false);
@@ -73,18 +73,22 @@ const Threads: FunctionComponent = props => {
     const { request: threadRequest, controller: threadController } = getAllThreads(forumId);
     const { request: followedThreadRequest, controller: followedThreadController } =
       getFollowedThreads(forumId);
-    Promise.all([threadRequest, followedThreadRequest]).then(([allRes, followedRes]) => {
-      setAll(allRes.data.results.map(r => r.id));
-      setFollowed(followedRes.data.results.map(r => r.id));
-      setFollowedResultsTotal(followedRes.data.total_results);
-      setAllResultsTotal(allRes.data.total_results);
-      batch(() => {
-        dispatch(setAllThreads(allRes.data.results));
-        dispatch(setFollowedThreads(followedRes.data.results));
+    Promise.allSettled([threadRequest, followedThreadRequest])
+      .then(([allRes, followedRes]) => {
+        if (allRes.status === 'fulfilled') {
+          setAll(allRes.value.data?.results?.map(r => r.id));
+          setAllResultsTotal(allRes.value?.data?.total_results);
+          dispatch(setAllThreads(allRes.value?.data?.results));
+        }
+        if (followedRes.status === 'fulfilled') {
+          setFollowed(followedRes.value?.data?.results?.map(r => r.id));
+          setFollowedResultsTotal(followedRes.value?.data?.total_results);
+          dispatch(setFollowedThreads(followedRes.value?.data?.results));
+        }
+      })
+      .finally(() => {
         setLoading(false);
       });
-    });
-
     return () => {
       threadController.abort();
       followedThreadController.abort();
@@ -99,23 +103,25 @@ const Threads: FunctionComponent = props => {
       if (tab) {
         setFollowedPage(page);
         setFollowedLoadingMore(true);
-        getFollowedThreads(forumId, page).request.then(r => {
-          setFollowed(r.data.results.map(f => f.id));
-          batch(() => {
-            dispatch(setFollowedThreads(r.data.results));
+        getFollowedThreads(forumId, page)
+          .request.then(r => {
+            setFollowed(r.data?.results?.map(f => f.id));
+            dispatch(setFollowedThreads(r.data?.results));
+          })
+          .finally(() => {
             setFollowedLoadingMore(false);
           });
-        });
       } else {
         setAllPage(page);
         setAllLoadingMore(true);
-        getAllThreads(forumId, page).request.then(r => {
-          setAll(r.data.results.map(a => a.id));
-          batch(() => {
-            dispatch(setAllThreads(r.data.results));
+        getAllThreads(forumId, page)
+          .request.then(r => {
+            setAll(r.data?.results?.map(a => a.id));
+            dispatch(setAllThreads(r.data?.results));
+          })
+          .finally(() => {
             setAllLoadingMore(false);
           });
-        });
       }
       flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
     },
@@ -128,22 +134,24 @@ const Threads: FunctionComponent = props => {
     }
     if (tab) {
       setFollowedRefreshing(true);
-      getFollowedThreads(forumId, followedPage).request.then(r => {
-        setFollowed(r.data.results.map(f => f.id));
-        batch(() => {
-          dispatch(setFollowedThreads(r.data.results));
+      getFollowedThreads(forumId, followedPage)
+        .request.then(r => {
+          setFollowed(r?.data?.results?.map(f => f.id));
+          dispatch(setFollowedThreads(r.data?.results));
+        })
+        .finally(() => {
           setFollowedRefreshing(false);
         });
-      });
     } else {
       setAllRefreshing(true);
-      getAllThreads(forumId, allPage).request.then(r => {
-        setAll(r.data.results.map(a => a.id));
-        batch(() => {
-          dispatch(setAllThreads(r.data.results));
+      getAllThreads(forumId, allPage)
+        .request.then(r => {
+          setAll(r.data?.results?.map(a => a.id));
+          dispatch(setAllThreads(r.data?.results));
+        })
+        .finally(() => {
           setAllRefreshing(false);
         });
-      });
     }
   }, [allPage, dispatch, followedPage, forumId, tab]);
 
@@ -157,19 +165,20 @@ const Threads: FunctionComponent = props => {
     return true;
   }, [canGoBack, goBack]);
 
+  const onTabChange = useCallback(
+    (index: number): void => {
+      setTab(index);
+      refresh();
+    },
+    [refresh]
+  );
+
   const renderFLHeader = useMemo(
     () => (
       <>
         <View style={styles.headerContainer}>
           {['ALL THREADS', 'FOLLOWED THREADS'].map((t, i) => (
-            <TouchableOpacity
-              key={t}
-              onPress={() => {
-                setTab(i);
-                refresh();
-              }}
-              style={styles.headerTOpacity}
-            >
+            <TouchableOpacity key={t} onPress={() => onTabChange(i)} style={styles.headerTOpacity}>
               <Text
                 style={[styles.headerText, tab === i ? { color: isDark ? 'white' : 'black' } : {}]}
               >
@@ -184,11 +193,11 @@ const Threads: FunctionComponent = props => {
     [
       appColor,
       isDark,
-      refresh,
       styles.headerContainer,
       styles.headerTOpacity,
       styles.headerText,
       tab,
+      onTabChange,
     ]
   );
 
@@ -211,10 +220,10 @@ const Threads: FunctionComponent = props => {
         tintColor={appColor}
         progressBackgroundColor={appColor}
         onRefresh={refresh}
-        refreshing={tab ? followedRefreshing : allRefreshing}
+        refreshing={followedRefreshing || allRefreshing}
       />
     ),
-    [tab, followedRefreshing, allRefreshing, appColor, refresh]
+    [followedRefreshing, allRefreshing, appColor, refresh]
   );
 
   const flFooter = useMemo(

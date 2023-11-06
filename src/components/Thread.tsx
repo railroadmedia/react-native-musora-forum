@@ -25,7 +25,7 @@ import Post from '../commons/Post';
 import ToastAlert from '../commons/ToastAlert';
 import BlockWarningModal from '../commons/modals/BlockWarningModal';
 import MenuModal from '../commons/modals/MenuModal';
-import type { IPost } from '../entity/IForum';
+import type { IPost, IThread } from '../entity/IForum';
 import { setForumRules, setPosts } from '../redux/threads/ThreadActions';
 import {
   getThread,
@@ -69,17 +69,16 @@ const Thread: FunctionComponent = props => {
   const [selectedPost, setSelectedPost] = useState<IPost | undefined>();
   const [reportMode, setReportMode] = useState<'post' | 'user'>();
   const [page, setPage] = useState<number>(pageProp || 1);
-  const [postCount, setPostCount] = useState<number>(0);
-  const [postsData, setPostsData] = useState<number[]>();
+  const [thread, setThread] = useState<IThread>({ id: threadId || -1, title: threadTitle || '' });
 
   const locked = useAppSelector(
     ({ threadsState }) =>
-      threadId &&
+      thread?.id &&
       !!(
-        threadsState?.forums?.[threadId] ||
-        threadsState?.all?.[threadId] ||
-        threadsState?.followed?.[threadId] ||
-        threadsState?.search?.[threadId] ||
+        threadsState?.forums?.[thread?.id] ||
+        threadsState?.all?.[thread?.id] ||
+        threadsState?.followed?.[thread?.id] ||
+        threadsState?.search?.[thread?.id] ||
         threadsState?.forumRules ||
         {}
       ).locked
@@ -122,28 +121,28 @@ const Thread: FunctionComponent = props => {
   const fetchData = useCallback(() => {
     if (threadId || isForumRules || postId.current) {
       const { request, controller } = getThread(threadId, page, isForumRules, postId.current);
-      request.then(thread => {
-        setPage(parseInt(thread.data?.page, 10));
-        setPostCount(thread.data?.post_count);
-        setPostsData(thread.data?.posts.map(p => p.id));
-        if (!threadId) {
-          props.route.params.threadId = thread?.data?.id;
-          props.route.params.threadTitle = thread?.data?.title;
-        }
-        batch(() => {
-          if (isForumRules) {
-            dispatch(setForumRules(thread.data));
-          }
-          dispatch(setPosts(thread.data.posts));
+      request
+        .then(res => {
+          setPage(parseInt(res.data?.page || '', 10));
+          setThread(res?.data);
+          batch(() => {
+            if (isForumRules) {
+              dispatch(setForumRules(res?.data));
+            }
+            dispatch(setPosts(res?.data?.posts || []));
+          });
+        })
+        .finally(() => {
           setLoading(false);
+          setRefreshing(false);
         });
-      });
       return () => {
         controller.abort();
       };
     }
     setLoading(false);
-  }, [dispatch, isForumRules, page, props.route.params, threadId]);
+    setRefreshing(false);
+  }, [dispatch, isForumRules, page, threadId]);
 
   const changePage = useCallback(
     (pageValue: number) => {
@@ -154,18 +153,18 @@ const Thread: FunctionComponent = props => {
       setPage(pageValue);
       setLoadingMore(true);
       const { request, controller } = getThread(threadId, pageValue, isForumRules, postId.current);
-      request.then(thread => {
-        setPostCount(thread.data.post_count);
-        setPostsData(thread.data.posts.map(p => p.id));
-        flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
-        batch(() => {
-          if (isForumRules) {
-            dispatch(setForumRules(thread.data));
-          }
-          dispatch(setPosts(thread.data.posts));
-          setLoadingMore(false);
-        });
-      });
+      request
+        .then(res => {
+          setThread(res.data);
+          flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+          batch(() => {
+            if (isForumRules) {
+              dispatch(setForumRules(res.data));
+            }
+            dispatch(setPosts(res.data.posts || []));
+          });
+        })
+        .finally(() => setLoadingMore(false));
       return () => controller.abort();
     },
     [dispatch, isForumRules, threadId]
@@ -180,22 +179,8 @@ const Thread: FunctionComponent = props => {
     }
     setRefreshing(true);
     setMultiQuotesArr([]);
-    const { request, controller } = getThread(threadId, page, isForumRules, postId.current);
-
-    request.then(thread => {
-      setPage(parseInt(thread.data.page, 10));
-      setPostCount(thread.data.post_count);
-      setPostsData(thread.data.posts.map(p => p.id));
-      batch(() => {
-        if (isForumRules) {
-          dispatch(setForumRules(thread.data));
-        }
-        dispatch(setPosts(thread.data.posts));
-        setRefreshing(false);
-      });
-    });
-    return () => controller.abort();
-  }, [dispatch, isForumRules, page, threadId]);
+    fetchData();
+  }, [isForumRules, threadId, fetchData]);
 
   const onAndroidBack = useCallback(() => {
     if (!connection(true)) {
@@ -213,22 +198,19 @@ const Thread: FunctionComponent = props => {
 
       if (
         postId.current &&
-        postsData?.every(p => Object.keys(postLayouts.current).includes(`${p}`))
+        thread?.posts?.every(p => Object.keys(postLayouts.current).includes(`${p?.id}`))
       ) {
         let scrollPos = flHeaderHeight.current;
-        postsData
-          ?.slice(
-            0,
-            postsData.findIndex(p => p === postId.current)
-          )
-          .map(pId => (scrollPos += postLayouts.current[pId]));
+        thread?.posts
+          ?.slice(0, thread?.posts?.findIndex(p => p.id === postId.current))
+          .map(p => (scrollPos += postLayouts.current[p.id]));
         flatListRef.current?.scrollToOffset({
           offset: scrollPos,
           animated: false,
         });
       }
     },
-    [postsData]
+    [thread?.posts]
   );
 
   const toggleLockedModal = useCallback(() => {
@@ -241,12 +223,14 @@ const Thread: FunctionComponent = props => {
       if (!connection(true)) {
         return;
       }
-      setPostsData(posts => posts?.filter(p => p !== pId));
-      if (!postsData?.length && page > 1) {
+      if (thread?.id && thread.posts) {
+        setThread({ ...thread, posts: thread?.posts?.filter(p => p.id !== pId) });
+      }
+      if (!thread?.posts?.length && page > 1) {
         changePage(page - 1);
       }
     },
-    [changePage, page, postsData?.length]
+    [changePage, page, thread]
   );
 
   const editPost = useCallback(() => {
@@ -328,7 +312,7 @@ const Thread: FunctionComponent = props => {
       }, 2000);
     } else {
       const { request, controller } = reportUser(selectedPost?.author?.id || 0);
-      request.then(res => {
+      request.then((res: { data: { success: boolean } }) => {
         if (res.data.success) {
           setShowReportAlert(true);
           setTimeout(() => {
@@ -344,7 +328,7 @@ const Thread: FunctionComponent = props => {
 
   const onBlockUser = useCallback(() => {
     const { request, controller } = blockUser(selectedPost?.author?.id || 0);
-    request.then(res => {
+    request.then((res: { data: { success: boolean } }) => {
       if (res.data.success) {
         setShowBlockAlert(true);
         setTimeout(() => {
@@ -435,11 +419,11 @@ const Thread: FunctionComponent = props => {
         }}
       >
         <Pagination
-          key={`${page}${postCount}`}
+          key={`${page}${thread?.post_count}`}
           active={page}
           isDark={isDark}
           appColor={appColor}
-          length={postCount}
+          length={thread?.post_count || 0}
           onChangePage={changePage}
         />
         {loadingMore && (
@@ -452,7 +436,7 @@ const Thread: FunctionComponent = props => {
         )}
       </View>
     ),
-    [appColor, changePage, isDark, loadingMore, page, postCount]
+    [appColor, changePage, isDark, loadingMore, page, thread?.post_count]
   );
 
   return loading ? (
@@ -462,12 +446,12 @@ const Thread: FunctionComponent = props => {
       style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
       edges={['right', 'left', 'bottom']}
     >
-      <NavigationHeader title={threadTitle || ''} {...props} />
+      <NavigationHeader title={threadTitle || thread?.title || ''} {...props} />
       <FlatList
         overScrollMode='never'
         onScrollBeginDrag={() => (postId.current = undefined)}
         windowSize={10}
-        data={postsData}
+        data={thread?.posts?.map(p => p.id)}
         style={styles.fList}
         initialNumToRender={10}
         maxToRenderPerBatch={10}

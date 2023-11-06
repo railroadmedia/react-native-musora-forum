@@ -1,5 +1,5 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
-import { TouchableOpacity, StyleSheet, StyleProp, View, Modal, Text } from 'react-native';
+import React, { forwardRef, useState, useImperativeHandle, useCallback } from 'react';
+import { Modal, TouchableOpacity, View, Text, type StyleProp, StyleSheet } from 'react-native';
 import { isTablet } from 'react-native-device-info';
 import LinearGradient from 'react-native-linear-gradient';
 

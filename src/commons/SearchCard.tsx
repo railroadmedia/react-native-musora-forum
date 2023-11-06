@@ -2,34 +2,18 @@ import React, { FunctionComponent } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, StyleProp } from 'react-native';
 import { arrowRight } from '../assets/svgs';
 import AccessLevelAvatar from './AccessLevelAvatar';
-import type { IThread } from '../entity/IForum';
+import type { ISearchItem } from '../entity/IForum';
 
 interface ISearchCard {
-  item: {
-    content: string;
-    thread: IThread;
-  };
+  item: ISearchItem;
   isDark: boolean;
   appColor: string;
-  onNavigate: (item: any) => void;
+  onNavigate: () => void;
 }
 
 const SearchCard: FunctionComponent<ISearchCard> = props => {
   const {
-    item: {
-      content,
-      thread: {
-        author_id,
-        author_avatar_url,
-        author_access_level,
-        author_display_name,
-        title,
-        published_on_formatted,
-        post_count,
-        latest_post,
-        category,
-      },
-    },
+    item: { content, thread },
     isDark,
     appColor,
     onNavigate,
@@ -40,9 +24,9 @@ const SearchCard: FunctionComponent<ISearchCard> = props => {
     <TouchableOpacity style={styles.container} onPress={onNavigate}>
       <AccessLevelAvatar
         author={{
-          id: author_id || -1,
-          avatar_url: author_avatar_url,
-          access_level: author_access_level,
+          id: thread?.author_id || -1,
+          avatar_url: thread?.author_avatar_url,
+          access_level: thread?.author_access_level,
         }}
         height={45}
         appColor={appColor}
@@ -50,13 +34,13 @@ const SearchCard: FunctionComponent<ISearchCard> = props => {
         tagHeight={4}
       />
       <Text style={styles.title}>
-        {title}
+        {thread?.title}
         {'\n'}
         <Text style={styles.text}>
-          {`Started on ${published_on_formatted} by ${author_display_name}`}
+          {`Started on ${thread?.published_on_formatted} by ${thread?.author_display_name}`}
         </Text>
       </Text>
-      <Text style={styles.text}>{`${post_count} Replies`}</Text>
+      <Text style={styles.text}>{`${thread?.post_count} Replies`}</Text>
       <View style={styles.contentContainer}>
         <Text style={styles.content} numberOfLines={3}>
           {content}
@@ -64,7 +48,7 @@ const SearchCard: FunctionComponent<ISearchCard> = props => {
         {arrowRight({ height: 15, fill: isDark ? 'white' : 'black' })}
       </View>
       <Text style={styles.text}>
-        {`Replied ${latest_post?.created_at_diff} by ${latest_post?.author_display_name} - ${category}`}
+        {`Replied ${thread?.latest_post?.created_at_diff} by ${thread?.latest_post?.author_display_name} - ${thread?.category}`}
       </Text>
     </TouchableOpacity>
   );

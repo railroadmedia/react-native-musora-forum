@@ -11,7 +11,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useDispatch, batch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setTestID, IS_TABLET } from '../ForumRouter';
 import ForumCard from '../commons/ForumCard';
 import NavigationHeader from '../commons/NavigationHeader';
@@ -22,6 +22,7 @@ import { setForumsThreads } from '../redux/threads/ThreadActions';
 import { connection, getForums, getFollowedThreads } from '../services/forum.service';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
+import type { IForum } from '../entity/IForum';
 
 const Forums: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
@@ -31,13 +32,13 @@ const Forums: FunctionComponent = props => {
   const dispatch = useDispatch();
   const { navigate, goBack, addListener, canGoBack } =
     useNavigation<StackNavigationProp<ForumRootStackParamList>>();
-  const [page, setPage] = useState(1);
-  const [forums, setForums] = useState([]);
-  const [followedThreads, setFollowedThreads] = useState([]);
-  const [followedThreadsTotal, setFollowedThreadsTotal] = useState(0);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState<number>(1);
+  const [forums, setForums] = useState<IForum[]>([]);
+  const [followedThreads, setFollowedThreads] = useState<number[]>([]);
+  const [followedThreadsTotal, setFollowedThreadsTotal] = useState<number>(0);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const reFocused = useRef<boolean>(false);
 
   const flatListRef = useRef<FlatList | null>(null);
@@ -67,17 +68,23 @@ const Forums: FunctionComponent = props => {
     const { request: forumsRequest, controller: forumsController } = getForums();
     const { request: followedRequest, controller: followedController } = getFollowedThreads();
 
-    Promise.all([forumsRequest, followedRequest]).then(([forumsResponse, followedResponse]) => {
-      setForums(forumsResponse.data?.results);
-      setFollowedThreads(followedResponse.data?.results?.map(r => r.id));
-      setFollowedThreadsTotal(followedResponse.data?.total_results);
-      batch(() => {
-        if (followedResponse.data) {
-          dispatch(setForumsThreads(followedResponse.data?.results));
+    Promise.allSettled([forumsRequest, followedRequest])
+      .then(([forumsResponse, followedResponse]) => {
+        if (forumsResponse.status === 'fulfilled') {
+          setForums(forumsResponse.value.data?.results);
         }
+        if (followedResponse.status === 'fulfilled') {
+          setFollowedThreads(followedResponse.value.data?.results?.map(r => r.id));
+          setFollowedThreadsTotal(followedResponse.value.data?.total_results);
+          if (followedResponse.value.data) {
+            dispatch(setForumsThreads(followedResponse.value.data?.results));
+          }
+        }
+      })
+      .finally(() => {
         setLoading(false);
+        setRefreshing(false);
       });
-    });
 
     return () => {
       forumsController.abort();
@@ -89,54 +96,30 @@ const Forums: FunctionComponent = props => {
     if (!connection(true)) {
       return;
     }
-
     setRefreshing(true);
-
-    const { request: forumsRequest, controller: forumsController } = getForums();
-    const { request: followedRequest, controller: followedController } = getFollowedThreads();
-
-    Promise.all([forumsRequest, followedRequest]).then(([forumsResponse, followedResponse]) => {
-      setForums(forumsResponse.data.results);
-      setFollowedThreads(followedResponse.data?.results?.map(r => r.id));
-
-      batch(() => {
-        dispatch(setForumsThreads(followedResponse.data?.results));
-        setRefreshing(false);
-      });
-    });
-
-    return () => {
-      forumsController.abort();
-      followedController.abort();
-    };
-  }, [dispatch]);
+    fetchData();
+  }, [fetchData]);
 
   const changePage = useCallback(
     (newPage: number) => {
       if (!connection(true)) {
         return;
       }
-
       setPage(newPage);
       setLoadingMore(true);
-
       const { request: followedRequest, controller: followedController } = getFollowedThreads(
         undefined,
         newPage
       );
-
-      followedRequest.then(response => {
-        setFollowedThreads(response.data?.results?.map(r => r.id));
-
-        if (flatListRef.current) {
-          flatListRef.current.scrollToOffset({ offset: 0, animated: false });
-        }
-
-        batch(() => {
+      followedRequest
+        .then(response => {
+          setFollowedThreads(response.data?.results?.map(r => r.id));
+          if (flatListRef.current) {
+            flatListRef.current.scrollToOffset({ offset: 0, animated: false });
+          }
           dispatch(setForumsThreads(response.data.results));
-          setLoadingMore(false);
-        });
-      });
+        })
+        .finally(() => setLoadingMore(false));
 
       return () => {
         followedController.abort();
@@ -153,7 +136,7 @@ const Forums: FunctionComponent = props => {
   );
 
   const renderForum = useCallback(
-    (item: any) => (
+    (item: IForum) => (
       <ForumCard
         key={item.id}
         data={item}

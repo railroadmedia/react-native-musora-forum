@@ -15,12 +15,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { batch, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { search as searchSvg, arrowLeft } from '../assets/svgs';
 import { search, connection } from '../services/forum.service';
 import Pagination from './Pagination';
 import SearchCard from './SearchCard';
-import type { IThread } from '../entity/IForum';
+import type { ISearchItem } from '../entity/IForum';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import { setSearchThreads } from '../redux/threads/ThreadActions';
 import type { ForumRootStackParamList } from '../entity/IRouteParams';
@@ -39,7 +39,7 @@ const Search: FunctionComponent<ISearch> = props => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<ISearchItem[]>([]);
   const [searchText, setSearchText] = useState('');
   const [searchTotal, setSearchTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -57,17 +57,18 @@ const Search: FunctionComponent<ISearch> = props => {
     (text = searchText) => {
       const { request, controller } = search(text, page);
 
-      request.then(searchResult => {
-        setSearchResults(searchResult.data?.results);
-        setSearchText(text);
-        setSearchTotal(searchResult.data?.total_results);
-        dispatch(setSearchThreads(searchResult.data?.results?.map(r => r.thread)));
-        batch(() => {
+      request
+        .then(searchResult => {
+          setSearchResults(searchResult.data?.results);
+          setSearchText(text);
+          setSearchTotal(searchResult.data?.total_results);
+          dispatch(setSearchThreads(searchResult.data?.results?.map(r => r.thread)));
+        })
+        .finally(() => {
           setLoading(false);
           setLoadingMore(false);
           setRefreshing(false);
         });
-      });
 
       return () => controller.abort();
     },
@@ -159,20 +160,25 @@ const Search: FunctionComponent<ISearch> = props => {
   );
 
   const onNavigate = useCallback(
-    (item: any) => {
+    (item: ISearchItem) => {
       closeModal();
       navigate('Thread', {
-        threadId: item.thread_id,
-        title: item.thread.title,
-        postId: item.id,
+        threadId: item?.thread_id,
+        title: item?.thread?.title,
+        postId: item?.id,
       });
     },
     [navigate, closeModal]
   );
 
   const renderFLItem = useCallback(
-    ({ item }: { item: any }) => (
-      <SearchCard onNavigate={onNavigate} item={item} isDark={isDark} appColor={appColor} />
+    ({ item }: { item: ISearchItem }) => (
+      <SearchCard
+        onNavigate={() => onNavigate(item)}
+        item={item}
+        isDark={isDark}
+        appColor={appColor}
+      />
     ),
     [appColor, isDark, onNavigate]
   );
@@ -220,7 +226,7 @@ const Search: FunctionComponent<ISearch> = props => {
     [appColor, refresh, refreshing]
   );
 
-  const keyExtractor = useCallback((item: IThread) => item.id.toString(), []);
+  const keyExtractor = useCallback((item: ISearchItem) => item.id.toString(), []);
 
   return (
     <>

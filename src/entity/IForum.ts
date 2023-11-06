@@ -1,6 +1,6 @@
 export interface IForum {
   id: number;
-  title?: string;
+  title: string;
   slug?: string;
   description?: string;
   weight?: number;
@@ -21,7 +21,7 @@ export interface IThread {
   id: number;
   category_id?: number;
   author_id?: number;
-  title?: string;
+  title: string;
   slug?: string;
   pinned?: boolean;
   locked?: boolean;
@@ -43,7 +43,7 @@ export interface IThread {
   published_on_formatted?: string;
   latest_post?: IPost;
   posts?: IPost[];
-  page?: number;
+  page?: string;
 }
 
 export interface IPost {
@@ -67,6 +67,7 @@ export interface IPost {
   url?: string;
   author_display_name?: string;
   author_avatar_url?: string;
+  thread_title?: string;
 }
 
 export interface IAuthor {
@@ -97,4 +98,27 @@ export interface IUser {
   level_rank?: string;
   access_level?: string;
   permission_level?: string;
+}
+
+export interface ISearchItem {
+  id: number;
+  thread_id: number;
+  author_id: number;
+  prompting_post_id: number;
+  content: string;
+  state: string;
+  published_on?: string;
+  edited_on?: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
+  like_count?: number;
+  is_liked_by_viewer: boolean;
+  is_reported_by_viewer: number;
+  created_at_diff?: string;
+  published_on_formatted?: string;
+  author: IAuthor;
+  url?: string;
+  mobile_app_url?: string;
+  thread: IThread;
 }

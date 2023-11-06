@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext, useEffect } from 'react';
+import React, { FunctionComponent, useContext } from 'react';
 import { Easing, KeyboardAvoidingView, Platform } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import DeviceInfo from 'react-native-device-info';
@@ -33,16 +33,16 @@ export const setTestID = (testID: string): string => {
 
 const ForumRouter: FunctionComponent = () => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
-  const { tryCall, NetworkContext, isDark, reduxStore, postId, threadId, categoryId } = params;
+  const { tryCall, NetworkContext, isDark, reduxStore, postId, threadId, categoryId, brand } =
+    params;
   const networkContext = useContext(NetworkContext);
 
-  useEffect(() => {
-    setForumService({
-      tryCall,
-      NetworkContext,
-      networkContext,
-    });
-  }, [tryCall, NetworkContext]);
+  setForumService({
+    tryCall,
+    NetworkContext,
+    networkContext,
+    brand: brand || 'drumeo',
+  });
 
   if (!store) {
     store = reduxStore?.injectReducer(forumStore) || forumStore;

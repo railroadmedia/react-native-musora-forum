@@ -2,21 +2,12 @@ import React, { FunctionComponent } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, StyleProp } from 'react-native';
 import { IS_TABLET } from '../ForumRouter';
 import { arrowRight, defaultForumIcon } from '../assets/svgs';
+import type { IForum } from '../entity/IForum';
 
 interface IForumCard {
   appColor: string;
   isDark: boolean;
-  data: {
-    title: string;
-    post_count: number;
-    description: string;
-    latest_post: {
-      created_at_diff: string;
-      thread_title: string;
-      author_display_name: string;
-    } | null;
-    icon_path: string | null;
-  };
+  data: IForum;
   onNavigate: () => void;
 }
 
@@ -28,9 +19,9 @@ const ForumCard: FunctionComponent<IForumCard> = props => {
     <TouchableOpacity onPress={onNavigate} style={styles.container}>
       <View style={styles.titleContainer}>
         <View style={styles.icon}>
-          {data.icon_path ? (
+          {data?.icon_path ? (
             <Image
-              source={{ uri: data.icon_path }}
+              source={{ uri: data?.icon_path }}
               style={{ height: '50%', aspectRatio: 1 }}
               resizeMode={'contain'}
             />
@@ -39,24 +30,24 @@ const ForumCard: FunctionComponent<IForumCard> = props => {
           )}
         </View>
         <View style={{ marginLeft: 5 }}>
-          <Text style={styles.title}>{data.title}</Text>
-          <Text style={styles.subtitle}>{`${data.post_count} Threads`}</Text>
+          <Text style={styles.title}>{data?.title}</Text>
+          <Text style={styles.subtitle}>{`${data?.post_count} Threads`}</Text>
         </View>
       </View>
       <View style={styles.descriptionContainer}>
-        <Text style={styles.description}>{data.description}</Text>
+        <Text style={styles.description}>{data?.description}</Text>
         {arrowRight({ height: 10, width: 10, fill: isDark ? '#FFFFFF' : '#000000' })}
       </View>
-      {!!data.latest_post && (
+      {!!data?.latest_post && (
         <View style={styles.tagsContainer}>
           <Text style={[styles.tags, { flexShrink: 0 }]} numberOfLines={1} ellipsizeMode='tail'>
-            {data.latest_post.created_at_diff}
+            {data?.latest_post?.created_at_diff}
           </Text>
           <Text style={styles.tags} numberOfLines={1} ellipsizeMode='tail'>
-            {` - In: ${data.latest_post.thread_title}`}
+            {` - In: ${data?.latest_post?.thread_title || ''}`}
           </Text>
           <Text style={styles.tags} numberOfLines={1} ellipsizeMode='tail'>
-            {` - By: ${data.latest_post.author_display_name}`}
+            {` - By: ${data?.latest_post?.author_display_name || ''}`}
           </Text>
         </View>
       )}

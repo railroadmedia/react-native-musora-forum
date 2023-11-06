@@ -269,8 +269,9 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
                           fontFamily: 'OpenSans',
                         }}
                       >
-                        {`You've ${thread?.is_followed ? 'started following' : 'unfollowed'} this
-                        thread.`}
+                        {`You've ${
+                          thread?.is_followed ? 'started following' : 'unfollowed'
+                        } this thread.`}
                       </Text>
                     </Text>
                   </View>

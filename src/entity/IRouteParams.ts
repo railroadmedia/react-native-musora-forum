@@ -34,7 +34,7 @@ export interface ICRUDParams {
   forumId?: number;
   threadId?: number;
   postId?: number;
-  quotes?: IPost[] & Array<{ content: string }>;
+  quotes?: IPost[] | Array<{ content: string }>;
   onPostCreated?: (postId?: number) => void;
   onDelete?: (postId: number) => void;
 }

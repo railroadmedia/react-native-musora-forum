@@ -42,6 +42,7 @@ import InsertLinkModal from '../commons/InsertLinkModal';
 import { useAppSelector } from '../redux/Store';
 import { selectPost, selectThread } from '../redux/threads/ThreadSelectors';
 import type { ForumRootStackParamList, ICRUDParams, IForumParams } from '../entity/IRouteParams';
+import type { IPost } from '../entity/IForum';
 
 const CRUD: FunctionComponent = () => {
   const { params }: RouteProp<{ params: ICRUDParams & IForumParams }, 'params'> = useRoute();
@@ -138,20 +139,21 @@ const CRUD: FunctionComponent = () => {
     if (!connection(true)) {
       return;
     }
-    Keyboard.dismiss();
-    richTextRef.current?.blurContentEditor();
-    setLoading(true);
-    let response;
-    const htmlValue = richHTML?.replace(/<div><br><\/div>/g, '') === '' ? '' : richHTML;
     try {
+      Keyboard.dismiss();
+      richTextRef.current?.blurContentEditor();
+      setLoading(true);
+      let response;
+
+      const htmlValue = richHTML?.replace(/<div><br><\/div>/g, '') === '' ? '' : richHTML;
       if (type === 'thread') {
         if (title) {
-          if (action === 'create') {
+          if (action === 'create' && forumId) {
             if (!htmlValue) {
               throw Error('First post cannot be empty.');
             }
             response = await createThread(title, htmlValue, forumId).request;
-          } else {
+          } else if (threadId) {
             if (thread) {
               dispatch(updateThreads({ ...thread, title: title }));
             }
@@ -171,13 +173,13 @@ const CRUD: FunctionComponent = () => {
               : ''
           }${htmlValue}`;
 
-          if (action === 'create') {
+          if (action === 'create' && threadId) {
             response = await createPost({
               content,
               thread_id: threadId,
-              parent_ids: quotes?.map(q => q?.id),
+              parent_ids: (quotes as IPost[])?.map(q => q?.id),
             }).request;
-          } else {
+          } else if (postId) {
             if (post) {
               dispatch(updatePosts({ ...post, content }));
             }
@@ -188,25 +190,20 @@ const CRUD: FunctionComponent = () => {
         }
       }
 
-      if (response.response) {
-        throw Error(
-          response.response?.data?.errors?.map((m: { detail: any }) => m?.detail).join(' ') ||
-            response?.response?.data?.message
-        );
+      setLoading(false);
+      onPostCreated?.(response?.data?.id);
+      if (type === 'thread' && action === 'create') {
+        pop();
+        navigate('Thread', { threadId: response?.data?.id });
       } else {
-        setLoading(false);
-        onPostCreated?.(response?.data?.id);
-        if (type === 'thread' && action === 'create') {
-          pop();
-          navigate('Thread', { threadId: response?.data?.id });
-        } else {
-          goBack();
-        }
+        goBack();
       }
     } catch (e: any) {
       customModalRef.current?.toggle(
         'Something went wrong',
-        e?.message || 'Please try again later.'
+        e?.errors?.map((m: { detail: any }) => m?.detail).join(' ') ||
+          e?.message ||
+          'Please try again later.'
       );
       setLoading(false);
     }
@@ -234,11 +231,11 @@ const CRUD: FunctionComponent = () => {
     }
     Keyboard.dismiss();
     setLoading(true);
-    if (type === 'thread') {
-      await deleteThread(threadId);
+    if (type === 'thread' && threadId) {
+      await deleteThread(threadId).request;
       pop();
     } else if (postId) {
-      await deletePost(postId);
+      await deletePost(postId).request;
       onDeleteProp?.(postId);
     }
     goBack();
@@ -292,8 +289,6 @@ const CRUD: FunctionComponent = () => {
             quotes?.map((p, index) => (
               <View style={styles.htmlContainer} key={index}>
                 <HTMLRenderer
-                  isDark={isDark}
-                  appColor={appColor}
                   html={p.content}
                   tagsStyles={{
                     div: { color: isDark ? 'white' : '#00101D' },
