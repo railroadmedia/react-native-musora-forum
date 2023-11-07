@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StyleProp } from 'react-native';
-import { IS_TABLET } from '../ForumRouter';
+import { IS_TABLET } from '../services/helpers';
 import { pin, arrowRight } from '../assets/svgs';
 import AccessLevelAvatar from './AccessLevelAvatar';
 import { useAppSelector } from '../redux/Store';
@@ -41,12 +41,10 @@ const ThreadCard: FunctionComponent<IThreadCard> = props => {
         tagHeight={8}
         isDark={false}
       />
-      <View style={{ paddingHorizontal: 10, flex: 1 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={styles.detailsContainer}>
+        <View style={styles.titleContainer}>
           {!!thread?.pinned && (
-            <View style={{ marginRight: 5 }}>
-              {pin({ width: 10, fill: isDark ? 'white' : 'black' })}
-            </View>
+            <View style={styles.icon}>{pin({ width: 10, fill: isDark ? 'white' : 'black' })}</View>
           )}
           <Text style={styles.title}>{thread?.title}</Text>
         </View>
@@ -82,6 +80,17 @@ const useStyles: StyleProp<any> = (isDark: boolean) =>
       shadowOffset: { width: 3, height: 4 },
       shadowOpacity: 1,
       shadowRadius: 4,
+    },
+    detailsContainer: {
+      paddingHorizontal: 10,
+      flex: 1,
+    },
+    titleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    icon: {
+      marginRight: 5,
     },
     title: {
       fontFamily: 'OpenSans-Bold',
