@@ -96,7 +96,7 @@ const InsertLinkModal = forwardRef<{ toggle: (linkType: string) => void }, IInse
                 />
               </View>
 
-              <TouchableOpacity style={styles.btn} onPress={() => onButtonPress()}>
+              <TouchableOpacity style={styles.btn} onPress={onButtonPress}>
                 <Text style={styles.text}>{'OK'}</Text>
               </TouchableOpacity>
             </View>

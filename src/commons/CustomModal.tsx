@@ -33,15 +33,12 @@ const CustomModal = forwardRef<
     toggle,
   }));
 
-  const toggle = useCallback(
-    (titleValue?: string, messageValue?: string, buttonTextValue?: string) => {
-      setTitle(titleValue || '');
-      setMessage(messageValue || '');
-      setButtonText(buttonTextValue || 'OK');
-      setVisible(v => !v);
-    },
-    []
-  );
+  const toggle = (titleValue?: string, messageValue?: string, buttonTextValue?: string): void => {
+    setTitle(titleValue || '');
+    setMessage(messageValue || '');
+    setButtonText(buttonTextValue || 'OK');
+    setVisible(v => !v);
+  };
 
   const animate = useCallback(() => {
     Animated.timing(opacity, {
@@ -51,12 +48,16 @@ const CustomModal = forwardRef<
     }).start();
   }, [opacity, visible]);
 
+  const onClose = (): void => {
+    toggle();
+  };
+
   return (
     <Modal
       transparent={true}
       onShow={animate}
       visible={visible}
-      onRequestClose={() => toggle()}
+      onRequestClose={onClose}
       supportedOrientations={['portrait', 'landscape']}
     >
       <LinearGradient
@@ -64,19 +65,21 @@ const CustomModal = forwardRef<
         colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
       />
       <SafeAreaView style={{ flex: 1 }}>
-        <TouchableOpacity style={styles.modalBackground} onPress={() => toggle()}>
+        <TouchableOpacity style={styles.modalBackground} onPress={onClose}>
           <View />
           <View style={styles.msgContainer}>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.message}>{message}</Text>
-            <TouchableOpacity style={styles.btn} onPress={onAction ? onAction : () => toggle()}>
-              <Text style={styles.btnText}>{buttonText}</Text>
-            </TouchableOpacity>
+            {title && <Text style={styles.title}>{title}</Text>}
+            {message && <Text style={styles.message}>{message}</Text>}
+            {buttonText && (
+              <TouchableOpacity style={styles.btn} onPress={onAction ? onAction : onClose}>
+                <Text style={styles.btnText}>{buttonText}</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {onCancel ? (
-            <TouchableOpacity onPress={() => toggle()}>
-              <Text style={styles.secondaryBtnText}>Close</Text>
+            <TouchableOpacity onPress={onClose}>
+              <Text style={styles.secondaryBtnText}>{'Close'}</Text>
             </TouchableOpacity>
           ) : (
             <View />

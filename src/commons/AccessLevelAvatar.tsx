@@ -35,7 +35,7 @@ const AccessLevelAvatar: FunctionComponent<IAccessLevelAvatar> = props => {
     let userTagIcon: ((_: ISvg) => ReactElement) | undefined;
     let userTagText: string | undefined;
 
-    switch (author.access_level) {
+    switch (author?.access_level) {
       case 'edge': {
         borderColor = appColor;
         userTagIcon = edge;
@@ -73,10 +73,10 @@ const AccessLevelAvatar: FunctionComponent<IAccessLevelAvatar> = props => {
   const onAvatarPress = useCallback(() => {
     if (showUserInfoProp) {
       if (
-        (author.access_level === 'coach' || author.access_level === 'house-coach') &&
-        author.associated_coach?.id
+        (author?.access_level === 'coach' || author?.access_level === 'house-coach') &&
+        author?.associated_coach?.id
       ) {
-        onNavigateToCoach?.(author.associated_coach?.id);
+        onNavigateToCoach?.(author?.associated_coach?.id);
       } else {
         setShowUserInfo(true);
       }
@@ -99,7 +99,7 @@ const AccessLevelAvatar: FunctionComponent<IAccessLevelAvatar> = props => {
         onPress={onAvatarPress}
         disallowInterruption={true}
       >
-        <Image source={{ uri: author.avatar_url }} style={{ height, aspectRatio: 1 }} />
+        <Image source={{ uri: author?.avatar_url }} style={{ height, aspectRatio: 1 }} />
         {userBorderColor?.userTagText ? (
           <View
             style={{

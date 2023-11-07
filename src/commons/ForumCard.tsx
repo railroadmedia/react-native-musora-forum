@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, StyleProp } from 'react-native';
-import { IS_TABLET } from '../ForumRouter';
+import { IS_TABLET } from '../services/helpers';
 import { arrowRight, defaultForumIcon } from '../assets/svgs';
 import type { IForum } from '../entity/IForum';
 
@@ -22,14 +22,14 @@ const ForumCard: FunctionComponent<IForumCard> = props => {
           {data?.icon_path ? (
             <Image
               source={{ uri: data?.icon_path }}
-              style={{ height: '50%', aspectRatio: 1 }}
+              style={styles.imageStyle}
               resizeMode={'contain'}
             />
           ) : (
             defaultForumIcon({ height: '50%', fill: appColor })
           )}
         </View>
-        <View style={{ marginLeft: 5 }}>
+        <View style={styles.titleTextContainer}>
           <Text style={styles.title}>{data?.title}</Text>
           <Text style={styles.subtitle}>{`${data?.post_count} Threads`}</Text>
         </View>
@@ -73,6 +73,13 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       backgroundColor: isDark ? '#002039' : '#F7F9FC',
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    imageStyle: {
+      height: '50%',
+      aspectRatio: 1,
+    },
+    titleTextContainer: {
+      marginLeft: 5,
     },
     title: {
       fontFamily: 'OpenSans-Bold',
