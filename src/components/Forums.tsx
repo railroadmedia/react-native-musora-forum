@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { setTestID, IS_TABLET } from '../ForumRouter';
+import { setTestID, IS_TABLET } from '../services/helpers';
 import ForumCard from '../commons/ForumCard';
 import NavigationHeader from '../commons/NavigationHeader';
 import Pagination from '../commons/Pagination';

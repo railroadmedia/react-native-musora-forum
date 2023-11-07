@@ -15,7 +15,7 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
-import { IS_TABLET } from '../ForumRouter';
+import { IS_TABLET } from '../services/helpers';
 import { addThread } from '../assets/svgs';
 import NavigationHeader from '../commons/NavigationHeader';
 import Pagination from '../commons/Pagination';

@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useContext } from 'react';
 import { Easing, KeyboardAvoidingView, Platform } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import DeviceInfo from 'react-native-device-info';
 import { Provider } from 'react-redux';
 import CRUD from './components/CRUD';
 import Forums from './components/Forums';
@@ -11,7 +10,10 @@ import { setForumService } from './services/forum.service';
 import { forumStore } from './redux/Store';
 import type { AnyAction, Store } from 'redux';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import type { TransitionSpec } from '@react-navigation/stack/lib/typescript/src/types';
+import type {
+  StackNavigationOptions,
+  TransitionSpec,
+} from '@react-navigation/stack/lib/typescript/src/types';
 import type { ForumRootStackParamList, IForumParams } from './entity/IRouteParams';
 
 let store: Store<unknown, AnyAction>;
@@ -20,15 +22,12 @@ const timingAnim: TransitionSpec = {
   animation: 'timing',
   config: { duration: 250, easing: Easing.out(Easing.circle) },
 };
-
-export const IS_TABLET = DeviceInfo.isTablet();
-
-export const setTestID = (testID: string): string => {
-  if (Platform.OS === 'ios') {
-    return testID;
-  } else {
-    return `com.musoraapp:id/${testID}`;
-  }
+const screenOptions: StackNavigationOptions = {
+  gestureEnabled: true,
+  transitionSpec: { open: timingAnim, close: timingAnim },
+  animationEnabled: false,
+  headerMode: 'screen',
+  headerShown: false,
 };
 
 const ForumRouter: FunctionComponent = () => {
@@ -55,37 +54,12 @@ const ForumRouter: FunctionComponent = () => {
       >
         <Stack.Navigator
           initialRouteName={categoryId ? 'Threads' : postId || threadId ? 'Thread' : 'Forums'}
-          screenOptions={{
-            gestureEnabled: true,
-            transitionSpec: { open: timingAnim, close: timingAnim },
-            animationEnabled: false,
-            headerMode: 'screen',
-          }}
+          screenOptions={screenOptions}
         >
-          <Stack.Screen
-            name='Forums'
-            component={Forums}
-            initialParams={params as any}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name='Threads'
-            component={Threads}
-            initialParams={params as any}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name='CRUD'
-            component={CRUD}
-            initialParams={params}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name='Thread'
-            component={Thread}
-            initialParams={params}
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name='Forums' component={Forums} initialParams={params as any} />
+          <Stack.Screen name='Threads' component={Threads} initialParams={params as any} />
+          <Stack.Screen name='CRUD' component={CRUD} initialParams={params} />
+          <Stack.Screen name='Thread' component={Thread} initialParams={params} />
         </Stack.Navigator>
       </KeyboardAvoidingView>
     </Provider>

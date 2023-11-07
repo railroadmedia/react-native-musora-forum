@@ -6,7 +6,7 @@ import HTMLRenderer from './HTMLRenderer';
 import { like, likeOn, menuHSvg, replies } from '../assets/svgs';
 import { likePost, disLikePost, connection } from '../services/forum.service';
 import { updatePosts } from '../redux/threads/ThreadActions';
-import { IS_TABLET } from '../ForumRouter';
+import { IS_TABLET } from '../services/helpers';
 import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import type { IAuthor, IPost, IUser } from '../entity/IForum';

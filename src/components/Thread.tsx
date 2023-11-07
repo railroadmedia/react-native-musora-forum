@@ -17,7 +17,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { batch, useDispatch } from 'react-redux';
-import { IS_TABLET } from '../ForumRouter';
 import { post as PostSvg, lock, multiQuote, reportSvg, banSvg } from '../assets/svgs';
 import NavigationHeader from '../commons/NavigationHeader';
 import Pagination from '../commons/Pagination';
@@ -36,6 +35,7 @@ import {
 } from '../services/forum.service';
 import { useAppSelector } from '../redux/Store';
 import type { ForumRootStackParamList, IForumParams, IThreadParams } from '../entity/IRouteParams';
+import { IS_TABLET } from '../services/helpers';
 
 const Thread: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IThreadParams & IForumParams }, 'params'> = useRoute();

@@ -1,13 +1,11 @@
 import React, { forwardRef, useState, useImperativeHandle, useCallback } from 'react';
 import { Modal, TouchableOpacity, View, Text, type StyleProp, StyleSheet } from 'react-native';
-import { isTablet } from 'react-native-device-info';
 import LinearGradient from 'react-native-linear-gradient';
+import { IS_TABLET } from '../../services/helpers';
 
 interface IBlockModal {
   onBlock: () => void;
 }
-
-const IS_TABLET = isTablet();
 
 const BlockModal = forwardRef<{ toggle: (user: string) => void }, IBlockModal>((props, ref) => {
   const { onBlock } = props;
@@ -45,16 +43,16 @@ const BlockModal = forwardRef<{ toggle: (user: string) => void }, IBlockModal>((
         <View style={styles.modalContent}>
           <View style={IS_TABLET && { height: '10%' }} />
           <View style={styles.contentContainer}>
-            <Text style={styles.header}>Are you sure you want to block {username}</Text>
+            <Text style={styles.header}>{`Are you sure you want to block ${username}`}</Text>
             <Text style={styles.description}>
-              You will no longer see {username}’s comments or forum posts.
+              {`You will no longer see ${username}’s comments or forum posts.`}
             </Text>
             <TouchableOpacity style={styles.blockButton} onPress={blockUser}>
-              <Text style={styles.blockText}>BLOCK</Text>
+              <Text style={styles.blockText}>{'BLOCK'}</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity onPress={closeModal}>
-            <Text style={styles.close}>Close</Text>
+            <Text style={styles.close}>{'Close'}</Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>

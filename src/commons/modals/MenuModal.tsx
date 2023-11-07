@@ -3,7 +3,7 @@ import { TouchableOpacity, StyleSheet, View, Modal, Text } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { banSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
 import type { IUser } from '../../entity/IForum';
-import { IS_TABLET } from '../../ForumRouter';
+import { IS_TABLET } from '../../services/helpers';
 
 interface IMenuModal {
   onReportUser?: () => void;
@@ -42,7 +42,11 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
   }, []);
 
   const report = useCallback(() => {
-    mode === 'user' ? onReportUser?.() : onReportPost?.();
+    if (mode === 'user') {
+      onReportUser?.();
+    } else {
+      onReportPost?.();
+    }
     closeModal();
   }, [closeModal, onReportPost, onReportUser, mode]);
 
@@ -118,7 +122,7 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
                 fill: 'white',
               })}
             </View>
-            <Text style={styles.actionText}>{'Block User '}</Text>
+            <Text style={styles.actionText}>{'Block User'}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={closeModal}>
             <Text style={styles.close}>{'Close'}</Text>
