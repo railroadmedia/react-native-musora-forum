@@ -1,5 +1,6 @@
 import type { IForum, ISearchItem, IThread } from '../entity/IForum';
 import type { IResponse, IResponseBody } from '../entity/IResponse';
+import type { IBrand } from '../entity/IRouteParams';
 
 export const setForumService = function (
   this: any,
@@ -7,7 +8,7 @@ export const setForumService = function (
     tryCall: any;
     networkContext: any;
     NetworkContext: any;
-    brand: string;
+    brand: IBrand;
   }
 ): void {
   // setting tryCall, NetworkContext etc

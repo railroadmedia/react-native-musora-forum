@@ -291,8 +291,6 @@ const Threads: FunctionComponent = props => {
     [styles.emptyList, tab]
   );
 
-  const keyExtractor = useCallback((item: number) => item.toString(), []);
-
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
@@ -314,7 +312,7 @@ const Threads: FunctionComponent = props => {
         keyboardShouldPersistTaps='handled'
         renderItem={renderFLItem}
         ListHeaderComponent={renderFLHeader}
-        keyExtractor={keyExtractor}
+        keyExtractor={(item: number) => item.toString()}
         ref={flatListRef}
         ListEmptyComponent={flEmpty}
         ListFooterComponent={flFooter}

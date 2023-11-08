@@ -1,6 +1,6 @@
 import type { IPost, IUser } from './IForum';
 
-type IBrand = 'drumeo' | 'pianote' | 'guitareo' | 'singeo';
+export type IBrand = 'drumeo' | 'pianote' | 'guitareo' | 'singeo';
 export interface IForumParams {
   isDark: boolean;
   NetworkContext: any;

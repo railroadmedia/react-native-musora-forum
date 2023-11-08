@@ -226,8 +226,6 @@ const Search: FunctionComponent<ISearch> = props => {
     [appColor, refresh, refreshing]
   );
 
-  const keyExtractor = useCallback((item: ISearchItem) => item.id.toString(), []);
-
   return (
     <>
       {renderSearchInput}
@@ -260,7 +258,7 @@ const Search: FunctionComponent<ISearch> = props => {
                 removeClippedSubviews={true}
                 keyboardShouldPersistTaps='handled'
                 renderItem={renderFLItem}
-                keyExtractor={keyExtractor}
+                keyExtractor={(item: ISearchItem) => item.id.toString()}
                 ref={flatListRef}
                 refreshControl={refreshControl}
                 ListEmptyComponent={flEmpty}
