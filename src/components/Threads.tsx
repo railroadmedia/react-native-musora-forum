@@ -24,6 +24,7 @@ import ThreadCard from '../commons/ThreadCard';
 import { setAllThreads, setFollowedThreads } from '../redux/threads/ThreadActions';
 import { getAllThreads, getFollowedThreads, connection } from '../services/forum.service';
 import type { ForumRootStackParamList, IForumParams, IThreadsParams } from '../entity/IRouteParams';
+import type { LayoutChangeEvent } from 'react-native';
 
 const Threads: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IThreadsParams & IForumParams }, 'params'> = useRoute();
@@ -180,6 +181,12 @@ const Threads: FunctionComponent = props => {
       forumId,
     });
 
+  const onLayoutAddThread = ({ nativeEvent: { layout } }: LayoutChangeEvent): void => {
+    if (!createForumHeight) {
+      setCreateForumHeight(layout.height + 15);
+    }
+  };
+
   const renderFLHeader = useMemo(
     () => (
       <>
@@ -315,9 +322,7 @@ const Threads: FunctionComponent = props => {
       />
       <View>
         <TouchableOpacity
-          onLayout={({ nativeEvent: { layout } }) =>
-            !createForumHeight && setCreateForumHeight(layout.height + 15)
-          }
+          onLayout={onLayoutAddThread}
           onPress={onPressAddTread}
           style={styles.bottomTOpacity}
         >

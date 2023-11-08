@@ -12,6 +12,7 @@ import {
   Modal,
   BackHandler,
   StyleProp,
+  LayoutChangeEvent,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -37,7 +38,7 @@ import { useAppSelector } from '../redux/Store';
 import type { ForumRootStackParamList, IForumParams, IThreadParams } from '../entity/IRouteParams';
 import { IS_TABLET } from '../services/helpers';
 
-const Thread: FunctionComponent = props => {
+const Thread: FunctionComponent = () => {
   const { params }: RouteProp<{ params: IThreadParams & IForumParams }, 'params'> = useRoute();
   const {
     isDark,
@@ -213,7 +214,7 @@ const Thread: FunctionComponent = props => {
     [thread?.posts]
   );
 
-  const toggleLockedModal = useCallback(() => {
+  const toggleLockedModal = useCallback((): void => {
     setLockedModalVisible(prevLockedModalVisible => !prevLockedModalVisible);
     setTimeout(() => setLockedModalVisible(false), 3000);
   }, []);
@@ -291,7 +292,7 @@ const Thread: FunctionComponent = props => {
     }
   }, [selectedPost, refresh]);
 
-  const showBlockModal = useCallback((selectedP: IPost, mode: 'post' | 'user') => {
+  const showBlockModal = useCallback((selectedP: IPost, mode: 'post' | 'user'): void => {
     setSelectedPost(selectedP);
     setReportMode(mode);
     blockRef.current?.toggle();
@@ -312,8 +313,8 @@ const Thread: FunctionComponent = props => {
       }, 2000);
     } else {
       const { request, controller } = reportUser(selectedPost?.author?.id || 0);
-      request.then((res: { data: { success: boolean } }) => {
-        if (res.data.success) {
+      request.then(res => {
+        if (res.data?.success) {
           setShowReportAlert(true);
           setTimeout(() => {
             setShowReportAlert(false);
@@ -341,6 +342,12 @@ const Thread: FunctionComponent = props => {
       controller.abort();
     };
   }, [refresh, selectedPost?.author?.id]);
+
+  const onLayoutAddPost = ({ nativeEvent: { layout } }: LayoutChangeEvent): void => {
+    if (!postHeight) {
+      setPostHeight(layout.height + 15);
+    }
+  };
 
   const onPressPost = useCallback(() => {
     postId.current = undefined;
@@ -435,6 +442,20 @@ const Thread: FunctionComponent = props => {
     [appColor, changePage, isDark, loadingMore, page, thread?.post_count]
   );
 
+  const flEmpty = <Text style={styles.emptyList}>{'No posts.'}</Text>;
+
+  const flRefreshControl = (
+    <RefreshControl
+      colors={['white']}
+      tintColor={appColor}
+      progressBackgroundColor={appColor}
+      onRefresh={refresh}
+      refreshing={refreshing}
+    />
+  );
+
+  const onScollBegin = (): void => (postId.current = undefined);
+
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
@@ -442,10 +463,10 @@ const Thread: FunctionComponent = props => {
       style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
       edges={['right', 'left', 'bottom']}
     >
-      <NavigationHeader title={threadTitle || thread?.title || ''} {...props} />
+      <NavigationHeader title={threadTitle || thread?.title || ''} />
       <FlatList
         overScrollMode='never'
-        onScrollBeginDrag={() => (postId.current = undefined)}
+        onScrollBeginDrag={onScollBegin}
         windowSize={10}
         data={thread?.posts?.map(p => p.id)}
         style={styles.fList}
@@ -458,34 +479,24 @@ const Thread: FunctionComponent = props => {
         ListHeaderComponent={renderPagination(20, 0, 1)}
         keyExtractor={id => id.toString()}
         ref={flatListRef}
-        ListEmptyComponent={<Text style={styles.emptyList}>{'No posts.'}</Text>}
+        ListEmptyComponent={flEmpty}
         ListFooterComponent={renderPagination(postHeight, 1, 0)}
-        refreshControl={
-          <RefreshControl
-            colors={['white']}
-            tintColor={appColor}
-            progressBackgroundColor={appColor}
-            onRefresh={refresh}
-            refreshing={refreshing}
-          />
-        }
+        refreshControl={flRefreshControl}
       />
       <View>
         <TouchableOpacity
-          onLayout={({ nativeEvent: { layout } }) =>
-            !postHeight && setPostHeight(layout.height + 15)
-          }
+          onLayout={onLayoutAddPost}
           onPress={onPressPost}
           style={styles.bottomTOpacity}
         >
-          {(locked ? lock : multiQuotesArr.length > 0 ? multiQuote : PostSvg)({
+          {(locked ? lock : multiQuotesArr?.length > 0 ? multiQuote : PostSvg)({
             height: 25,
             width: 25,
             fill: 'white',
           })}
-          {multiQuotesArr.length > 0 && (
+          {multiQuotesArr?.length > 0 && (
             <View style={styles.multiQuoteBadge}>
-              <Text style={{ color: appColor, fontSize: 10 }}>+{multiQuotesArr.length}</Text>
+              <Text style={styles.multiQuote}>+{multiQuotesArr?.length}</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -506,14 +517,7 @@ const Thread: FunctionComponent = props => {
             {lock({ height: 15, width: 15, fill: '#FFAE00' })}
             <Text style={styles.lockedTitle}>
               Locked{'\n'}
-              <Text
-                style={{
-                  color: isDark ? 'white' : '#000000',
-                  fontFamily: 'OpenSans',
-                }}
-              >
-                This thread is locked.
-              </Text>
+              <Text style={styles.lockedText}>This thread is locked.</Text>
             </Text>
           </View>
         </TouchableOpacity>
@@ -610,6 +614,10 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
       padding: 4,
       bottom: 0,
     },
+    multiQuote: {
+      color: appColor,
+      fontSize: 10,
+    },
     lockedModalBackground: {
       flex: 1,
       backgroundColor: 'rgba(0,0,0,.5)',
@@ -628,6 +636,10 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
       paddingLeft: 15,
       color: isDark ? 'white' : '#000000',
       fontFamily: 'OpenSans-Bold',
+    },
+    lockedText: {
+      color: isDark ? 'white' : '#000000',
+      fontFamily: 'OpenSans',
     },
   });
 
