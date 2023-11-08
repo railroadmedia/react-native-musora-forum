@@ -173,6 +173,13 @@ const Threads: FunctionComponent = props => {
     [refresh]
   );
 
+  const onPressAddTread = (): void =>
+    navigate('CRUD', {
+      type: 'thread',
+      action: 'create',
+      forumId,
+    });
+
   const renderFLHeader = useMemo(
     () => (
       <>
@@ -311,13 +318,7 @@ const Threads: FunctionComponent = props => {
           onLayout={({ nativeEvent: { layout } }) =>
             !createForumHeight && setCreateForumHeight(layout.height + 15)
           }
-          onPress={() =>
-            navigate('CRUD', {
-              type: 'thread',
-              action: 'create',
-              forumId,
-            })
-          }
+          onPress={onPressAddTread}
           style={styles.bottomTOpacity}
         >
           {addThread({ height: 25, width: 25, fill: 'white' })}
