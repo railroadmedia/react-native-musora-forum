@@ -50,10 +50,14 @@ const Pagination: FunctionComponent<IPagination> = props => {
       }
       const origActive = active;
       let currVal = active;
-      if (page === '<' && active > 1) {
-        currVal--;
-      } else if (page === '>' && active < pagesNo) {
-        currVal++;
+      if (page === '<') {
+        if (active > 1) {
+          currVal--;
+        }
+      } else if (page === '>') {
+        if (active < pagesNo) {
+          currVal++;
+        }
       } else {
         currVal = page as number;
       }

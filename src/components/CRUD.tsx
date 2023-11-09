@@ -232,13 +232,18 @@ const CRUD: FunctionComponent = () => {
     Keyboard.dismiss();
     setLoading(true);
     if (type === 'thread' && threadId) {
-      await deleteThread(threadId).request;
-      pop();
+      await deleteThread(threadId).request.finally(() => setLoading(false));
+      pop(2);
     } else if (postId) {
-      await deletePost(postId).request;
-      onDeleteProp?.(postId);
+      await deletePost(postId).request.finally(() => {
+        setLoading(false);
+        if (onDeleteProp) {
+          onDeleteProp?.(postId);
+        } else {
+          goBack();
+        }
+      });
     }
-    goBack();
   }, [goBack, pop, postId, threadId, type, onDeleteProp]);
 
   return (

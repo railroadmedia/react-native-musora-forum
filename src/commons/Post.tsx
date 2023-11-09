@@ -87,131 +87,135 @@ const Post: FunctionComponent<IPostProps> = props => {
   }, [navigate, onPostCreated, post]);
 
   return (
-    <View
-      style={{
-        marginBottom: 40,
-        backgroundColor: selected ? selectedColor : baseColor,
-      }}
-    >
-      <View style={styles.header}>
-        <Text style={styles.headerText}>#{index}</Text>
-        <Text style={styles.headerText}>{post?.published_on_formatted}</Text>
-      </View>
-      <View style={styles.header}>
-        <View style={styles.userDetails}>
-          <AccessLevelAvatar
-            author={post?.author || ({} as IAuthor)}
-            height={45}
-            appColor={appColor}
-            isDark={isDark}
-            tagHeight={4}
-            showUserInfo={true}
-            onNavigateToCoach={onNavigateToCoach}
-            onMenuPress={() => post && toggleMenu(post, 'user')}
-          />
-          <View style={{ marginLeft: 5 }}>
-            <Text style={styles.name} numberOfLines={2} ellipsizeMode='tail'>
-              {post?.author?.display_name}
-            </Text>
-            <Text style={styles.xp}>
-              {post?.author?.total_posts} Posts - {post?.author?.xp_rank} - Level{' '}
-              {post?.author?.level_rank}
-            </Text>
-          </View>
-        </View>
-      </View>
-      {post?.content && (
-        <View style={styles.htmlRendererCont}>
-          <HTMLRenderer
-            html={post?.content}
-            tagsStyles={{
-              div: {
-                color: isDark ? 'white' : '#00101D',
-                fontFamily: 'OpenSans',
-                fontSize: 14,
-              },
-              blockquote: {
-                padding: 10,
-                borderRadius: 5,
-                fontFamily: 'OpenSans',
-              },
-            }}
-            olItemStyle={{
-              color: isDark ? 'white' : '#00101D',
-              fontFamily: 'OpenSans',
-            }}
-            ulItemStyle={{
-              color: isDark ? 'white' : '#00101D',
-              fontFamily: 'OpenSans',
-            }}
-            classesStyles={{
-              'blockquote-even': {
-                backgroundColor: isDark ? '#081825' : 'white',
-              },
-              'blockquote-odd': {
-                backgroundColor: isDark ? '#002039' : '#E1E6EB',
-              },
-              shadow: {
-                elevation: 5,
-                shadowColor: 'black',
-                shadowOffset: { height: 4 },
-                shadowOpacity: 0.4,
-                shadowRadius: 2,
-                borderRadius: 5,
-                backgroundColor: selected ? selectedColor : baseColor,
-              },
-            }}
-          />
-        </View>
-      )}
-
-      <View style={styles.likeContainer}>
-        <TouchableOpacity
-          disabled={user?.id === post?.author_id}
-          onPress={toggleLike}
-          disallowInterruption={true}
-          style={styles.interactionBtn}
+    <>
+      {!!post && (
+        <View
+          style={{
+            marginBottom: 40,
+            backgroundColor: selected ? selectedColor : baseColor,
+          }}
         >
-          {(isLiked ? likeOn : like)({
-            height: 15,
-            width: 15,
-            fill: appColor,
-          })}
-          {likeCount > 0 && <Text style={styles.likesNoText}>{likeCount}</Text>}
-        </TouchableOpacity>
-        {!locked && (
-          <TouchableOpacity
-            onPress={reply}
-            disallowInterruption={true}
-            style={styles.interactionBtn}
-          >
-            {replies({
-              height: 15,
-              width: 15,
-              fill: appColor,
-            })}
-            <Text style={styles.likesNoText}>{'REPLY'}</Text>
-          </TouchableOpacity>
-        )}
-        <View style={styles.menuContainer}>
-          <TouchableOpacity
-            onPress={() => post && toggleMenu(post, 'post')}
-            disallowInterruption={true}
-          >
-            {menuHSvg({
-              width: 23,
-              height: 20,
-              fill: isDark ? 'white' : 'black',
-            })}
-          </TouchableOpacity>
-        </View>
-      </View>
-      {signShown && !!post?.author?.signature && (
-        <View style={styles.signatureContainer}>
-          <HTMLRenderer html={post?.author?.signature} tagsStyles={{ div: styles.signature }} />
+          <View style={styles.header}>
+            <Text style={styles.headerText}>#{index}</Text>
+            <Text style={styles.headerText}>{post?.published_on_formatted}</Text>
+          </View>
+          <View style={styles.header}>
+            <View style={styles.userDetails}>
+              <AccessLevelAvatar
+                author={post?.author || ({} as IAuthor)}
+                height={45}
+                appColor={appColor}
+                isDark={isDark}
+                tagHeight={4}
+                showUserInfo={true}
+                onNavigateToCoach={onNavigateToCoach}
+                onMenuPress={() => post && toggleMenu(post, 'user')}
+              />
+              <View style={{ marginLeft: 5 }}>
+                <Text style={styles.name} numberOfLines={2} ellipsizeMode='tail'>
+                  {post?.author?.display_name}
+                </Text>
+                <Text style={styles.xp}>
+                  {post?.author?.total_posts} Posts - {post?.author?.xp_rank} - Level{' '}
+                  {post?.author?.level_rank}
+                </Text>
+              </View>
+            </View>
+          </View>
+          {post?.content && (
+            <View style={styles.htmlRendererCont}>
+              <HTMLRenderer
+                html={post?.content}
+                tagsStyles={{
+                  div: {
+                    color: isDark ? 'white' : '#00101D',
+                    fontFamily: 'OpenSans',
+                    fontSize: 14,
+                  },
+                  blockquote: {
+                    padding: 10,
+                    borderRadius: 5,
+                    fontFamily: 'OpenSans',
+                  },
+                }}
+                olItemStyle={{
+                  color: isDark ? 'white' : '#00101D',
+                  fontFamily: 'OpenSans',
+                }}
+                ulItemStyle={{
+                  color: isDark ? 'white' : '#00101D',
+                  fontFamily: 'OpenSans',
+                }}
+                classesStyles={{
+                  'blockquote-even': {
+                    backgroundColor: isDark ? '#081825' : 'white',
+                  },
+                  'blockquote-odd': {
+                    backgroundColor: isDark ? '#002039' : '#E1E6EB',
+                  },
+                  shadow: {
+                    elevation: 5,
+                    shadowColor: 'black',
+                    shadowOffset: { height: 4 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 2,
+                    borderRadius: 5,
+                    backgroundColor: selected ? selectedColor : baseColor,
+                  },
+                }}
+              />
+            </View>
+          )}
+
+          <View style={styles.likeContainer}>
+            <TouchableOpacity
+              disabled={user?.id === post?.author_id}
+              onPress={toggleLike}
+              disallowInterruption={true}
+              style={styles.interactionBtn}
+            >
+              {(isLiked ? likeOn : like)({
+                height: 15,
+                width: 15,
+                fill: appColor,
+              })}
+              {likeCount > 0 && <Text style={styles.likesNoText}>{likeCount}</Text>}
+            </TouchableOpacity>
+            {!locked && (
+              <TouchableOpacity
+                onPress={reply}
+                disallowInterruption={true}
+                style={styles.interactionBtn}
+              >
+                {replies({
+                  height: 15,
+                  width: 15,
+                  fill: appColor,
+                })}
+                <Text style={styles.likesNoText}>{'REPLY'}</Text>
+              </TouchableOpacity>
+            )}
+            <View style={styles.menuContainer}>
+              <TouchableOpacity
+                onPress={() => post && toggleMenu(post, 'post')}
+                disallowInterruption={true}
+              >
+                {menuHSvg({
+                  width: 23,
+                  height: 20,
+                  fill: isDark ? 'white' : 'black',
+                })}
+              </TouchableOpacity>
+            </View>
+          </View>
+          {signShown && !!post?.author?.signature && (
+            <View style={styles.signatureContainer}>
+              <HTMLRenderer html={post?.author?.signature} tagsStyles={{ div: styles.signature }} />
+            </View>
+          )}
         </View>
       )}
-    </View>
+    </>
   );
 };
 

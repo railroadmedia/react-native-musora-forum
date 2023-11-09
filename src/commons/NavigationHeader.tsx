@@ -177,12 +177,12 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
       }
       if (user?.permission_level === 'administrator' || user?.id === thread?.author_id) {
         options.edit = { text: 'Edit', icon: pencil, action: onEdit };
-        options.toggleFollow = {
-          text: `${thread?.is_followed ? 'Unfollow' : 'Follow'} Thread`,
-          icon: thread?.is_followed ? unfollowThreadSvg : followThreadSvg,
-          action: toggleFollow,
-        };
       }
+      options.toggleFollow = {
+        text: `${thread?.is_followed ? 'Unfollow' : 'Follow'} Thread`,
+        icon: thread?.is_followed ? unfollowThreadSvg : followThreadSvg,
+        action: toggleFollow,
+      };
     }
     options.forumRules = {
       text: 'Musora Community Guidelines',

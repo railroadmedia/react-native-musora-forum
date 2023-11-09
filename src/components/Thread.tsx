@@ -53,7 +53,7 @@ const Thread: FunctionComponent = () => {
   } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
-  const { navigate, goBack, addListener, canGoBack } =
+  const { navigate, goBack, addListener, canGoBack, pop } =
     useNavigation<StackNavigationProp<ForumRootStackParamList>>();
 
   const [loading, setLoading] = useState(true);
@@ -140,9 +140,10 @@ const Thread: FunctionComponent = () => {
       return () => {
         controller.abort();
       };
+    } else {
+      setLoading(false);
+      setRefreshing(false);
     }
-    setLoading(false);
-    setRefreshing(false);
   }, [dispatch, isForumRules, page, threadId]);
 
   const changePage = useCallback(
@@ -224,14 +225,18 @@ const Thread: FunctionComponent = () => {
       if (!connection(true)) {
         return;
       }
-      if (thread?.id && thread.posts) {
-        setThread({ ...thread, posts: thread?.posts?.filter(p => p.id !== pId) });
+      const updateThread = { ...thread, posts: thread?.posts?.filter(p => p.id !== pId) };
+      if (updateThread?.id && updateThread.posts) {
+        setThread(updateThread);
       }
-      if (!thread?.posts?.length && page > 1) {
+      if (!updateThread?.posts?.length && page > 1) {
         changePage(page - 1);
       }
+      if (updateThread?.posts && updateThread?.posts?.length < 1) {
+        pop(2);
+      }
     },
-    [changePage, page, thread]
+    [changePage, page, thread, pop]
   );
 
   const editPost = useCallback(() => {
