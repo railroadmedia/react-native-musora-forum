@@ -4,7 +4,7 @@
   "description": "Forum component for musora apps.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
-  "types": "lib/javascript/index.d.js",
+  "types": "lib/commonjs/index.d.js",
   "react-native": "src/index",
   "source": "src/index",
   "files": [
