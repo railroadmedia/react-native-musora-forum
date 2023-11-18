@@ -1,7 +1,11 @@
 import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
-import { LayoutChangeEvent, Platform, Text, View } from 'react-native';
-import iframe from '@native-html/iframe-plugin';
-import HTML, { IGNORED_TAGS, StylesDictionary } from 'react-native-render-html';
+import { LayoutChangeEvent, Linking, Platform, Text, View } from 'react-native';
+import { HTMLIframe, iframeModel, useHtmlIframeProps } from '@native-html/iframe-plugin';
+import HTML, {
+  HTMLContentModel,
+  HTMLElementModel,
+  defaultHTMLElementModels,
+} from 'react-native-render-html';
 import WebView from 'react-native-webview';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { expandQuote } from '../assets/svgs';
@@ -11,14 +15,12 @@ import type { IForumParams } from '../entity/IRouteParams';
 
 interface IHTMLRenderer {
   html: string;
-  tagsStyles: StylesDictionary | undefined;
-  classesStyles?: StylesDictionary | undefined;
-  olItemStyle?: StylesDictionary | undefined;
-  ulItemStyle?: StylesDictionary | undefined;
+  tagsStyles: any;
+  classesStyles?: any;
 }
 
 const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
-  const { html: htmlProp, tagsStyles, classesStyles, olItemStyle, ulItemStyle } = props;
+  const { html: htmlProp, tagsStyles, classesStyles } = props;
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
   const {
     isDark,
@@ -76,13 +78,91 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
     },
   }: LayoutChangeEvent): void => setHtmlWidth(width);
 
+  const IframeRenderer = function IframeRenderer(props) {
+    const iframeProps = useHtmlIframeProps(props);
+    const src = iframeProps.htmlAttribs.src.startsWith('//')
+      ? 'https:' + iframeProps.htmlAttribs.src
+      : iframeProps.htmlAttribs.src;
+    const attributes = props?.tnode?.attributes;
+    const ar = (attributes?.height as number) / (attributes?.width as number) || 9 / 16;
+    return (
+      <HTMLIframe
+        {...iframeProps}
+        source={{ uri: src + '?fs=0&modestbranding=1&rel=0' }}
+        style={{
+          width: htmlWidth > 420 ? 420 : htmlWidth,
+          height: htmlWidth > 420 ? 420 * ar : htmlWidth * ar,
+        }}
+      />
+    );
+  };
+
+  const ATagRenderer = useCallback(
+    ({ tnode, TNodeChildrenRenderer, style }) => {
+      const href = (tnode?.attributes?.href as string) || '';
+      const onPressLink = () => {
+        let brand: string | string[] = rootUrl?.split('.');
+        brand = [brand.pop(), brand.pop()].reverse().join('.');
+        brand = brand.substring(0, brand.indexOf('.com') + 4);
+        if (!href?.includes('http')) {
+          return null;
+        }
+        if (href?.toLowerCase()?.includes(brand)) {
+          let urlBrand = href?.substring(href?.indexOf('.com') + 5);
+          if (urlBrand?.includes('/')) {
+            urlBrand = urlBrand.substring(0, urlBrand.indexOf('/'));
+          }
+          if (currBrand !== urlBrand) {
+            setLinkToOpen(href);
+            return customModalRef.current?.toggle(
+              `This link will take you to ${urlBrand.charAt(0).toUpperCase() + urlBrand.slice(1)}!`,
+              `Clicking this link will take you to the ${
+                urlBrand.charAt(0).toUpperCase() + urlBrand.slice(1)
+              } members' area, and you won't be able to return directly to this post.`,
+              `GO TO ${urlBrand.toUpperCase()}`
+            );
+          }
+          return decideWhereToRedirect(
+            href,
+            { brandName: currBrand || 'drumeo', color: appColor },
+            user || {},
+            isDark
+          );
+        }
+        if (href) {
+          Linking.openURL(href);
+        }
+      };
+
+      return (
+        <Text>
+          {Platform.OS === 'ios' ? (
+            <TouchableOpacity
+              style={{ marginBottom: -3, marginRight: 2 }}
+              disallowInterruption={true}
+              onPress={onPressLink}
+            >
+              <Text style={style}>
+                <TNodeChildrenRenderer tnode={tnode} />
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <Text onPress={onPressLink}>
+              <TNodeChildrenRenderer tnode={tnode} />
+            </Text>
+          )}
+        </Text>
+      );
+    },
+    [appColor, currBrand, decideWhereToRedirect, isDark, rootUrl, user]
+  );
+
   return (
     <View onLayout={onLayout}>
       {!!htmlWidth ? (
         <HTML
-          ignoredTags={IGNORED_TAGS.filter((tag: string) => tag !== 'video' && tag !== 'source')}
           key={`${expanderVisible}${maxQuoteHeight}`}
-          ignoredStyles={['font-family', 'background-color', 'line-height']}
+          ignoredStyles={['fontFamily', 'backgroundColor', 'lineHeight']}
           WebView={WebView}
           source={{
             html: html
@@ -91,20 +171,10 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
                 )}</div>`
               : `</div>`,
           }}
+          systemFonts={['OpenSans']}
           tagsStyles={tagsStyles}
           classesStyles={classesStyles}
-          listsPrefixesRenderers={{
-            ol: (_, __, ___, passProps) => (
-              <Text style={olItemStyle} key={passProps.key}>
-                {passProps.nodeIndex + 1}.{`  `}
-              </Text>
-            ),
-            ul: (_, __, ___, { key }) => (
-              <Text key={key} style={ulItemStyle}>
-                ·{`  `}
-              </Text>
-            ),
-          }}
+          contentWidth={htmlWidth}
           renderersProps={{
             iframe: {
               scalesPageToFit: true,
@@ -114,24 +184,32 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
               },
             },
           }}
+          customHTMLElementModels={{
+            shadow: HTMLElementModel.fromCustomModel({
+              tagName: 'shadow',
+              mixedUAStyles: classesStyles?.shadow,
+              contentModel: HTMLContentModel.mixed,
+            }),
+            expander: HTMLElementModel.fromCustomModel({
+              tagName: 'expander',
+              contentModel: HTMLContentModel.mixed,
+            }),
+            iframe: iframeModel,
+            a: defaultHTMLElementModels.a.extend({
+              contentModel: HTMLContentModel.mixed,
+            }),
+          }}
           renderers={{
-            shadow: (_, children, __, { key }) => (
-              <View style={classesStyles?.shadow} key={key}>
-                {children}
-              </View>
-            ),
-            blockquote: (htmlAttribs, children, _, { key }) => {
-              const { class: className } = htmlAttribs;
-              return (className as string)?.includes('blockquote') ? (
+            blockquote: ({ tnode, TNodeChildrenRenderer }) =>
+              tnode?.attributes?.class?.includes('blockquote') ? (
                 <View
-                  key={key}
                   onLayout={({
                     nativeEvent: {
                       layout: { height },
                     },
                   }) => {
                     if (
-                      (className as string)?.includes('first') &&
+                      tnode?.attributes?.class?.includes('first') &&
                       height > 150 &&
                       !expanderVisible
                     ) {
@@ -147,20 +225,20 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
                       overflow: 'hidden',
                     },
                     classesStyles?.[
-                      (className as string)?.includes('odd') ? 'blockquote-odd' : 'blockquote-even'
+                      tnode?.attributes?.class?.includes('odd')
+                        ? 'blockquote-odd'
+                        : 'blockquote-even'
                     ],
                   ]}
                 >
-                  {children}
+                  <TNodeChildrenRenderer tnode={tnode} />
                 </View>
               ) : (
-                children
-              );
-            },
-            expander: (_, __, ___, { key }) =>
+                <TNodeChildrenRenderer tnode={tnode} />
+              ),
+            expander: () =>
               expanderVisible ? (
                 <TouchableOpacity
-                  key={key}
                   disallowInterruption={true}
                   onPress={() =>
                     setMaxQuoteHeight(mQuoteHeight => (mQuoteHeight === 150 ? undefined : 150))
@@ -181,32 +259,16 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
                   {expandQuote({ height: 15, width: 15, fill: appColor })}
                 </TouchableOpacity>
               ) : null,
-            iframe: (htmlAttribs, children, convertedCSSStyles, passProps) => {
-              const ar = (htmlAttribs?.height as number) / (htmlAttribs?.width as number) || 9 / 16;
-              return (
-                <View key={passProps.key}>
-                  {iframe(
-                    {
-                      ...htmlAttribs,
-                      src: htmlAttribs.src + '?fs=0&modestbranding=1&rel=0',
-                      width: htmlWidth > 420 ? 420 : htmlWidth,
-                      height: htmlWidth > 420 ? 420 * ar : htmlWidth * ar,
-                    },
-                    children,
-                    convertedCSSStyles,
-                    passProps
-                  )}
-                </View>
-              );
-            },
-            source: (htmlAttribs, _, __, passProps) => {
-              if (!htmlAttribs.src) {
+            iframe: IframeRenderer,
+            source: ({ tnode }) => {
+              const attributes = tnode?.attributes;
+              if (!attributes?.src) {
                 return null;
               }
-              const ar = (htmlAttribs?.height as number) / (htmlAttribs?.width as number) || 9 / 16;
+              const ar = (attributes?.height as number) / (attributes?.width as number) || 9 / 16;
 
               return (
-                <View onStartShouldSetResponder={() => true} key={passProps.key}>
+                <View onStartShouldSetResponder={() => true}>
                   <WebView
                     originWhitelist={['*']}
                     androidLayerType={'hardware'}
@@ -217,7 +279,7 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
                       html: `
                     <body style="margin: 0">
                       <video width="100%" height="100%" controls style="background: black; margin: 0;" playsinline>
-                          <source src="${htmlAttribs.src}" type="video/mp4">
+                          <source src="${attributes.src}" type="video/mp4">
                       </video>
                     </body>
                     `,
@@ -231,59 +293,12 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
                 </View>
               );
             },
-            a: ({ href }, children, _, { onLinkPress, key }) => {
-              const onPressLink = (): any => {
-                let brand: string | string[] = rootUrl?.split('.');
-                brand = [brand.pop(), brand.pop()].reverse().join('.');
-                brand = brand.substring(0, brand.indexOf('.com') + 4);
-                if (!(href as string)?.includes('http')) {
-                  return null;
-                }
-                if ((href as string).toLowerCase()?.includes(brand)) {
-                  let urlBrand = (href as string).substring((href as string).indexOf('.com') + 5);
-                  if (urlBrand?.includes('/')) {
-                    urlBrand = urlBrand.substring(0, urlBrand.indexOf('/'));
-                  }
-                  if (currBrand !== urlBrand) {
-                    setLinkToOpen(href as string);
-                    return customModalRef.current?.toggle(
-                      `This link will take you to ${
-                        urlBrand.charAt(0).toUpperCase() + urlBrand.slice(1)
-                      }!`,
-                      `Clicking this link will take you to the ${
-                        urlBrand.charAt(0).toUpperCase() + urlBrand.slice(1)
-                      } members' area, and you won't be able to return directly to this post.`,
-                      `GO TO ${urlBrand.toUpperCase()}`
-                    );
-                  }
-                  return decideWhereToRedirect(
-                    href as string,
-                    { brandName: currBrand || 'drumeo', color: appColor },
-                    user || {},
-                    isDark
-                  );
-                }
-                if (href) {
-                  onLinkPress?.(_, href as string, _);
-                }
-              };
-              return (
-                <Text key={key}>
-                  {Platform.OS === 'ios' ? (
-                    <TouchableOpacity
-                      style={{ marginBottom: -3, marginRight: 2 }}
-                      disallowInterruption={true}
-                      onPress={onPressLink}
-                    >
-                      <Text>{children}</Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <Text onPress={onPressLink}>{children}</Text>
-                  )}
-                </Text>
-              );
-            },
-            p: (_, children, key) => <Text key={key}>{children}</Text>,
+            a: ATagRenderer,
+            p: ({ tnode, TNodeChildrenRenderer }) => (
+              <Text>
+                <TNodeChildrenRenderer tnode={tnode} />
+              </Text>
+            ),
           }}
         />
       ) : null}

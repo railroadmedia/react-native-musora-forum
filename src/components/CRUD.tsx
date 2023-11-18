@@ -299,8 +299,6 @@ const CRUD: FunctionComponent = () => {
                     div: { color: isDark ? 'white' : '#00101D' },
                     blockquote: { padding: 10, borderRadius: 5 },
                   }}
-                  olItemStyle={{ color: isDark ? 'white' : '#00101D' }}
-                  ulItemStyle={{ color: isDark ? 'white' : '#00101D' }}
                   classesStyles={{
                     'blockquote-even': {
                       backgroundColor: isDark ? '#081825' : 'white',
