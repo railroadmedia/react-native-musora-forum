@@ -1,9 +1,14 @@
 import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import { LayoutChangeEvent, Linking, Platform, Text, View } from 'react-native';
-import { HTMLIframe, iframeModel, useHtmlIframeProps } from '@native-html/iframe-plugin';
+import { iframeModel } from '@native-html/iframe-plugin';
 import HTML, {
+  CustomBlockRenderer,
+  CustomMixedRenderer,
+  CustomRendererProps,
+  CustomTextualRenderer,
   HTMLContentModel,
   HTMLElementModel,
+  TBlock,
   defaultHTMLElementModels,
 } from 'react-native-render-html';
 import WebView from 'react-native-webview';
@@ -12,6 +17,7 @@ import { expandQuote } from '../assets/svgs';
 import CustomModal from './CustomModal';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import type { IForumParams } from '../entity/IRouteParams';
+import IFrameRenderer from './renderers/IFrameRenderer';
 
 interface IHTMLRenderer {
   html: string;
@@ -78,29 +84,110 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
     },
   }: LayoutChangeEvent): void => setHtmlWidth(width);
 
-  const IframeRenderer = function IframeRenderer(props) {
-    const iframeProps = useHtmlIframeProps(props);
-    const src = iframeProps.htmlAttribs.src.startsWith('//')
-      ? 'https:' + iframeProps.htmlAttribs.src
-      : iframeProps.htmlAttribs.src;
-    const attributes = props?.tnode?.attributes;
-    const ar = (attributes?.height as number) / (attributes?.width as number) || 9 / 16;
-    return (
-      <HTMLIframe
-        {...iframeProps}
-        source={{ uri: src + '?fs=0&modestbranding=1&rel=0' }}
-        style={{
-          width: htmlWidth > 420 ? 420 : htmlWidth,
-          height: htmlWidth > 420 ? 420 * ar : htmlWidth * ar,
-        }}
-      />
+  const BlockquoteRenderer: CustomBlockRenderer | CustomTextualRenderer | CustomMixedRenderer =
+    useCallback(
+      ({ tnode, TNodeChildrenRenderer }: CustomRendererProps<TBlock>) =>
+        tnode?.attributes?.class?.includes('blockquote') ? (
+          <View
+            onLayout={({
+              nativeEvent: {
+                layout: { height },
+              },
+            }) => {
+              if (tnode?.attributes?.class?.includes('first') && height > 150 && !expanderVisible) {
+                setExpanderVisible(true);
+                setMaxQuoteHeight(150);
+              }
+            }}
+            style={[
+              {
+                padding: 10,
+                borderRadius: 5,
+                maxHeight: maxQuoteHeight,
+                overflow: 'hidden',
+              },
+              classesStyles?.[
+                tnode?.attributes?.class?.includes('odd') ? 'blockquote-odd' : 'blockquote-even'
+              ],
+            ]}
+          >
+            <TNodeChildrenRenderer tnode={tnode} />
+          </View>
+        ) : (
+          <TNodeChildrenRenderer tnode={tnode} />
+        ),
+      [classesStyles, expanderVisible, maxQuoteHeight]
     );
-  };
+
+  const ExpanderRenderer = useCallback(
+    () =>
+      expanderVisible ? (
+        <TouchableOpacity
+          disallowInterruption={true}
+          onPress={() =>
+            setMaxQuoteHeight(mQuoteHeight => (mQuoteHeight === 150 ? undefined : 150))
+          }
+          containerStyle={{
+            padding: 20,
+            paddingTop: 10,
+            alignSelf: 'flex-end',
+            paddingRight: maxQuoteHeight === 150 ? 0 : 20,
+            paddingLeft: maxQuoteHeight === 150 ? 20 : 0,
+            transform: [
+              {
+                rotate: `${maxQuoteHeight === 150 ? 0 : 180}deg`,
+              },
+            ],
+          }}
+        >
+          {expandQuote({ height: 15, width: 15, fill: appColor })}
+        </TouchableOpacity>
+      ) : null,
+    [appColor, expanderVisible, maxQuoteHeight]
+  );
+
+  const SourceRenderer: CustomBlockRenderer | CustomTextualRenderer | CustomMixedRenderer =
+    useCallback(
+      ({ tnode }: CustomRendererProps<TBlock>) => {
+        const attributes = tnode?.attributes;
+        if (!attributes?.src) {
+          return null;
+        }
+        const ar = Number(attributes?.height) / Number(attributes?.width) || 9 / 16;
+
+        return (
+          <View onStartShouldSetResponder={() => true}>
+            <WebView
+              originWhitelist={['*']}
+              androidLayerType={'hardware'}
+              automaticallyAdjustContentInsets={true}
+              allowsInlineMediaPlayback={true}
+              scrollEnabled={false}
+              source={{
+                html: `
+          <body style="margin: 0">
+            <video width="100%" height="100%" controls style="background: black; margin: 0;" playsinline>
+                <source src="${attributes.src}" type="video/mp4">
+            </video>
+          </body>
+          `,
+              }}
+              style={{
+                width: htmlWidth,
+                height: htmlWidth * ar,
+                backgroundColor: 'black',
+              }}
+            />
+          </View>
+        );
+      },
+      [htmlWidth]
+    );
 
   const ATagRenderer = useCallback(
-    ({ tnode, TNodeChildrenRenderer, style }) => {
+    ({ tnode, TNodeChildrenRenderer, style }: CustomRendererProps<TBlock>) => {
       const href = (tnode?.attributes?.href as string) || '';
-      const onPressLink = () => {
+      const onPressLink = (): any => {
         let brand: string | string[] = rootUrl?.split('.');
         brand = [brand.pop(), brand.pop()].reverse().join('.');
         brand = brand.substring(0, brand.indexOf('.com') + 4);
@@ -157,10 +244,59 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
     [appColor, currBrand, decideWhereToRedirect, isDark, rootUrl, user]
   );
 
+  const PTagRenderer = useCallback(
+    ({ tnode, TNodeChildrenRenderer }: CustomRendererProps<TBlock>) => (
+      <Text>
+        <TNodeChildrenRenderer tnode={tnode} />
+      </Text>
+    ),
+    []
+  );
+
   return (
     <View onLayout={onLayout}>
       {!!htmlWidth ? (
         <HTML
+          ignoredDomTags={[
+            'head',
+            'script',
+            'audio',
+            'track',
+            'embed',
+            'object',
+            'param',
+            'canvas',
+            'noscript',
+            'caption',
+            'col',
+            'colgroup',
+            'table',
+            'tbody',
+            'td',
+            'tfoot',
+            'th',
+            'thead',
+            'tr',
+            'button',
+            'datalist',
+            'fieldset',
+            'form',
+            'input',
+            'label',
+            'legend',
+            'meter',
+            'optgroup',
+            'option',
+            'output',
+            'progress',
+            'select',
+            'textarea',
+            'details',
+            'dialog',
+            'menu',
+            'menuitem',
+            'summary',
+          ]}
           key={`${expanderVisible}${maxQuoteHeight}`}
           ignoredStyles={['fontFamily', 'backgroundColor', 'lineHeight']}
           WebView={WebView}
@@ -190,115 +326,33 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
               mixedUAStyles: classesStyles?.shadow,
               contentModel: HTMLContentModel.mixed,
             }),
+            blockquote: defaultHTMLElementModels.blockquote.extend({
+              contentModel: HTMLContentModel.mixed,
+            }),
             expander: HTMLElementModel.fromCustomModel({
               tagName: 'expander',
               contentModel: HTMLContentModel.mixed,
             }),
             iframe: iframeModel,
+            source: defaultHTMLElementModels.source.extend({
+              contentModel: HTMLContentModel.mixed,
+            }),
             a: defaultHTMLElementModels.a.extend({
               contentModel: HTMLContentModel.mixed,
             }),
+            p: defaultHTMLElementModels.p.extend({
+              contentModel: HTMLContentModel.block,
+            }),
           }}
           renderers={{
-            blockquote: ({ tnode, TNodeChildrenRenderer }) =>
-              tnode?.attributes?.class?.includes('blockquote') ? (
-                <View
-                  onLayout={({
-                    nativeEvent: {
-                      layout: { height },
-                    },
-                  }) => {
-                    if (
-                      tnode?.attributes?.class?.includes('first') &&
-                      height > 150 &&
-                      !expanderVisible
-                    ) {
-                      setExpanderVisible(true);
-                      setMaxQuoteHeight(150);
-                    }
-                  }}
-                  style={[
-                    {
-                      padding: 10,
-                      borderRadius: 5,
-                      maxHeight: maxQuoteHeight,
-                      overflow: 'hidden',
-                    },
-                    classesStyles?.[
-                      tnode?.attributes?.class?.includes('odd')
-                        ? 'blockquote-odd'
-                        : 'blockquote-even'
-                    ],
-                  ]}
-                >
-                  <TNodeChildrenRenderer tnode={tnode} />
-                </View>
-              ) : (
-                <TNodeChildrenRenderer tnode={tnode} />
-              ),
-            expander: () =>
-              expanderVisible ? (
-                <TouchableOpacity
-                  disallowInterruption={true}
-                  onPress={() =>
-                    setMaxQuoteHeight(mQuoteHeight => (mQuoteHeight === 150 ? undefined : 150))
-                  }
-                  containerStyle={{
-                    padding: 20,
-                    paddingTop: 10,
-                    alignSelf: 'flex-end',
-                    paddingRight: maxQuoteHeight === 150 ? 0 : 20,
-                    paddingLeft: maxQuoteHeight === 150 ? 20 : 0,
-                    transform: [
-                      {
-                        rotate: `${maxQuoteHeight === 150 ? 0 : 180}deg`,
-                      },
-                    ],
-                  }}
-                >
-                  {expandQuote({ height: 15, width: 15, fill: appColor })}
-                </TouchableOpacity>
-              ) : null,
-            iframe: IframeRenderer,
-            source: ({ tnode }) => {
-              const attributes = tnode?.attributes;
-              if (!attributes?.src) {
-                return null;
-              }
-              const ar = (attributes?.height as number) / (attributes?.width as number) || 9 / 16;
-
-              return (
-                <View onStartShouldSetResponder={() => true}>
-                  <WebView
-                    originWhitelist={['*']}
-                    androidLayerType={'hardware'}
-                    automaticallyAdjustContentInsets={true}
-                    allowsInlineMediaPlayback={true}
-                    scrollEnabled={false}
-                    source={{
-                      html: `
-                    <body style="margin: 0">
-                      <video width="100%" height="100%" controls style="background: black; margin: 0;" playsinline>
-                          <source src="${attributes.src}" type="video/mp4">
-                      </video>
-                    </body>
-                    `,
-                    }}
-                    style={{
-                      width: htmlWidth,
-                      height: htmlWidth * ar,
-                      backgroundColor: 'black',
-                    }}
-                  />
-                </View>
-              );
-            },
-            a: ATagRenderer,
-            p: ({ tnode, TNodeChildrenRenderer }) => (
-              <Text>
-                <TNodeChildrenRenderer tnode={tnode} />
-              </Text>
+            blockquote: BlockquoteRenderer,
+            expander: ExpanderRenderer,
+            iframe: (ifProps: CustomRendererProps<TBlock>) => (
+              <IFrameRenderer iFrameProps={ifProps} htmlWidth={htmlWidth} />
             ),
+            source: SourceRenderer,
+            a: ATagRenderer,
+            p: PTagRenderer,
           }}
         />
       ) : null}

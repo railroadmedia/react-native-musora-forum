@@ -64,8 +64,8 @@ export const getThread = (
     isForumRules
       ? `/forums/api/rules?brand=${(this as any)?.brand}`
       : postId
-      ? `/forums/api/jump-to-post/${postId}?brand=${(this as any)?.brand}`
-      : `/forums/api/thread/show/${threadId}?amount=10&page=${page}&brand=${(this as any)?.brand}`
+        ? `/forums/api/jump-to-post/${postId}?brand=${(this as any)?.brand}`
+        : `/forums/api/thread/show/${threadId}?amount=10&page=${page}&brand=${(this as any)?.brand}`
   );
 
 interface ISearchRes extends IResponseBody {
