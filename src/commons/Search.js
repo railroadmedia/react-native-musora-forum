@@ -59,7 +59,7 @@ class Search extends React.Component {
   renderSearchInput = () => {
     let { isDark } = this.props;
     return (
-      <View style={{ padding: 15 }}>
+      <View style={{ paddingHorizontal: 15, paddingVertical: 30 }}>
         <View style={styles.inputContainer}>
           <View style={styles.searchIcon}>
             {searchSvg({
