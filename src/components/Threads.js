@@ -270,7 +270,7 @@ let setStyles = (isDark, appColor) =>
       flexWrap: 'wrap',
     },
     headerTOpacity: {
-      paddingVertical: 15,
+      paddingTop: 15,
       marginRight: 15,
       borderBottomWidth: 2,
       borderColor: isDark ? '#00101D' : '#f0f1f2',
