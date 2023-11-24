@@ -70,7 +70,7 @@ const Thread: FunctionComponent = () => {
   const [selectedPost, setSelectedPost] = useState<IPost | undefined>();
   const [reportMode, setReportMode] = useState<'post' | 'user'>();
   const [page, setPage] = useState<number>(pageProp || 1);
-  const [thread, setThread] = useState<IThread>({ id: threadId || -1, title: threadTitle || '' });
+  const [thread, setThread] = useState<IThread>({ id: threadId || 0, title: threadTitle || '' });
 
   const locked = useAppSelector(
     ({ threadsState }) =>
@@ -105,6 +105,7 @@ const Thread: FunctionComponent = () => {
     const blurListener = addListener('blur', () => setPostKey(k => !k));
     BackHandler.addEventListener('hardwareBackPress', onAndroidBack);
 
+    postId.current = postIdProp;
     fetchData();
 
     return () => {
@@ -113,15 +114,16 @@ const Thread: FunctionComponent = () => {
       BackHandler.removeEventListener('hardwareBackPress', onAndroidBack);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    postId.current = postIdProp;
   }, [postIdProp]);
 
   const fetchData = useCallback(() => {
-    if (threadId || isForumRules || postId.current) {
-      const { request, controller } = getThread(threadId, page, isForumRules, postId.current);
+    if (thread?.id || isForumRules || postId.current) {
+      const { request, controller } = getThread(
+        thread?.id ? thread?.id : undefined,
+        page,
+        isForumRules,
+        postId.current
+      );
       request
         .then(res => {
           setPage(parseInt(res.data?.page || '', 10));
@@ -144,7 +146,7 @@ const Thread: FunctionComponent = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [dispatch, isForumRules, page, threadId]);
+  }, [dispatch, isForumRules, page, thread?.id]);
 
   const changePage = useCallback(
     (pageValue: number) => {
@@ -154,7 +156,12 @@ const Thread: FunctionComponent = () => {
       }
       setPage(pageValue);
       setLoadingMore(true);
-      const { request, controller } = getThread(threadId, pageValue, isForumRules, postId.current);
+      const { request, controller } = getThread(
+        thread?.id ? thread?.id : undefined,
+        pageValue,
+        isForumRules,
+        postId.current
+      );
       request
         .then(res => {
           setThread(res.data);
@@ -169,20 +176,20 @@ const Thread: FunctionComponent = () => {
         .finally(() => setLoadingMore(false));
       return () => controller.abort();
     },
-    [dispatch, isForumRules, threadId]
+    [dispatch, isForumRules, thread?.id]
   );
 
   const refresh = useCallback(() => {
     if (!connection(true)) {
       return;
     }
-    if (!threadId && !isForumRules && !postId.current) {
+    if (!thread?.id && !isForumRules && !postId.current) {
       return;
     }
     setRefreshing(true);
     setMultiQuotesArr([]);
     fetchData();
-  }, [isForumRules, threadId, fetchData]);
+  }, [isForumRules, thread?.id, fetchData]);
 
   const onAndroidBack = useCallback(() => {
     if (!connection(true)) {
@@ -234,9 +241,11 @@ const Thread: FunctionComponent = () => {
       }
       if (updateThread?.posts && updateThread?.posts?.length < 1) {
         pop(2);
+      } else {
+        goBack();
       }
     },
-    [changePage, page, thread, pop]
+    [changePage, page, thread, pop, goBack]
   );
 
   const editPost = useCallback(() => {
@@ -365,14 +374,14 @@ const Thread: FunctionComponent = () => {
         onPostCreated: pId => {
           postId.current = pId;
         },
-        threadId,
+        threadId: thread?.id,
         quotes: multiQuotesArr.map(post => ({
           ...post,
           content: `<blockquote><b>${post?.author?.display_name}</b>:<br>${post?.content}</blockquote>`,
         })),
       });
     }
-  }, [locked, navigate, multiQuotesArr, threadId, toggleLockedModal]);
+  }, [locked, navigate, multiQuotesArr, thread?.id, toggleLockedModal]);
 
   const renderFLItem = useCallback(
     ({ item, index }: { item: number; index: number }) => (

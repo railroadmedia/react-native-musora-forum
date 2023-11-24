@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useState } from 'react';
+import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, StyleProp } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AccessLevelAvatar from './AccessLevelAvatar';
@@ -38,6 +38,11 @@ const Post: FunctionComponent<IPostProps> = props => {
 
   const baseColor = isDark ? '#081825' : '#FFFFFF';
   const selectedColor = isDark ? '#002039' : '#E1E6EB';
+
+  useEffect(() => {
+    setIsLiked(post?.is_liked_by_viewer);
+    setLikeCount(post?.like_count || 0);
+  }, [post?.is_liked_by_viewer, post?.like_count]);
 
   const toggleLike = useCallback(() => {
     if (!connection(true)) {

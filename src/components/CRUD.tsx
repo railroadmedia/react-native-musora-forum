@@ -271,8 +271,8 @@ const CRUD: FunctionComponent = () => {
             ? quotes?.length === 1
               ? 'Reply'
               : quotes?.length && quotes?.length > 1
-              ? 'MultiQuote'
-              : `Create ${type}`
+                ? 'MultiQuote'
+                : `Create ${type}`
             : `Edit ${type}`}
         </Text>
         <TouchableOpacity onPress={save} disabled={loading}>
