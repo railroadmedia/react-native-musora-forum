@@ -143,14 +143,6 @@ const Post: FunctionComponent<IPostProps> = props => {
                     fontFamily: 'OpenSans',
                   },
                 }}
-                olItemStyle={{
-                  color: isDark ? 'white' : '#00101D',
-                  fontFamily: 'OpenSans',
-                }}
-                ulItemStyle={{
-                  color: isDark ? 'white' : '#00101D',
-                  fontFamily: 'OpenSans',
-                }}
                 classesStyles={{
                   'blockquote-even': {
                     backgroundColor: isDark ? '#081825' : 'white',
