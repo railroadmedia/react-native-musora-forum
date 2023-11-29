@@ -313,8 +313,8 @@ const Thread: FunctionComponent = () => {
   }, []);
 
   const showBlockWarning = useCallback(() => {
-    warningRef.current?.toggle(user?.display_name || '');
-  }, [user?.display_name]);
+    warningRef.current?.toggle(selectedPost?.author?.display_name || '');
+  }, [selectedPost?.author?.display_name]);
 
   const onReportUser = useCallback(() => {
     if (!selectedPost) {

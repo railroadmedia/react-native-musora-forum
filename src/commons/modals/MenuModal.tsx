@@ -104,26 +104,30 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
               <Text style={styles.actionText}>{multiQuoteText}</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity onPress={report} style={styles.actionContainer}>
-            <View style={styles.iconContainer}>
-              {reportSvg({
-                height: 24,
-                width: 24,
-                fill: 'white',
-              })}
-            </View>
-            <Text style={styles.actionText}>{'Report'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={blockUser} style={styles.actionContainer}>
-            <View style={styles.iconContainer}>
-              {banSvg({
-                height: 24,
-                width: 24,
-                fill: 'white',
-              })}
-            </View>
-            <Text style={styles.actionText}>{'Block User'}</Text>
-          </TouchableOpacity>
+          {user?.id !== authorId && (
+            <>
+              <TouchableOpacity onPress={report} style={styles.actionContainer}>
+                <View style={styles.iconContainer}>
+                  {reportSvg({
+                    height: 24,
+                    width: 24,
+                    fill: 'white',
+                  })}
+                </View>
+                <Text style={styles.actionText}>{'Report'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={blockUser} style={styles.actionContainer}>
+                <View style={styles.iconContainer}>
+                  {banSvg({
+                    height: 24,
+                    width: 24,
+                    fill: 'white',
+                  })}
+                </View>
+                <Text style={styles.actionText}>{'Block User'}</Text>
+              </TouchableOpacity>
+            </>
+          )}
           <TouchableOpacity onPress={closeModal}>
             <Text style={styles.close}>{'Close'}</Text>
           </TouchableOpacity>
