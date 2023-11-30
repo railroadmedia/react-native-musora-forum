@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import React, { FunctionComponent, useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, StyleProp } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AccessLevelAvatar from './AccessLevelAvatar';
@@ -91,6 +91,44 @@ const Post: FunctionComponent<IPostProps> = props => {
     }
   }, [navigate, onPostCreated, post]);
 
+  const renderer = useMemo(
+    () => (
+      <HTMLRenderer
+        html={post?.content || ''}
+        tagsStyles={{
+          div: {
+            color: isDark ? 'white' : '#00101D',
+            fontFamily: 'OpenSans',
+            fontSize: 14,
+          },
+          blockquote: {
+            padding: 10,
+            borderRadius: 5,
+            fontFamily: 'OpenSans',
+          },
+        }}
+        classesStyles={{
+          'blockquote-even': {
+            backgroundColor: isDark ? '#081825' : 'white',
+          },
+          'blockquote-odd': {
+            backgroundColor: isDark ? '#002039' : '#E1E6EB',
+          },
+          shadow: {
+            elevation: 5,
+            shadowColor: 'black',
+            shadowOffset: { height: 4 },
+            shadowOpacity: 0.4,
+            shadowRadius: 2,
+            borderRadius: 5,
+            backgroundColor: baseColor,
+          },
+        }}
+      />
+    ),
+    [post?.content, isDark, baseColor]
+  );
+
   return (
     <>
       {!!post && (
@@ -127,42 +165,8 @@ const Post: FunctionComponent<IPostProps> = props => {
               </View>
             </View>
           </View>
-          {post?.content && (
-            <View style={styles.htmlRendererCont}>
-              <HTMLRenderer
-                html={post?.content}
-                tagsStyles={{
-                  div: {
-                    color: isDark ? 'white' : '#00101D',
-                    fontFamily: 'OpenSans',
-                    fontSize: 14,
-                  },
-                  blockquote: {
-                    padding: 10,
-                    borderRadius: 5,
-                    fontFamily: 'OpenSans',
-                  },
-                }}
-                classesStyles={{
-                  'blockquote-even': {
-                    backgroundColor: isDark ? '#081825' : 'white',
-                  },
-                  'blockquote-odd': {
-                    backgroundColor: isDark ? '#002039' : '#E1E6EB',
-                  },
-                  shadow: {
-                    elevation: 5,
-                    shadowColor: 'black',
-                    shadowOffset: { height: 4 },
-                    shadowOpacity: 0.4,
-                    shadowRadius: 2,
-                    borderRadius: 5,
-                    backgroundColor: selected ? selectedColor : baseColor,
-                  },
-                }}
-              />
-            </View>
-          )}
+
+          {post?.content && <View style={styles.htmlRendererCont}>{renderer}</View>}
 
           <View style={styles.likeContainer}>
             <TouchableOpacity

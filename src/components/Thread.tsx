@@ -67,8 +67,7 @@ const Thread: FunctionComponent = () => {
   const [showReportAlert, setShowReportAlert] = useState(false);
   const [showBlockAlert, setShowBlockAlert] = useState(false);
   const [alertText, setAlertText] = useState('');
-  const [selectedPost, setSelectedPost] = useState<IPost | undefined>();
-  const [reportMode, setReportMode] = useState<'post' | 'user'>();
+  const selectedPost = useRef<IPost | undefined>();
   const [page, setPage] = useState<number>(pageProp || 1);
   const [thread, setThread] = useState<IThread>({ id: threadId || 0, title: threadTitle || '' });
 
@@ -249,40 +248,45 @@ const Thread: FunctionComponent = () => {
   );
 
   const editPost = useCallback(() => {
-    const blockQuote = selectedPost?.content
+    const blockQuote = selectedPost.current?.content
       ?.split('</blockquote>')
       .slice(0, -1)
       .join('</blockquote');
     navigate('CRUD', {
       type: 'post',
       action: 'edit',
-      postId: selectedPost?.id,
+      postId: selectedPost.current?.id,
       onDelete: deletePost,
       quotes: blockQuote
         ? [
             {
               content:
-                selectedPost?.content?.split('</blockquote>').slice(0, -1).join('</blockquote>') +
-                '</blockquote>',
+                selectedPost.current?.content
+                  ?.split('</blockquote>')
+                  .slice(0, -1)
+                  .join('</blockquote>') + '</blockquote>',
             },
           ]
         : [],
     });
-  }, [navigate, selectedPost, deletePost]);
+  }, [navigate, deletePost]);
 
   const multiquote = useCallback(() => {
-    const isQuoted = multiQuotesArr.find(f => f.id === selectedPost?.id);
+    const isQuoted = multiQuotesArr.find(f => f.id === selectedPost.current?.id);
     if (isQuoted) {
       setMultiQuotesArr(prevMultiQuotesArr =>
-        prevMultiQuotesArr.filter(item => item.id !== selectedPost?.id)
+        prevMultiQuotesArr.filter(item => item.id !== selectedPost.current?.id)
       );
     } else {
-      setMultiQuotesArr(prevMultiQuotesArr => [...prevMultiQuotesArr, selectedPost as IPost]);
+      setMultiQuotesArr(prevMultiQuotesArr => [
+        ...prevMultiQuotesArr,
+        selectedPost.current as IPost,
+      ]);
     }
-  }, [multiQuotesArr, selectedPost]);
+  }, [multiQuotesArr]);
 
   const reportForumPost = useCallback(() => {
-    if (!!selectedPost?.is_reported_by_viewer) {
+    if (!!selectedPost.current?.is_reported_by_viewer) {
       setShowToastAlert(true);
       setAlertText('You have already reported this post.');
       setTimeout(() => {
@@ -290,7 +294,7 @@ const Thread: FunctionComponent = () => {
         setAlertText('');
       }, 2000);
     } else {
-      const { request, controller } = reportPost(selectedPost?.id || 0);
+      const { request, controller } = reportPost(selectedPost.current?.id || 0);
       request.then(() => {
         setShowToastAlert(true);
         setAlertText('The forum post was reported.');
@@ -304,29 +308,28 @@ const Thread: FunctionComponent = () => {
         controller.abort();
       };
     }
-  }, [selectedPost, refresh]);
+  }, [refresh]);
 
   const showBlockModal = useCallback((selectedP: IPost, mode: 'post' | 'user'): void => {
-    setSelectedPost(selectedP);
-    setReportMode(mode);
-    blockRef.current?.toggle();
+    selectedPost.current = selectedP;
+    blockRef.current?.toggle(mode, selectedP);
   }, []);
 
-  const showBlockWarning = useCallback(() => {
-    warningRef.current?.toggle(selectedPost?.author?.display_name || '');
-  }, [selectedPost?.author?.display_name]);
+  const showBlockWarning = (): void => {
+    warningRef.current?.toggle(selectedPost.current?.author?.display_name || '');
+  };
 
-  const onReportUser = useCallback(() => {
-    if (!selectedPost) {
+  const onReportUser = (): any => {
+    if (!selectedPost.current) {
       return;
     }
-    if (selectedPost?.author?.is_reported_by_viewer) {
+    if (selectedPost.current?.author?.is_reported_by_viewer) {
       setShowReportAlert(true);
       setTimeout(() => {
         setShowReportAlert(false);
       }, 2000);
     } else {
-      const { request, controller } = reportUser(selectedPost?.author?.id || 0);
+      const { request, controller } = reportUser(selectedPost.current?.author?.id || 0);
       request.then(res => {
         if (res.data?.success) {
           setShowReportAlert(true);
@@ -339,10 +342,10 @@ const Thread: FunctionComponent = () => {
         controller.abort();
       };
     }
-  }, [selectedPost]);
+  };
 
   const onBlockUser = useCallback(() => {
-    const { request, controller } = blockUser(selectedPost?.author?.id || 0);
+    const { request, controller } = blockUser(selectedPost.current?.author?.id || 0);
     request.then((res: { data: { success: boolean } }) => {
       if (res.data.success) {
         setShowBlockAlert(true);
@@ -355,7 +358,7 @@ const Thread: FunctionComponent = () => {
     return () => {
       controller.abort();
     };
-  }, [refresh, selectedPost?.author?.id]);
+  }, [refresh]);
 
   const onLayoutAddPost = ({ nativeEvent: { layout } }: LayoutChangeEvent): void => {
     if (!postHeight) {
@@ -542,14 +545,10 @@ const Thread: FunctionComponent = () => {
         onReportUser={onReportUser}
         onReportPost={reportForumPost}
         onBlock={showBlockWarning}
-        mode={reportMode}
         onEdit={editPost}
         onMultiquote={multiquote}
         user={user}
-        authorId={selectedPost?.author_id}
-        multiQuoteText={
-          multiQuotesArr.find(f => f.id === selectedPost?.id) ? 'Remove quote' : 'Multiquote'
-        }
+        multiQuoteArr={multiQuotesArr}
       />
       <BlockWarningModal ref={warningRef} onBlock={onBlockUser} />
       {showToastAlert && (
@@ -566,9 +565,9 @@ const Thread: FunctionComponent = () => {
       {showReportAlert && (
         <ToastAlert
           content={
-            selectedPost?.author?.is_reported_by_viewer
+            selectedPost.current?.author?.is_reported_by_viewer
               ? 'You have already reported this profile.'
-              : `${selectedPost?.author?.display_name} was reported.`
+              : `${selectedPost.current?.author?.display_name || 'User'} was reported.`
           }
           icon={reportSvg({
             height: 21.6,
@@ -580,7 +579,7 @@ const Thread: FunctionComponent = () => {
       )}
       {showBlockAlert && (
         <ToastAlert
-          content={`${selectedPost?.author?.display_name} was blocked.`}
+          content={`${selectedPost.current?.author?.display_name || 'User'} was blocked.`}
           icon={banSvg({
             height: 21.6,
             width: 21.6,

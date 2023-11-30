@@ -2,7 +2,7 @@ import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'r
 import { TouchableOpacity, StyleSheet, View, Modal, Text } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { banSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
-import type { IUser } from '../../entity/IForum';
+import type { IPost, IUser } from '../../entity/IForum';
 import { IS_TABLET } from '../../services/helpers';
 
 interface IMenuModal {
@@ -14,25 +14,22 @@ interface IMenuModal {
   mode?: 'user' | 'post';
   user?: IUser;
   authorId?: number;
-  multiQuoteText: string;
+  multiQuoteArr: IPost[];
 }
 
-const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) => {
-  const {
-    onReportUser,
-    onReportPost,
-    onBlock,
-    onEdit,
-    onMultiquote,
-    mode,
-    user,
-    authorId,
-    multiQuoteText,
-  } = props;
+const MenuModal = forwardRef<
+  { toggle: (mode: 'post' | 'user', selected: IPost) => void },
+  IMenuModal
+>((props, ref) => {
+  const { onReportUser, onReportPost, onBlock, onEdit, onMultiquote, user, multiQuoteArr } = props;
   const [visible, setVisible] = useState(false);
+  const [reportMode, setReportMode] = useState<'post' | 'user'>();
+  const [selectedPost, setSelectedPost] = useState<IPost | undefined>();
 
   useImperativeHandle(ref, () => ({
-    toggle() {
+    toggle(mode: 'post' | 'user', selected: IPost) {
+      setReportMode(mode);
+      setSelectedPost(selected);
       setVisible(!visible);
     },
   }));
@@ -42,13 +39,13 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
   }, []);
 
   const report = useCallback(() => {
-    if (mode === 'user') {
+    if (reportMode === 'user') {
       onReportUser?.();
     } else {
       onReportPost?.();
     }
     closeModal();
-  }, [closeModal, onReportPost, onReportUser, mode]);
+  }, [closeModal, onReportPost, onReportUser, reportMode]);
 
   const blockUser = useCallback(() => {
     onBlock?.();
@@ -79,8 +76,8 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
         />
         <View style={styles.modalContent}>
           <View style={IS_TABLET && { height: '10%' }} />
-          {(mode === 'post' && user?.permission_level === 'administrator') ||
-          (authorId && user?.id === authorId) ? (
+          {(reportMode === 'post' && user?.permission_level === 'administrator') ||
+          (selectedPost?.author_id && user?.id === selectedPost?.author_id) ? (
             <TouchableOpacity onPress={editPost} style={styles.actionContainer}>
               <View style={styles.iconContainer}>
                 {edit({
@@ -92,7 +89,7 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
               <Text style={styles.actionText}>{'Edit'}</Text>
             </TouchableOpacity>
           ) : null}
-          {mode === 'post' && (
+          {reportMode === 'post' && (
             <TouchableOpacity onPress={multiquote} style={styles.actionContainer}>
               <View style={styles.iconContainer}>
                 {multiQuoteSvg({
@@ -101,10 +98,14 @@ const MenuModal = forwardRef<{ toggle: () => void }, IMenuModal>((props, ref) =>
                   fill: 'white',
                 })}
               </View>
-              <Text style={styles.actionText}>{multiQuoteText}</Text>
+              <Text style={styles.actionText}>
+                {multiQuoteArr?.find(f => f.id === selectedPost?.id)
+                  ? 'Remove quote'
+                  : 'Multiquote'}
+              </Text>
             </TouchableOpacity>
           )}
-          {user?.id !== authorId && (
+          {user?.id !== selectedPost?.author_id && (
             <>
               <TouchableOpacity onPress={report} style={styles.actionContainer}>
                 <View style={styles.iconContainer}>
