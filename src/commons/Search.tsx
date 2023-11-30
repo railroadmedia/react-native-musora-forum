@@ -302,9 +302,9 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       color: 'black',
       paddingVertical: 5,
     },
-    searchInputContainer: { 
-      paddingHorizontal: 15, 
-      paddingVertical: 30 
+    searchInputContainer: {
+      paddingHorizontal: 15,
+      paddingVertical: 30,
     },
     inputContainer: {
       flexDirection: 'row',
