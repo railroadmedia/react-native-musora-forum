@@ -234,7 +234,7 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
               </Text>
             </TouchableOpacity>
           ) : (
-            <Text onPress={onPressLink}>
+            <Text style={style} onPress={onPressLink}>
               <TNodeChildrenRenderer tnode={tnode} />
             </Text>
           )}
@@ -246,9 +246,9 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
 
   const PTagRenderer = useCallback(
     ({ tnode, TNodeChildrenRenderer }: CustomRendererProps<TBlock>) => (
-      <Text>
+      <View>
         <TNodeChildrenRenderer tnode={tnode} />
-      </Text>
+      </View>
     ),
     []
   );
@@ -324,18 +324,18 @@ const HTMLRenderer: FunctionComponent<IHTMLRenderer> = props => {
             shadow: HTMLElementModel.fromCustomModel({
               tagName: 'shadow',
               mixedUAStyles: classesStyles?.shadow,
-              contentModel: HTMLContentModel.mixed,
+              contentModel: HTMLContentModel.block,
             }),
             blockquote: defaultHTMLElementModels.blockquote.extend({
-              contentModel: HTMLContentModel.mixed,
+              contentModel: HTMLContentModel.block,
             }),
             expander: HTMLElementModel.fromCustomModel({
               tagName: 'expander',
-              contentModel: HTMLContentModel.mixed,
+              contentModel: HTMLContentModel.block,
             }),
             iframe: iframeModel,
             source: defaultHTMLElementModels.source.extend({
-              contentModel: HTMLContentModel.mixed,
+              contentModel: HTMLContentModel.none,
             }),
             a: defaultHTMLElementModels.a.extend({
               contentModel: HTMLContentModel.mixed,
