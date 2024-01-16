@@ -169,13 +169,13 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
       fontSize: 16,
       color: '#FFFFFF',
     },
-	lgradient: {
-		width: '100%',
-	height: '100%',
-	position: 'absolute',
-	top: 0,
-	zIndex: 0,
-	},
+    lgradient: {
+      width: '100%',
+      height: '100%',
+      position: 'absolute',
+      top: 0,
+      zIndex: 0,
+    },
   });
 
 export default Sort;

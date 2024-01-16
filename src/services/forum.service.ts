@@ -50,12 +50,10 @@ export const getFollowedThreads = (
   page?: number,
   sort?: string
 ): IResponse<IFollowedThreadsRes> =>
-  {console.log( `/forums/api/thread/index?amount=10&page=${page || 1}&brand=${(this as any)
-    ?.brand}&followed=1&sort=${sort || '-published_on'}&category_id=${forumId || ''}`)
-    return (this as any)?.tryCall.get(
+  (this as any)?.tryCall.get(
     `/forums/api/thread/index?amount=10&page=${page || 1}&brand=${(this as any)
       ?.brand}&followed=1&sort=${sort || '-published_on'}&category_id=${forumId || ''}`
-  );}
+  );
 
 export const getThread = (
   threadId: number | undefined,
