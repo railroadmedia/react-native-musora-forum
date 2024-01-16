@@ -16,7 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
 import { IS_TABLET } from '../services/helpers';
-import { addThread, sortSvg } from '../assets/svgs';
+import { addThread } from '../assets/svgs';
 import NavigationHeader from '../commons/NavigationHeader';
 import Pagination from '../commons/Pagination';
 import Search from '../commons/Search';
@@ -25,6 +25,7 @@ import { setAllThreads, setFollowedThreads } from '../redux/threads/ThreadAction
 import { getAllThreads, getFollowedThreads, connection } from '../services/forum.service';
 import type { ForumRootStackParamList, IForumParams, IThreadsParams } from '../entity/IRouteParams';
 import type { LayoutChangeEvent } from 'react-native';
+import Sort from '../commons/Sort';
 
 const Threads: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IThreadsParams & IForumParams }, 'params'> = useRoute();
@@ -50,6 +51,7 @@ const Threads: FunctionComponent = props => {
   const [allRefreshing, setAllRefreshing] = useState<boolean>(false);
   const flatListRef = useRef<FlatList | null>(null);
   const reFocused = useRef<boolean>(false);
+  const selectedSort = useRef('-published_on');
 
   useEffect(() => {
     const refreshOnFocusListener = addListener('focus', () => {
@@ -104,7 +106,7 @@ const Threads: FunctionComponent = props => {
       if (tab) {
         setFollowedPage(page);
         setFollowedLoadingMore(true);
-        getFollowedThreads(forumId, page)
+        getFollowedThreads(forumId, page, selectedSort.current)
           .request.then(r => {
             setFollowed(r.data?.results?.map(f => f.id));
             dispatch(setFollowedThreads(r.data?.results));
@@ -115,7 +117,7 @@ const Threads: FunctionComponent = props => {
       } else {
         setAllPage(page);
         setAllLoadingMore(true);
-        getAllThreads(forumId, page)
+        getAllThreads(forumId, page, selectedSort.current)
           .request.then(r => {
             setAll(r.data?.results?.map(a => a.id));
             dispatch(setAllThreads(r.data?.results));
@@ -129,13 +131,11 @@ const Threads: FunctionComponent = props => {
     [dispatch, forumId, tab]
   );
 
-  const refresh = useCallback(() => {
-    if (!connection(true)) {
-      return;
-    }
+  const onSort = useCallback((sortBy: string)=> {
+    selectedSort.current = sortBy;
     if (tab) {
       setFollowedRefreshing(true);
-      getFollowedThreads(forumId, followedPage)
+      getFollowedThreads(forumId, followedPage, sortBy)
         .request.then(r => {
           setFollowed(r?.data?.results?.map(f => f.id));
           dispatch(setFollowedThreads(r.data?.results));
@@ -145,7 +145,34 @@ const Threads: FunctionComponent = props => {
         });
     } else {
       setAllRefreshing(true);
-      getAllThreads(forumId, allPage)
+      getAllThreads(forumId, allPage, sortBy)
+        .request.then(r => {
+          setAll(r.data?.results?.map(a => a.id));
+          dispatch(setAllThreads(r.data?.results));
+        })
+        .finally(() => {
+          setAllRefreshing(false);
+        });
+    }
+  },[dispatch, forumId, tab])
+
+  const refresh = useCallback(() => {
+    if (!connection(true)) {
+      return;
+    }
+    if (tab) {
+      setFollowedRefreshing(true);
+      getFollowedThreads(forumId, followedPage, selectedSort.current)
+        .request.then(r => {
+          setFollowed(r?.data?.results?.map(f => f.id));
+          dispatch(setFollowedThreads(r.data?.results));
+        })
+        .finally(() => {
+          setFollowedRefreshing(false);
+        });
+    } else {
+      setAllRefreshing(true);
+      getAllThreads(forumId, allPage, selectedSort.current)
         .request.then(r => {
           setAll(r.data?.results?.map(a => a.id));
           dispatch(setAllThreads(r.data?.results));
@@ -204,7 +231,7 @@ const Threads: FunctionComponent = props => {
               </TouchableOpacity>
             ))}
           </View>
-          {sortSvg({ height: 35, width: 35, fill: isDark ? 'white' : '#000C17', backgroundFill: isDark ? '#000C17' : 'white', })}
+          <Sort onSort={onSort} defaultSelectedSort='Newest First' />
         </View>
         <Search isDark={isDark} appColor={appColor} />
       </>
