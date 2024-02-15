@@ -169,7 +169,7 @@ const Thread: FunctionComponent = () => {
             if (isForumRules) {
               dispatch(setForumRules(res.data));
             }
-            dispatch(setPosts(res.data.posts || []));
+            dispatch(setPosts(res.data?.posts || []));
           });
         })
         .finally(() => setLoadingMore(false));
