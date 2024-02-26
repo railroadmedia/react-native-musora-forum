@@ -28,6 +28,7 @@ import {
   moderate,
   check,
   unfollow,
+  menuCircle,
 } from '../assets/svgs';
 import { updateThreads, toggleSignShown } from '../redux/threads/ThreadActions';
 import {
@@ -45,6 +46,7 @@ import { useAppSelector } from '../redux/Store';
 import { selectThread } from '../redux/threads/ThreadSelectors';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
 import type { ISvg } from '../entity/ISvg';
+import { IS_TABLET } from '../services/helpers';
 
 interface INavigationHeader {
   title: string;
@@ -214,95 +216,116 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     user?.permission_level,
   ]);
 
+  const renderHomeHeader = useMemo(
+    () => (
+      // <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
+      <>
+        <View style={styles.rowContainer}>
+          <Text style={styles.sectionTitle}>Forums</Text>
+          <TouchableOpacity onPress={() => setOptionsVisible(true)}>
+            {menuCircle({ width: 39, height: 39, fill: '#FFF' })}
+          </TouchableOpacity>
+        </View>
+        <View style={styles.divider} />
+      </>
+      // </SafeAreaView>
+    ),
+    []
+  );
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
-      <View style={styles.subContainer}>
-        <View style={styles.titleContainer}>
-          {!!thread?.locked && (
-            <View style={styles.iconContainer}>
-              {lock({ width: 10, fill: isDark ? 'white' : 'black' })}
-            </View>
-          )}
-          {!!thread?.pinned && (
-            <View style={styles.iconContainer}>
-              {pin({ width: 10, fill: isDark ? 'white' : 'black' })}
-            </View>
-          )}
-          <Text style={styles.titleText} numberOfLines={2} ellipsizeMode='tail'>
-            {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.headerButton} onPress={goBack}>
-          {arrowLeft({
-            height: 20,
-            fill: isDark ? 'white' : 'black',
-          })}
-        </TouchableOpacity>
-        {name?.match(/^(Forums|Threads|Thread)$/) && !isForumRules && (
-          <>
-            <TouchableOpacity style={styles.headerButton} onPress={() => setOptionsVisible(true)}>
-              {moderate({ width: 20, fill: isDark ? 'white' : 'black' })}
-            </TouchableOpacity>
-            <Modal
-              animationType='slide'
-              onRequestClose={() => setOptionsVisible(false)}
-              supportedOrientations={['portrait', 'landscape']}
-              transparent={true}
-              visible={optionsVisible || followStateVisible}
-            >
-              <LinearGradient
-                style={styles.lgradient}
-                colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
-              />
-              <TouchableOpacity
-                activeOpacity={1}
-                style={styles.optionsContainer}
-                onPress={() => setOptionsVisible(false)}
-              >
-                {followStateVisible ? (
-                  <View
-                    style={{
-                      ...styles.followStateContainer,
-                      borderTopColor: thread?.is_followed ? '#34D399' : '#FFAE00',
-                    }}
-                  >
-                    {(thread?.is_followed ? check : unfollow)({
-                      height: 25,
-                      width: 25,
-                      fill: thread?.is_followed ? '#34D399' : '#FFAE00',
-                    })}
-                    <Text style={styles.followStateTitle}>
-                      {thread?.is_followed ? 'Follow' : 'Unfollow'} Thread{'\n'}
-                      <Text
-                        style={{
-                          color: isDark ? 'white' : '#000000',
-                          fontFamily: 'OpenSans',
-                        }}
-                      >
-                        {`You've ${
-                          thread?.is_followed ? 'started following' : 'unfollowed'
-                        } this thread.`}
-                      </Text>
-                    </Text>
-                  </View>
-                ) : (
-                  <SafeAreaView style={styles.options}>
-                    {Object.values(menuOptions).map(({ text, icon, action }) => (
-                      <TouchableOpacity key={text} onPress={action} style={styles.optionBtn}>
-                        {icon({ width: 20, fill: '#FFFFFF' })}
-                        <Text style={styles.optionText}>{text}</Text>
-                      </TouchableOpacity>
-                    ))}
-                    <TouchableOpacity onPress={() => setOptionsVisible(false)}>
-                      <Text style={styles.closeText}>{'Close'}</Text>
-                    </TouchableOpacity>
-                  </SafeAreaView>
-                )}
+      {true ? (
+        renderHomeHeader
+      ) : (
+        <View style={styles.subContainer}>
+          <View style={styles.titleContainer}>
+            {!!thread?.locked && (
+              <View style={styles.iconContainer}>
+                {lock({ width: 10, fill: isDark ? 'white' : 'black' })}
+              </View>
+            )}
+            {!!thread?.pinned && (
+              <View style={styles.iconContainer}>
+                {pin({ width: 10, fill: isDark ? 'white' : 'black' })}
+              </View>
+            )}
+            <Text style={styles.titleText} numberOfLines={2} ellipsizeMode='tail'>
+              {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.headerButton} onPress={goBack}>
+            {arrowLeft({
+              height: 20,
+              fill: isDark ? 'white' : 'black',
+            })}
+          </TouchableOpacity>
+          {name?.match(/^(Threads|Thread)$/) && !isForumRules && (
+            <>
+              <TouchableOpacity style={styles.headerButton} onPress={() => setOptionsVisible(true)}>
+                {moderate({ width: 20, fill: isDark ? 'white' : 'black' })}
               </TouchableOpacity>
-            </Modal>
-          </>
-        )}
-      </View>
+            </>
+          )}
+        </View>
+      )}
+      <Modal
+        animationType='slide'
+        onRequestClose={() => setOptionsVisible(false)}
+        supportedOrientations={['portrait', 'landscape']}
+        transparent={true}
+        visible={optionsVisible || followStateVisible}
+      >
+        <LinearGradient
+          style={styles.lgradient}
+          colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
+        />
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.optionsContainer}
+          onPress={() => setOptionsVisible(false)}
+        >
+          {followStateVisible ? (
+            <View
+              style={{
+                ...styles.followStateContainer,
+                borderTopColor: thread?.is_followed ? '#34D399' : '#FFAE00',
+              }}
+            >
+              {(thread?.is_followed ? check : unfollow)({
+                height: 25,
+                width: 25,
+                fill: thread?.is_followed ? '#34D399' : '#FFAE00',
+              })}
+              <Text style={styles.followStateTitle}>
+                {thread?.is_followed ? 'Follow' : 'Unfollow'} Thread{'\n'}
+                <Text
+                  style={{
+                    color: isDark ? 'white' : '#000000',
+                    fontFamily: 'OpenSans',
+                  }}
+                >
+                  {`You've ${
+                    thread?.is_followed ? 'started following' : 'unfollowed'
+                  } this thread.`}
+                </Text>
+              </Text>
+            </View>
+          ) : (
+            <SafeAreaView style={styles.options}>
+              {Object.values(menuOptions).map(({ text, icon, action }) => (
+                <TouchableOpacity key={text} onPress={action} style={styles.optionBtn}>
+                  {icon({ width: 20, fill: '#FFFFFF' })}
+                  <Text style={styles.optionText}>{text}</Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity onPress={() => setOptionsVisible(false)}>
+                <Text style={styles.closeText}>{'Close'}</Text>
+              </TouchableOpacity>
+            </SafeAreaView>
+          )}
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -310,7 +333,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
 const setStyles: StyleProp<any> = (isDark: boolean) =>
   StyleSheet.create({
     container: {
-      backgroundColor: isDark ? '#081825' : 'white',
+      backgroundColor: isDark ? 'transparent' : 'white',
     },
     subContainer: {
       flexDirection: 'row',
@@ -367,7 +390,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       marginLeft: 15,
     },
     followStateContainer: {
-      backgroundColor: isDark ? '#081825' : '#F7F9FC',
+      // backgroundColor: isDark ? '#081825' : '#F7F9FC',
       margin: 5,
       padding: 15,
       borderTopWidth: 6,
@@ -386,6 +409,26 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       alignSelf: 'center',
       textAlign: 'center',
       fontFamily: 'OpenSans-Bold',
+    },
+    rowContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginHorizontal: 15,
+    },
+    sectionTitle: {
+      fontFamily: 'OpenSans-Bold',
+      fontSize: IS_TABLET ? 32 : 28,
+      color: isDark ? '#FFFFFF' : '#00101D',
+
+      margin: 5,
+      marginVertical: 20,
+      // backgroundColor: isDark ? '#00101D' : '#f0f1f2',
+    },
+    divider: {
+      backgroundColor: '#223F57',
+      height: 1,
+      marginHorizontal: 10,
     },
   });
 

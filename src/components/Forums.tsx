@@ -23,7 +23,6 @@ import { connection, getForums, getFollowedThreads } from '../services/forum.ser
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
 import type { IForum } from '../entity/IForum';
-import HomeHeader from '../commons/HomeHeader';
 
 const Forums: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
@@ -222,8 +221,7 @@ const Forums: FunctionComponent = props => {
       edges={['left', 'right', 'bottom']}
       testID={setTestID(`${brand}ForumsScreen`)}
     >
-      {/* <NavigationHeader title={'Forums'} {...props} /> */}
-      <HomeHeader isDark={isDark} appColor={appColor} />
+      <NavigationHeader title={'Forums'} {...props} />
       {loading ? (
         <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
       ) : (
