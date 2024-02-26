@@ -174,6 +174,7 @@ const Forums: FunctionComponent = props => {
   const flHeader = useMemo(
     () => (
       <>
+        <NavigationHeader title={'Forums'} {...props} />
         <Search isDark={isDark} appColor={appColor} />
         {forums?.map(item => renderForum(item))}
         <Text style={styles.sectionTitle}>{'Followed Threads'}</Text>
@@ -221,7 +222,6 @@ const Forums: FunctionComponent = props => {
       edges={['left', 'right', 'bottom']}
       testID={setTestID(`${brand}ForumsScreen`)}
     >
-      <NavigationHeader title={'Forums'} {...props} />
       {loading ? (
         <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
       ) : (

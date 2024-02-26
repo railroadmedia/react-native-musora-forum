@@ -218,7 +218,6 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
 
   const renderHomeHeader = useMemo(
     () => (
-      // <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
       <>
         <View style={styles.rowContainer}>
           <Text style={styles.sectionTitle}>Forums</Text>
@@ -228,14 +227,13 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
         </View>
         <View style={styles.divider} />
       </>
-      // </SafeAreaView>
     ),
     []
   );
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
-      {true ? (
+      {name?.match(/^(Forums)$/) && !isForumRules ? (
         renderHomeHeader
       ) : (
         <View style={styles.subContainer}>
