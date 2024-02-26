@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import Svg, { Circle, Path, Polygon } from 'react-native-svg';
+import Svg, { Circle, G, Path, Polygon, Rect } from 'react-native-svg';
 import type { ISvg } from '../entity/ISvg';
 
 export const arrowLeft = ({ width, height, fill }: ISvg): ReactElement => (
@@ -537,5 +537,29 @@ export const multiQuoteSvg = ({ width, height, fill }: ISvg): ReactElement => (
       strokeLinecap='round'
       strokeLinejoin='round'
     />
+  </Svg>
+);
+
+export const menuCircle = ({ width, height, fill }: ISvg): ReactElement => (
+  <Svg width={width} height={height} viewBox='0 0 39 39' fill={fill}>
+    <G>
+      <Rect x='2' y='1.3335' width='35' height='35' rx='17.5' fill='none' />
+      <Rect
+        x='2.4375'
+        y='1.771'
+        width='34.125'
+        height='34.125'
+        rx='17.0625'
+        stroke='white'
+        strokeWidth='0.875'
+      />
+      <Path
+        d='M13.1196 18.8333H13.1287M19.4998 18.8333H19.5089M25.88 18.8333H25.8891M14.031 18.8333C14.031 19.3367 13.623 19.7448 13.1196 19.7448C12.6162 19.7448 12.2081 19.3367 12.2081 18.8333C12.2081 18.3299 12.6162 17.9219 13.1196 17.9219C13.623 17.9219 14.031 18.3299 14.031 18.8333ZM20.4113 18.8333C20.4113 19.3367 20.0032 19.7448 19.4998 19.7448C18.9964 19.7448 18.5883 19.3367 18.5883 18.8333C18.5883 18.3299 18.9964 17.9219 19.4998 17.9219C20.0032 17.9219 20.4113 18.3299 20.4113 18.8333ZM26.7915 18.8333C26.7915 19.3367 26.3834 19.7448 25.88 19.7448C25.3766 19.7448 24.9685 19.3367 24.9685 18.8333C24.9685 18.3299 25.3766 17.9219 25.88 17.9219C26.3834 17.9219 26.7915 18.3299 26.7915 18.8333Z'
+        stroke={fill}
+        strokeWidth='1.25'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </G>
   </Svg>
 );
