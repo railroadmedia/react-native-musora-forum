@@ -294,10 +294,7 @@ const Threads: FunctionComponent = props => {
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
-    <SafeAreaView
-      style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
-      edges={['left', 'right', 'bottom']}
-    >
+    <SafeAreaView style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
       <NavigationHeader title={title} {...props} />
       <FlatList
         key={tab}

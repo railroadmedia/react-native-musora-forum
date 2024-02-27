@@ -6,11 +6,10 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { StyleSheet, TouchableOpacity, Text, View, Modal, StyleProp } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, View, StyleProp } from 'react-native';
 import { batch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
 import {
   hideSignSvg,
   showSignSvg,
@@ -25,9 +24,6 @@ import {
   lock,
   pin,
   arrowLeft,
-  moderate,
-  check,
-  unfollow,
   menuCircle,
 } from '../assets/svgs';
 import { updateThreads, toggleSignShown } from '../redux/threads/ThreadActions';
@@ -47,6 +43,7 @@ import { selectThread } from '../redux/threads/ThreadSelectors';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
 import type { ISvg } from '../entity/ISvg';
 import { IS_TABLET } from '../services/helpers';
+import HeaderOptionsModal from './modals/HeaderOptionsModal';
 
 interface INavigationHeader {
   title: string;
@@ -55,7 +52,7 @@ interface INavigationHeader {
 
 const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   const { title, isForumRules } = props;
-  const route: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
+  const route: RouteProp<{ params: IForumParams }> = useRoute();
   const {
     name,
     params: { isDark, postId, user, threadId },
@@ -66,6 +63,8 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   const [optionsVisible, setOptionsVisible] = useState(false);
   const [followStateVisible, setFollowStateVisible] = useState(false);
   const [thread, setThread] = useState<IThread>();
+
+  const isHome = useMemo(() => name?.match(/^(Forums)$/), [name]);
 
   const signShown = useAppSelector(({ threadsState }) =>
     name.match(/^(Thread)$/) ? threadsState.signShown : undefined
@@ -216,114 +215,73 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     user?.permission_level,
   ]);
 
-  const renderHomeHeader = useMemo(
+  const MenuButton = useMemo(
     () => (
-      <>
-        <View style={styles.rowContainer}>
-          <Text style={styles.sectionTitle}>Forums</Text>
-          <TouchableOpacity onPress={() => setOptionsVisible(true)}>
-            {menuCircle({ width: 39, height: 39, fill: '#FFF' })}
-          </TouchableOpacity>
-        </View>
-        <View style={styles.divider} />
-      </>
+      <TouchableOpacity onPress={() => setOptionsVisible(true)}>
+        {menuCircle({ width: 39, height: 39, fill: '#FFF' })}
+      </TouchableOpacity>
     ),
     []
   );
 
+  const LockIcon = useMemo(() => {
+    !!thread?.locked && (
+      <View style={styles.iconContainer}>
+        {lock({ width: 10, fill: isDark ? 'white' : 'black' })}
+      </View>
+    );
+  }, [thread?.locked, isDark, styles.iconContainer]);
+
+  const PinIcon = useMemo(() => {
+    !!thread?.pinned && (
+      <View style={styles.iconContainer}>
+        {pin({ width: 10, fill: isDark ? 'white' : 'black' })}
+      </View>
+    );
+  }, [thread?.pinned, isDark, styles.iconContainer]);
+
+  const prevScreen = useMemo(() => 'Forums'.toUpperCase(), []);
+
   return (
     <SafeAreaView style={styles.container} edges={['right', 'left']}>
-      {name?.match(/^(Forums)$/) && !isForumRules ? (
-        renderHomeHeader
-      ) : (
-        <View style={styles.subContainer}>
+      <View style={styles.subContainer}>
+        {!isHome ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity style={styles.backButton} onPress={goBack}>
+              {arrowLeft({
+                height: 16,
+                fill: isDark ? 'white' : 'black',
+              })}
+            </TouchableOpacity>
+            <Text style={{ color: 'white', fontSize: 12 }}>{prevScreen}</Text>
+          </View>
+        ) : null}
+
+        {LockIcon}
+        {PinIcon}
+
+        <View style={styles.titleRow}>
           <View style={styles.titleContainer}>
-            {!!thread?.locked && (
-              <View style={styles.iconContainer}>
-                {lock({ width: 10, fill: isDark ? 'white' : 'black' })}
-              </View>
-            )}
-            {!!thread?.pinned && (
-              <View style={styles.iconContainer}>
-                {pin({ width: 10, fill: isDark ? 'white' : 'black' })}
-              </View>
-            )}
-            <Text style={styles.titleText} numberOfLines={2} ellipsizeMode='tail'>
+            <Text
+              style={isHome ? styles.sectionTitle : styles.titleText}
+              numberOfLines={2}
+              ellipsizeMode='tail'
+            >
               {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
             </Text>
           </View>
-          <TouchableOpacity style={styles.headerButton} onPress={goBack}>
-            {arrowLeft({
-              height: 20,
-              fill: isDark ? 'white' : 'black',
-            })}
-          </TouchableOpacity>
-          {name?.match(/^(Threads|Thread)$/) && !isForumRules && (
-            <>
-              <TouchableOpacity style={styles.headerButton} onPress={() => setOptionsVisible(true)}>
-                {moderate({ width: 20, fill: isDark ? 'white' : 'black' })}
-              </TouchableOpacity>
-            </>
-          )}
+          {name?.match(/^(Forums|Threads|Thread)$/) && !isForumRules && MenuButton}
         </View>
-      )}
-      <Modal
-        animationType='slide'
-        onRequestClose={() => setOptionsVisible(false)}
-        supportedOrientations={['portrait', 'landscape']}
-        transparent={true}
-        visible={optionsVisible || followStateVisible}
-      >
-        <LinearGradient
-          style={styles.lgradient}
-          colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
-        />
-        <TouchableOpacity
-          activeOpacity={1}
-          style={styles.optionsContainer}
-          onPress={() => setOptionsVisible(false)}
-        >
-          {followStateVisible ? (
-            <View
-              style={{
-                ...styles.followStateContainer,
-                borderTopColor: thread?.is_followed ? '#34D399' : '#FFAE00',
-              }}
-            >
-              {(thread?.is_followed ? check : unfollow)({
-                height: 25,
-                width: 25,
-                fill: thread?.is_followed ? '#34D399' : '#FFAE00',
-              })}
-              <Text style={styles.followStateTitle}>
-                {thread?.is_followed ? 'Follow' : 'Unfollow'} Thread{'\n'}
-                <Text
-                  style={{
-                    color: isDark ? 'white' : '#000000',
-                    fontFamily: 'OpenSans',
-                  }}
-                >
-                  {`You've ${
-                    thread?.is_followed ? 'started following' : 'unfollowed'
-                  } this thread.`}
-                </Text>
-              </Text>
-            </View>
-          ) : (
-            <SafeAreaView style={styles.options}>
-              {Object.values(menuOptions).map(({ text, icon, action }) => (
-                <TouchableOpacity key={text} onPress={action} style={styles.optionBtn}>
-                  {icon({ width: 20, fill: '#FFFFFF' })}
-                  <Text style={styles.optionText}>{text}</Text>
-                </TouchableOpacity>
-              ))}
-              <TouchableOpacity onPress={() => setOptionsVisible(false)}>
-                <Text style={styles.closeText}>{'Close'}</Text>
-              </TouchableOpacity>
-            </SafeAreaView>
-          )}
-        </TouchableOpacity>
-      </Modal>
+      </View>
+      <View style={styles.divider} />
+      <HeaderOptionsModal
+        optionsVisible={optionsVisible}
+        setOptionsVisible={setOptionsVisible}
+        followStateVisible={followStateVisible}
+        isFollowed={thread?.is_followed || false}
+        menuOptions={menuOptions}
+        isDark={isDark}
+      />
     </SafeAreaView>
   );
 };
@@ -331,20 +289,21 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
 const setStyles: StyleProp<any> = (isDark: boolean) =>
   StyleSheet.create({
     container: {
-      backgroundColor: isDark ? 'transparent' : 'white',
+      paddingHorizontal: 15,
     },
     subContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       justifyContent: 'space-between',
+    },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      justifyContent: 'space-between',
+      marginVertical: 10,
     },
     titleContainer: {
       flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      position: 'absolute',
-      left: 50,
-      right: 50,
+      flex: 1,
     },
     iconContainer: {
       marginRight: 5,
@@ -353,80 +312,20 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       fontFamily: 'OpenSans-ExtraBold',
       fontSize: 20,
       color: isDark ? 'white' : 'black',
-      textAlign: 'center',
+      textAlign: 'left',
       textTransform: 'capitalize',
       marginBottom: 2,
     },
-    headerButton: {
-      padding: 15,
-    },
-    lgradient: {
-      width: '100%',
-      height: '100%',
-      position: 'absolute',
-      top: 0,
-      zIndex: 0,
-    },
-    optionsContainer: {
-      flex: 1,
-      justifyContent: 'flex-end',
-    },
-    options: {
-      padding: 20,
-      borderTopEndRadius: 20,
-      borderTopStartRadius: 20,
-    },
-    optionBtn: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    optionText: {
-      paddingVertical: 13,
-      color: 'white',
-      fontFamily: 'OpenSans',
-      fontSize: 16,
-      marginLeft: 15,
-    },
-    followStateContainer: {
-      // backgroundColor: isDark ? '#081825' : '#F7F9FC',
-      margin: 5,
-      padding: 15,
-      borderTopWidth: 6,
-      borderRadius: 8,
-      flexDirection: 'row',
-    },
-    followStateTitle: {
-      paddingLeft: 15,
-      color: isDark ? 'white' : '#000000',
-      fontFamily: 'OpenSans-Bold',
-    },
-    closeText: {
-      fontSize: 18,
-      color: '#FFFFFF',
-      padding: 10,
-      alignSelf: 'center',
-      textAlign: 'center',
-      fontFamily: 'OpenSans-Bold',
-    },
-    rowContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginHorizontal: 15,
-    },
+    backButton: {},
     sectionTitle: {
       fontFamily: 'OpenSans-Bold',
       fontSize: IS_TABLET ? 32 : 28,
       color: isDark ? '#FFFFFF' : '#00101D',
-
-      margin: 5,
-      marginVertical: 20,
-      // backgroundColor: isDark ? '#00101D' : '#f0f1f2',
     },
     divider: {
       backgroundColor: '#223F57',
       height: 1,
-      marginHorizontal: 10,
+      marginTop: 5,
     },
   });
 

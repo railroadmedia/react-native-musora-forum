@@ -210,7 +210,10 @@ const Thread: FunctionComponent = () => {
       ) {
         let scrollPos = flHeaderHeight.current;
         thread?.posts
-          ?.slice(0, thread?.posts?.findIndex(p => p.id === postId.current))
+          ?.slice(
+            0,
+            thread?.posts?.findIndex(p => p.id === postId.current)
+          )
           .map(p => (scrollPos += postLayouts.current[p.id]));
         flatListRef.current?.scrollToOffset({
           offset: scrollPos,
@@ -476,10 +479,7 @@ const Thread: FunctionComponent = () => {
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
-    <SafeAreaView
-      style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
-      edges={['right', 'left', 'bottom']}
-    >
+    <SafeAreaView style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
       <NavigationHeader title={threadTitle || thread?.title || ''} />
       <FlatList
         overScrollMode='never'
