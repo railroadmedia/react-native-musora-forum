@@ -224,22 +224,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     []
   );
 
-  const LockIcon = useMemo(() => {
-    !!thread?.locked && (
-      <View style={styles.iconContainer}>
-        {lock({ width: 10, fill: isDark ? 'white' : 'black' })}
-      </View>
-    );
-  }, [thread?.locked, isDark, styles.iconContainer]);
-
-  const PinIcon = useMemo(() => {
-    !!thread?.pinned && (
-      <View style={styles.iconContainer}>
-        {pin({ width: 10, fill: isDark ? 'white' : 'black' })}
-      </View>
-    );
-  }, [thread?.pinned, isDark, styles.iconContainer]);
-
+  // TODO: This is a temporary fix for the back button text
   const prevScreen = useMemo(() => 'Forums'.toUpperCase(), []);
 
   return (
@@ -256,13 +241,22 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
           </TouchableOpacity>
         ) : null}
 
-        {LockIcon}
-        {PinIcon}
-
         <View style={styles.titleRow}>
           <View style={styles.titleContainer}>
+            <View style={styles.titleIconsContainer}>
+              {!!thread?.locked && (
+                <View style={styles.iconContainer}>
+                  {lock({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
+                </View>
+              )}
+              {!!thread?.pinned && (
+                <View style={styles.iconContainer}>
+                  {pin({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
+                </View>
+              )}
+            </View>
             <Text
-              style={isHome ? styles.sectionTitle : styles.titleText}
+              style={isHome ? styles.forumTitle : styles.titleText}
               numberOfLines={2}
               ellipsizeMode='tail'
             >
@@ -304,8 +298,18 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       flexDirection: 'row',
       flex: 1,
     },
+    titleIconsContainer: {
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+      marginTop: 10,
+    },
     iconContainer: {
       marginRight: 5,
+    },
+    forumTitle: {
+      fontFamily: 'OpenSans-Bold',
+      fontSize: IS_TABLET ? 32 : 28,
+      color: isDark ? '#FFFFFF' : '#00101D',
     },
     titleText: {
       fontFamily: 'OpenSans-ExtraBold',
@@ -323,11 +327,6 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       color: isDark ? 'white' : 'black',
       fontSize: 12,
       paddingLeft: 4,
-    },
-    sectionTitle: {
-      fontFamily: 'OpenSans-Bold',
-      fontSize: IS_TABLET ? 32 : 28,
-      color: isDark ? '#FFFFFF' : '#00101D',
     },
     divider: {
       backgroundColor: '#223F57',
