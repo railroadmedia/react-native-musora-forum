@@ -246,15 +246,14 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     <SafeAreaView style={styles.container} edges={['right', 'left']}>
       <View style={styles.subContainer}>
         {!isHome ? (
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity style={styles.backButton} onPress={goBack}>
-              {arrowLeft({
-                height: 16,
-                fill: isDark ? 'white' : 'black',
-              })}
-            </TouchableOpacity>
-            <Text style={{ color: 'white', fontSize: 12 }}>{prevScreen}</Text>
-          </View>
+          <TouchableOpacity style={styles.backButton} onPress={goBack}>
+            {arrowLeft({
+              width: 20,
+              height: 16,
+              fill: isDark ? 'white' : 'black',
+            })}
+            <Text style={styles.backText}>{prevScreen}</Text>
+          </TouchableOpacity>
         ) : null}
 
         {LockIcon}
@@ -316,7 +315,15 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       textTransform: 'capitalize',
       marginBottom: 2,
     },
-    backButton: {},
+    backButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    backText: {
+      color: isDark ? 'white' : 'black',
+      fontSize: 12,
+      paddingLeft: 4,
+    },
     sectionTitle: {
       fontFamily: 'OpenSans-Bold',
       fontSize: IS_TABLET ? 32 : 28,
