@@ -232,7 +232,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
+    <SafeAreaView style={styles.container} edges={['right', 'left']}>
       {name?.match(/^(Forums)$/) && !isForumRules ? (
         renderHomeHeader
       ) : (

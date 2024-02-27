@@ -219,7 +219,7 @@ const Forums: FunctionComponent = props => {
   return (
     <SafeAreaView
       style={[styles.fList, { paddingBottom: bottomPadding / 2 }]}
-      edges={['left', 'right', 'bottom']}
+      edges={['top', 'left', 'right', 'bottom']}
       testID={setTestID(`${brand}ForumsScreen`)}
     >
       {loading ? (
