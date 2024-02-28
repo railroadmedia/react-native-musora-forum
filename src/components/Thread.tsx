@@ -50,6 +50,7 @@ const Thread: FunctionComponent = () => {
     page: pageProp,
     postId: postIdProp,
     isForumRules,
+    prevScreen = '',
   } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
@@ -480,7 +481,7 @@ const Thread: FunctionComponent = () => {
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
     <SafeAreaView style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
-      <NavigationHeader title={threadTitle || thread?.title || ''} />
+      <NavigationHeader title={threadTitle || thread?.title || ''} prevScreen={prevScreen} />
       <FlatList
         overScrollMode='never'
         onScrollBeginDrag={onScollBegin}

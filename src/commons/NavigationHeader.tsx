@@ -48,10 +48,11 @@ import HeaderOptionsModal from './modals/HeaderOptionsModal';
 interface INavigationHeader {
   title: string;
   isForumRules?: boolean;
+  prevScreen?: string;
 }
 
 const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
-  const { title, isForumRules } = props;
+  const { title, isForumRules, prevScreen = '' } = props;
   const route: RouteProp<{ params: IForumParams }> = useRoute();
   const {
     name,
@@ -225,7 +226,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   );
 
   // TODO: This is a temporary fix for the back button text
-  const prevScreen = useMemo(() => 'Forums'.toUpperCase(), []);
+  const prevScreenLabel = useMemo(() => prevScreen.toUpperCase(), []);
 
   return (
     <SafeAreaView style={styles.container} edges={['right', 'left']}>
@@ -237,7 +238,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
               height: 16,
               fill: isDark ? 'white' : 'black',
             })}
-            <Text style={styles.backText}>{prevScreen}</Text>
+            <Text style={styles.backText}>{prevScreenLabel}</Text>
           </TouchableOpacity>
         ) : null}
 

@@ -43,6 +43,8 @@ const Forums: FunctionComponent = props => {
 
   const flatListRef = useRef<FlatList | null>(null);
 
+  const title = 'Forums';
+
   useEffect(() => {
     const refreshOnFocusListener = addListener('focus', () => {
       if (reFocused.current) {
@@ -130,7 +132,13 @@ const Forums: FunctionComponent = props => {
 
   const renderFLItem = useCallback(
     ({ item }: { item: number }) => (
-      <ThreadCard appColor={appColor} isDark={isDark} id={item} reduxKey='forums' />
+      <ThreadCard
+        appColor={appColor}
+        isDark={isDark}
+        id={item}
+        reduxKey='forums'
+        prevScreen={title}
+      />
     ),
     [appColor, isDark]
   );
@@ -142,7 +150,9 @@ const Forums: FunctionComponent = props => {
         data={item}
         appColor={appColor}
         isDark={isDark}
-        onNavigate={() => navigate('Threads', { title: item.title, forumId: item.id })}
+        onNavigate={() =>
+          navigate('Threads', { title: item.title, forumId: item.id, prevScreen: title })
+        }
       />
     ),
     [appColor, isDark, navigate]
@@ -174,7 +184,7 @@ const Forums: FunctionComponent = props => {
   const flHeader = useMemo(
     () => (
       <>
-        <NavigationHeader title={'Forums'} {...props} />
+        <NavigationHeader title={title} {...props} />
         <Search isDark={isDark} appColor={appColor} />
         {forums?.map(item => renderForum(item))}
         <Text style={styles.sectionTitle}>{'Followed Threads'}</Text>

@@ -28,7 +28,7 @@ import type { LayoutChangeEvent } from 'react-native';
 
 const Threads: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IThreadsParams & IForumParams }, 'params'> = useRoute();
-  const { bottomPadding, isDark, appColor, title, forumId } = params;
+  const { bottomPadding, isDark, appColor, title, forumId, prevScreen } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
   const { navigate, goBack, addListener, canGoBack } =
@@ -222,6 +222,7 @@ const Threads: FunctionComponent = props => {
         isDark={isDark}
         id={item}
         reduxKey={tab ? 'followed' : 'all'}
+        prevScreen={title}
       />
     ),
     [appColor, isDark, tab]
@@ -295,7 +296,7 @@ const Threads: FunctionComponent = props => {
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
     <SafeAreaView style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
-      <NavigationHeader title={title} {...props} />
+      <NavigationHeader title={title} {...props} prevScreen={prevScreen} />
       <FlatList
         key={tab}
         overScrollMode='never'
