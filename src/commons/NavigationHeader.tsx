@@ -330,7 +330,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       paddingLeft: 4,
     },
     divider: {
-      backgroundColor: '#223F57',
+      backgroundColor: isDark ? '#223F57' : '#B2B2B5',
       height: 1,
       marginTop: 5,
     },
