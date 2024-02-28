@@ -266,8 +266,9 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
           </View>
           {name?.match(/^(Forums|Threads|Thread)$/) && !isForumRules && MenuButton}
         </View>
+
+        <View style={styles.divider} />
       </View>
-      <View style={styles.divider} />
       <HeaderOptionsModal
         optionsVisible={optionsVisible}
         setOptionsVisible={setOptionsVisible}
@@ -287,7 +288,6 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
     },
     subContainer: {
       alignItems: 'flex-start',
-      justifyContent: 'space-between',
     },
     titleRow: {
       flexDirection: 'row',
@@ -333,6 +333,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       backgroundColor: isDark ? '#223F57' : '#B2B2B5',
       height: 1,
       marginTop: 5,
+      width: '100%',
     },
   });
 
