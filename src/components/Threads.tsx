@@ -77,12 +77,12 @@ const Threads: FunctionComponent = props => {
     Promise.allSettled([threadRequest, followedThreadRequest])
       .then(([allRes, followedRes]) => {
         if (allRes.status === 'fulfilled') {
-          setAll(allRes.value.data?.results?.map(r => r.id));
+          setAll(allRes.value.data?.results?.map((r: { id: number }) => r.id));
           setAllResultsTotal(allRes.value?.data?.total_results);
           dispatch(setAllThreads(allRes.value?.data?.results));
         }
         if (followedRes.status === 'fulfilled') {
-          setFollowed(followedRes.value?.data?.results?.map(r => r.id));
+          setFollowed(followedRes.value?.data?.results?.map((r: { id: number }) => r.id));
           setFollowedResultsTotal(followedRes.value?.data?.total_results);
           dispatch(setFollowedThreads(followedRes.value?.data?.results));
         }
@@ -106,7 +106,7 @@ const Threads: FunctionComponent = props => {
         setFollowedLoadingMore(true);
         getFollowedThreads(forumId, page)
           .request.then(r => {
-            setFollowed(r.data?.results?.map(f => f.id));
+            setFollowed(r.data?.results?.map((f: { id: number }) => f.id));
             dispatch(setFollowedThreads(r.data?.results));
           })
           .finally(() => {
@@ -117,7 +117,7 @@ const Threads: FunctionComponent = props => {
         setAllLoadingMore(true);
         getAllThreads(forumId, page)
           .request.then(r => {
-            setAll(r.data?.results?.map(a => a.id));
+            setAll(r.data?.results?.map((a: { id: number }) => a.id));
             dispatch(setAllThreads(r.data?.results));
           })
           .finally(() => {
@@ -137,7 +137,7 @@ const Threads: FunctionComponent = props => {
       setFollowedRefreshing(true);
       getFollowedThreads(forumId, followedPage)
         .request.then(r => {
-          setFollowed(r?.data?.results?.map(f => f.id));
+          setFollowed(r?.data?.results?.map((f: { id: number }) => f.id));
           dispatch(setFollowedThreads(r.data?.results));
         })
         .finally(() => {
@@ -147,7 +147,7 @@ const Threads: FunctionComponent = props => {
       setAllRefreshing(true);
       getAllThreads(forumId, allPage)
         .request.then(r => {
-          setAll(r.data?.results?.map(a => a.id));
+          setAll(r.data?.results?.map((a: { id: number }) => a.id));
           dispatch(setAllThreads(r.data?.results));
         })
         .finally(() => {

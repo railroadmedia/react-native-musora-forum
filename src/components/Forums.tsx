@@ -76,7 +76,9 @@ const Forums: FunctionComponent = props => {
           setForums(forumsResponse.value.data?.results);
         }
         if (followedResponse.status === 'fulfilled') {
-          setFollowedThreads(followedResponse.value.data?.results?.map(r => r.id));
+          setFollowedThreads(
+            followedResponse.value.data?.results?.map((r: { id: string }) => r.id)
+          );
           setFollowedThreadsTotal(followedResponse.value.data?.total_results);
           if (followedResponse.value.data) {
             dispatch(setForumsThreads(followedResponse.value.data?.results));
@@ -115,7 +117,7 @@ const Forums: FunctionComponent = props => {
       );
       followedRequest
         .then(response => {
-          setFollowedThreads(response.data?.results?.map(r => r.id));
+          setFollowedThreads(response.data?.results?.map((r: { id: string }) => r.id));
           if (flatListRef.current) {
             flatListRef.current.scrollToOffset({ offset: 0, animated: false });
           }
