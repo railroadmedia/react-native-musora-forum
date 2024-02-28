@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { StyleSheet, TouchableOpacity, Text, View, StyleProp } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, View, StyleProp, Animated } from 'react-native';
 import { batch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -49,10 +49,11 @@ interface INavigationHeader {
   title: string;
   isForumRules?: boolean;
   prevScreen?: string;
+  scrollOffset?: Animated.Value;
 }
 
 const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
-  const { title, isForumRules, prevScreen = '' } = props;
+  const { title, isForumRules, prevScreen = '', scrollOffset } = props;
   const route: RouteProp<{ params: IForumParams }> = useRoute();
   const {
     name,
@@ -225,26 +226,72 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     []
   );
 
-  // TODO: This is a temporary fix for the back button text
-  const prevScreenLabel = useMemo(() => prevScreen.toUpperCase(), []);
+  const RANGE_START = 0;
+  const RANGE_END = 100;
+
+  const headerOpacity = scrollOffset?.interpolate({
+    inputRange: [RANGE_START, RANGE_END],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const negHeaderOpacity = scrollOffset?.interpolate({
+    inputRange: [RANGE_START, RANGE_END],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
 
   return (
     <SafeAreaView style={styles.container} edges={['right', 'left']}>
-      <View style={styles.subContainer}>
+      <Animated.View style={[styles.subContainer, {}]}>
         {!isHome ? (
-          <TouchableOpacity style={styles.backButton} onPress={goBack}>
-            {arrowLeft({
-              width: 20,
-              height: 16,
-              fill: isDark ? 'white' : 'black',
-            })}
-            <Text style={styles.backText}>{prevScreenLabel}</Text>
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity style={styles.backButton} onPress={goBack}>
+              {arrowLeft({
+                width: 20,
+                height: 16,
+                fill: isDark ? 'white' : 'black',
+              })}
+              <Animated.Text style={[styles.backText, { opacity: headerOpacity }]}>
+                {prevScreen.toUpperCase()}
+              </Animated.Text>
+            </TouchableOpacity>
+            <Animated.View
+              style={{
+                position: 'absolute',
+                width: '100%',
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+
+                opacity: negHeaderOpacity,
+              }}
+            >
+              <Animated.Text
+                style={{
+                  color: 'white',
+                  fontFamily: 'OpenSans-SemiBold',
+                }}
+              >
+                {title}
+              </Animated.Text>
+            </Animated.View>
+          </View>
         ) : null}
 
-        <View style={styles.titleRow}>
-          <View style={styles.titleContainer}>
-            <View style={styles.titleIconsContainer}>
+        <Animated.View
+          style={[
+            styles.titleRow,
+            {
+              opacity: headerOpacity,
+            },
+          ]}
+        >
+          <Animated.View style={[styles.titleContainer]}>
+            <Animated.View style={[styles.titleIconsContainer]}>
               {!!thread?.locked && (
                 <View style={styles.iconContainer}>
                   {lock({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
@@ -255,7 +302,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
                   {pin({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
                 </View>
               )}
-            </View>
+            </Animated.View>
             <Text
               style={isHome ? styles.forumTitle : styles.titleText}
               numberOfLines={2}
@@ -263,12 +310,12 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
             >
               {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
             </Text>
-          </View>
+          </Animated.View>
           {name?.match(/^(Forums|Threads|Thread)$/) && !isForumRules && MenuButton}
-        </View>
+        </Animated.View>
 
         <View style={styles.divider} />
-      </View>
+      </Animated.View>
       <HeaderOptionsModal
         optionsVisible={optionsVisible}
         setOptionsVisible={setOptionsVisible}

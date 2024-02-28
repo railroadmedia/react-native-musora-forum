@@ -3,6 +3,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   BackHandler,
   FlatList,
   RefreshControl,
@@ -292,12 +293,25 @@ const Threads: FunctionComponent = props => {
     [styles.emptyList, tab]
   );
 
+  const scrollOffsetY = useRef(new Animated.Value(0)).current;
+
+  const handleScroll = Animated.event([{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }], {
+    useNativeDriver: true,
+  });
+
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
     <SafeAreaView style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
-      <NavigationHeader title={title} {...props} prevScreen={prevScreen} />
-      <FlatList
+      <NavigationHeader
+        title={title}
+        {...props}
+        prevScreen={prevScreen}
+        scrollOffset={scrollOffsetY}
+      />
+      <Animated.FlatList
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         key={tab}
         overScrollMode='never'
         windowSize={10}
