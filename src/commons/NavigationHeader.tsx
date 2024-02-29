@@ -267,7 +267,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
                 justifyContent: 'flex-end',
                 alignItems: 'center',
 
-                opacity: negHeaderOpacity,
+                opacity: negHeaderOpacity ?? 0,
               }}
             >
               <Animated.Text
