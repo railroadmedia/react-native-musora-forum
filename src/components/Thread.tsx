@@ -492,7 +492,7 @@ const Thread: FunctionComponent = () => {
         overScrollMode='never'
         onScrollBeginDrag={onScollBegin}
         windowSize={10}
-        data={thread?.posts?.map(p => p.id)}
+        data={thread?.posts?.map(p => p.id) as number[]}
         style={styles.fList}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
@@ -501,7 +501,7 @@ const Thread: FunctionComponent = () => {
         keyboardShouldPersistTaps='handled'
         renderItem={renderFLItem}
         ListHeaderComponent={renderPagination(20, 0, 1)}
-        keyExtractor={id => id.toString()}
+        keyExtractor={(id: number) => id.toString()}
         ref={flatListRef}
         ListEmptyComponent={flEmpty}
         ListFooterComponent={renderPagination(postHeight, 1, 0)}
