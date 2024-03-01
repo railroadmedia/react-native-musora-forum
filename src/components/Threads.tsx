@@ -302,13 +302,10 @@ const Threads: FunctionComponent = props => {
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
-    <SafeAreaView style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
-      <NavigationHeader
-        title={title}
-        {...props}
-        prevScreen={prevScreen}
-        scrollOffset={scrollOffsetY}
-      />
+    <SafeAreaView
+      style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
+      edges={['top', 'bottom', 'left', 'right']}
+    >
       <Animated.FlatList
         onScroll={handleScroll}
         scrollEventThrottle={16}
@@ -330,6 +327,13 @@ const Threads: FunctionComponent = props => {
         ListFooterComponent={flFooter}
         refreshControl={flRefreshControl}
       />
+      <NavigationHeader
+        title={title}
+        {...props}
+        prevScreen={prevScreen}
+        scrollOffset={scrollOffsetY}
+      />
+
       <View>
         <TouchableOpacity
           onLayout={onLayoutAddThread}
@@ -350,6 +354,7 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
       flexDirection: 'row',
       backgroundColor: isDark ? '#00101D' : '#f0f1f2',
       flexWrap: 'wrap',
+      paddingTop: 100,
     },
     headerTOpacity: {
       paddingTop: 15,

@@ -226,6 +226,27 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     []
   );
 
+  const menuModal = useMemo(
+    () => (
+      <HeaderOptionsModal
+        optionsVisible={optionsVisible}
+        setOptionsVisible={setOptionsVisible}
+        followStateVisible={followStateVisible}
+        isFollowed={thread?.is_followed || false}
+        menuOptions={menuOptions}
+        isDark={isDark}
+      />
+    ),
+    [
+      optionsVisible,
+      setOptionsVisible,
+      followStateVisible,
+      thread?.is_followed,
+      menuOptions,
+      isDark,
+    ]
+  );
+
   const RANGE_START = 0;
   const RANGE_END = 100;
 
@@ -241,9 +262,19 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     extrapolate: 'clamp',
   });
 
-  return (
-    <SafeAreaView style={styles.container} edges={['right', 'left']}>
-      <Animated.View style={[styles.subContainer, {}]}>
+  const bigHeader = (
+    <Animated.View style={[styles.absoluteContainer, { opacity: headerOpacity }]}>
+      <SafeAreaView
+        style={[
+          styles.subContainer,
+          {
+            backgroundColor: isDark ? '#00101D' : '#f0f1f2',
+            paddingTop: 15,
+            paddingBottom: 0,
+          },
+        ]}
+        edges={['top', 'right', 'left']}
+      >
         {!isHome ? (
           <View style={{ flexDirection: 'row' }}>
             <TouchableOpacity style={styles.backButton} onPress={goBack}>
@@ -256,29 +287,6 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
                 {prevScreen.toUpperCase()}
               </Animated.Text>
             </TouchableOpacity>
-            <Animated.View
-              style={{
-                position: 'absolute',
-                width: '100%',
-                left: 0,
-                top: 0,
-                right: 0,
-                bottom: 0,
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-
-                opacity: negHeaderOpacity ?? 0,
-              }}
-            >
-              <Animated.Text
-                style={{
-                  color: 'white',
-                  fontFamily: 'OpenSans-SemiBold',
-                }}
-              >
-                {title}
-              </Animated.Text>
-            </Animated.View>
           </View>
         ) : null}
 
@@ -305,7 +313,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
             </Animated.View>
             <Text
               style={isHome ? styles.forumTitle : styles.titleText}
-              numberOfLines={2}
+              numberOfLines={1}
               ellipsizeMode='tail'
             >
               {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
@@ -315,26 +323,100 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
         </Animated.View>
 
         <View style={styles.divider} />
+      </SafeAreaView>
+    </Animated.View>
+  );
+
+  const smallHeader = (
+    <Animated.View style={[{ opacity: negHeaderOpacity, width: '100%', paddingHorizontal: 10 }]}>
+      <Animated.View
+        style={[
+          styles.absoluteContainer,
+          {
+            paddingVertical: 15,
+            backgroundColor: isDark ? '#001A2F' : 'white',
+            opacity: 0.75,
+          },
+        ]}
+      >
+        <SafeAreaView style={styles.subContainer} edges={['top', 'right', 'left']}>
+          <Text />
+        </SafeAreaView>
       </Animated.View>
-      <HeaderOptionsModal
-        optionsVisible={optionsVisible}
-        setOptionsVisible={setOptionsVisible}
-        followStateVisible={followStateVisible}
-        isFollowed={thread?.is_followed || false}
-        menuOptions={menuOptions}
-        isDark={isDark}
-      />
-    </SafeAreaView>
+
+      <View
+        style={[
+          styles.absoluteContainer,
+          {
+            paddingVertical: 15,
+            opacity: 1,
+          },
+        ]}
+      >
+        <SafeAreaView style={styles.subContainer} edges={['top', 'right', 'left']}>
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity style={styles.backButton} onPress={goBack}>
+              {arrowLeft({
+                width: 20,
+                height: 16,
+                fill: isDark ? 'white' : 'black',
+              })}
+            </TouchableOpacity>
+            <View
+              style={{
+                position: 'absolute',
+                width: '100%',
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+              }}
+            >
+              <Text
+                style={{
+                  color: 'white',
+                  fontFamily: 'OpenSans-SemiBold',
+                  fontSize: IS_TABLET ? 18 : 14,
+                }}
+              >
+                {title}
+              </Text>
+            </View>
+          </View>
+        </SafeAreaView>
+      </View>
+    </Animated.View>
+  );
+
+  return (
+    <View style={styles.absoluteContainer}>
+      {bigHeader}
+      {!isHome ? smallHeader : null}
+
+      {menuModal}
+    </View>
   );
 };
 
 const setStyles: StyleProp<any> = (isDark: boolean) =>
   StyleSheet.create({
     container: {
-      paddingHorizontal: 15,
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
     },
     subContainer: {
       alignItems: 'flex-start',
+      paddingHorizontal: 10,
+    },
+    absoluteContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
     },
     titleRow: {
       flexDirection: 'row',

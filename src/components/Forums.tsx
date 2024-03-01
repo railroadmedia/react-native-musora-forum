@@ -186,10 +186,11 @@ const Forums: FunctionComponent = props => {
   const flHeader = useMemo(
     () => (
       <>
-        <NavigationHeader title={title} {...props} />
+        <View style={{ marginTop: 70 }} />
         <Search isDark={isDark} appColor={appColor} />
         {forums?.map(item => renderForum(item))}
         <Text style={styles.sectionTitle}>{'Followed Threads'}</Text>
+        <NavigationHeader title={title} {...props} />
       </>
     ),
     [forums, appColor, isDark, renderForum, styles.sectionTitle]
@@ -231,7 +232,7 @@ const Forums: FunctionComponent = props => {
   return (
     <SafeAreaView
       style={[styles.fList, { paddingBottom: bottomPadding / 2 }]}
-      edges={['top', 'left', 'right', 'bottom']}
+      edges={['left', 'right', 'bottom']}
       testID={setTestID(`${brand}ForumsScreen`)}
     >
       {loading ? (

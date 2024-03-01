@@ -13,9 +13,8 @@ import {
   BackHandler,
   StyleProp,
   LayoutChangeEvent,
+  Animated,
 } from 'react-native';
-
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { batch, useDispatch } from 'react-redux';
 import { post as PostSvg, lock, multiQuote, reportSvg, banSvg } from '../assets/svgs';
@@ -440,6 +439,7 @@ const Thread: FunctionComponent = () => {
           borderColor: isDark ? '#9EC0DC' : 'lightgrey',
           marginHorizontal: 15,
           marginBottom,
+          paddingTop: 160,
         }}
       >
         <Pagination
@@ -477,12 +477,18 @@ const Thread: FunctionComponent = () => {
 
   const onScollBegin = (): void => (postId.current = undefined);
 
+  const scrollOffsetY = useRef(new Animated.Value(0)).current;
+
+  const handleScroll = Animated.event([{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }], {
+    useNativeDriver: true,
+  });
+
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
-    <SafeAreaView style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
-      <NavigationHeader title={threadTitle || thread?.title || ''} prevScreen={prevScreen} />
-      <FlatList
+    <View style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
+      <Animated.FlatList
+        onScroll={handleScroll}
         overScrollMode='never'
         onScrollBeginDrag={onScollBegin}
         windowSize={10}
@@ -500,6 +506,11 @@ const Thread: FunctionComponent = () => {
         ListEmptyComponent={flEmpty}
         ListFooterComponent={renderPagination(postHeight, 1, 0)}
         refreshControl={flRefreshControl}
+      />
+      <NavigationHeader
+        title={threadTitle || thread?.title || ''}
+        prevScreen={prevScreen}
+        scrollOffset={scrollOffsetY}
       />
       <View>
         <TouchableOpacity
@@ -589,7 +600,7 @@ const Thread: FunctionComponent = () => {
           isDark={isDark}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
@@ -597,6 +608,7 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
     fList: {
       flex: 1,
       backgroundColor: isDark ? '#00101D' : '#f0f1f2',
+      // paddingTop: 100,
     },
     loading: {
       flex: 1,
