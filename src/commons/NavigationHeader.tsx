@@ -262,26 +262,26 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     extrapolate: 'clamp',
   });
 
+  const backArrow = (
+    <TouchableOpacity style={styles.backButton} onPress={goBack}>
+      {arrowLeft({
+        width: 20,
+        height: 16,
+        fill: isDark ? 'white' : 'black',
+      })}
+      <Animated.Text style={[styles.backText, { opacity: headerOpacity }]}>
+        {prevScreen.toUpperCase()}
+      </Animated.Text>
+    </TouchableOpacity>
+  );
+
   const bigHeader = (
-    <Animated.View style={[styles.absoluteContainer, { opacity: headerOpacity }]}>
+    <Animated.View style={{ opacity: headerOpacity }}>
       <SafeAreaView
         style={[styles.subContainer, styles.bigHeaderSafeArea]}
-        edges={['top', 'right', 'left']}
+        edges={isHome ? ['right', 'left'] : ['top', 'right', 'left']}
       >
-        {!isHome ? (
-          <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity style={styles.backButton} onPress={goBack}>
-              {arrowLeft({
-                width: 20,
-                height: 16,
-                fill: isDark ? 'white' : 'black',
-              })}
-              <Animated.Text style={[styles.backText, { opacity: headerOpacity }]}>
-                {prevScreen.toUpperCase()}
-              </Animated.Text>
-            </TouchableOpacity>
-          </View>
-        ) : null}
+        {!isHome ? backArrow : null}
 
         <Animated.View
           style={[
@@ -314,7 +314,12 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   );
 
   const smallHeader = (
-    <Animated.View style={{ opacity: negHeaderOpacity, width: '100%', paddingHorizontal: 10 }}>
+    <Animated.View
+      style={[
+        styles.absoluteContainer,
+        { opacity: negHeaderOpacity, width: '100%', paddingHorizontal: 10 },
+      ]}
+    >
       <Animated.View style={[styles.absoluteContainer, styles.translucentBackground]}>
         <SafeAreaView style={styles.subContainer} edges={['top', 'right', 'left']}>
           <Text />
@@ -360,12 +365,6 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
 
 const setStyles: StyleProp<any> = (isDark: boolean) =>
   StyleSheet.create({
-    container: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-    },
     subContainer: {
       alignItems: 'flex-start',
       paddingHorizontal: 10,

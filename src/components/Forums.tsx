@@ -231,8 +231,7 @@ const Forums: FunctionComponent = props => {
 
   return (
     <SafeAreaView
-      style={[styles.fList, { paddingBottom: bottomPadding / 2 }]}
-      edges={['left', 'right', 'bottom']}
+      style={[styles.container, { paddingBottom: bottomPadding / 2 }]}
       testID={setTestID(`${brand}ForumsScreen`)}
     >
       {loading ? (
@@ -261,9 +260,12 @@ const Forums: FunctionComponent = props => {
 
 const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
   StyleSheet.create({
-    fList: {
+    container: {
       flex: 1,
       backgroundColor: isDark ? '#00101D' : '#f0f1f2',
+    },
+    fList: {
+      flex: 1,
     },
     loading: {
       flex: 1,
