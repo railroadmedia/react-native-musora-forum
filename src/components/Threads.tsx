@@ -391,6 +391,8 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
     headerText: {
       fontFamily: 'BebasNeue-Regular',
       fontSize: IS_TABLET ? 16 : 14,
+      letterSpacing: 1,
+      lineHeight: 20,
       color: isDark ? 'white' : '#00101D',
     },
     fList: {
