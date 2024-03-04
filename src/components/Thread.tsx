@@ -608,7 +608,6 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
     fList: {
       flex: 1,
       backgroundColor: isDark ? '#00101D' : '#f0f1f2',
-      // paddingTop: 100,
     },
     loading: {
       flex: 1,

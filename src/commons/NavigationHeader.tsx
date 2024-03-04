@@ -52,6 +52,9 @@ interface INavigationHeader {
   scrollOffset?: Animated.Value;
 }
 
+const RANGE_START = 0;
+const RANGE_END = 100;
+
 const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   const { title, isForumRules, prevScreen = '', scrollOffset } = props;
   const route: RouteProp<{ params: IForumParams }> = useRoute();
@@ -247,9 +250,6 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     ]
   );
 
-  const RANGE_START = 0;
-  const RANGE_END = 100;
-
   const headerOpacity = scrollOffset?.interpolate({
     inputRange: [RANGE_START, RANGE_END],
     outputRange: [1, 0],
@@ -265,14 +265,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   const bigHeader = (
     <Animated.View style={[styles.absoluteContainer, { opacity: headerOpacity }]}>
       <SafeAreaView
-        style={[
-          styles.subContainer,
-          {
-            backgroundColor: isDark ? '#00101D' : '#f0f1f2',
-            paddingTop: 15,
-            paddingBottom: 0,
-          },
-        ]}
+        style={[styles.subContainer, styles.bigHeaderSafeArea]}
         edges={['top', 'right', 'left']}
       >
         {!isHome ? (
@@ -300,16 +293,9 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
         >
           <Animated.View style={[styles.titleContainer]}>
             <Animated.View style={[styles.titleIconsContainer]}>
-              {!!thread?.locked && (
-                <View style={styles.iconContainer}>
-                  {lock({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
-                </View>
-              )}
-              {!!thread?.pinned && (
-                <View style={styles.iconContainer}>
-                  {pin({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
-                </View>
-              )}
+              {!!thread?.locked &&
+                lock({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
+              {!!thread?.pinned && pin({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
             </Animated.View>
             <Text
               style={isHome ? styles.forumTitle : styles.titleText}
@@ -328,17 +314,8 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   );
 
   const smallHeader = (
-    <Animated.View style={[{ opacity: negHeaderOpacity, width: '100%', paddingHorizontal: 10 }]}>
-      <Animated.View
-        style={[
-          styles.absoluteContainer,
-          {
-            paddingVertical: 15,
-            backgroundColor: isDark ? '#001A2F' : 'white',
-            opacity: 0.75,
-          },
-        ]}
-      >
+    <Animated.View style={{ opacity: negHeaderOpacity, width: '100%', paddingHorizontal: 10 }}>
+      <Animated.View style={[styles.absoluteContainer, styles.translucentBackground]}>
         <SafeAreaView style={styles.subContainer} edges={['top', 'right', 'left']}>
           <Text />
         </SafeAreaView>
@@ -362,27 +339,8 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
                 fill: isDark ? 'white' : 'black',
               })}
             </TouchableOpacity>
-            <View
-              style={{
-                position: 'absolute',
-                width: '100%',
-                left: 0,
-                top: 0,
-                right: 0,
-                bottom: 0,
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-              }}
-            >
-              <Text
-                style={{
-                  color: 'white',
-                  fontFamily: 'OpenSans-SemiBold',
-                  fontSize: IS_TABLET ? 18 : 14,
-                }}
-              >
-                {title}
-              </Text>
+            <View style={styles.smallTitleContainer}>
+              <Text style={styles.smallTitle}>{title}</Text>
             </View>
           </View>
         </SafeAreaView>
@@ -412,11 +370,21 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       alignItems: 'flex-start',
       paddingHorizontal: 10,
     },
+    bigHeaderSafeArea: {
+      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
+      paddingTop: 15,
+      paddingBottom: 0,
+    },
     absoluteContainer: {
       position: 'absolute',
       top: 0,
       left: 0,
       right: 0,
+    },
+    translucentBackground: {
+      paddingVertical: 15,
+      backgroundColor: isDark ? '#001A2F' : 'white',
+      opacity: 0.75,
     },
     titleRow: {
       flexDirection: 'row',
@@ -430,11 +398,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
     },
     titleIconsContainer: {
       flexDirection: 'column',
-      justifyContent: 'flex-start',
-      marginTop: 10,
-    },
-    iconContainer: {
-      marginRight: 5,
+      justifyContent: 'center',
     },
     forumTitle: {
       fontFamily: 'OpenSans-Bold',
@@ -448,6 +412,23 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       textAlign: 'left',
       textTransform: 'capitalize',
       marginBottom: 2,
+      marginHorizontal: 5,
+    },
+    smallTitleContainer: {
+      position: 'absolute',
+      width: '100%',
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+    },
+    smallTitle: {
+      color: 'white',
+      fontFamily: 'OpenSans-SemiBold',
+      fontSize: IS_TABLET ? 18 : 14,
+      lineHeight: IS_TABLET ? 20 : 16,
     },
     backButton: {
       flexDirection: 'row',
