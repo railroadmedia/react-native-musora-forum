@@ -400,7 +400,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
     titleText: {
       fontFamily: 'OpenSans-ExtraBold',
       fontSize: 20,
-      color: isDark ? 'white' : 'black',
+      color: isDark ? 'white' : '#00101D',
       textAlign: 'left',
       textTransform: 'capitalize',
       marginBottom: 2,
@@ -417,7 +417,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       alignItems: 'center',
     },
     smallTitle: {
-      color: 'white',
+      color: isDark ? 'white' : '#00101D',
       fontFamily: 'OpenSans-SemiBold',
       fontSize: IS_TABLET ? 18 : 14,
       lineHeight: IS_TABLET ? 20 : 16,
@@ -427,7 +427,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       alignItems: 'center',
     },
     backText: {
-      color: isDark ? 'white' : 'black',
+      color: isDark ? 'white' : '#00101D',
       fontSize: 12,
       paddingLeft: 4,
     },
