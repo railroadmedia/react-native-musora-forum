@@ -541,7 +541,7 @@ export const multiQuoteSvg = ({ width, height, fill }: ISvg): ReactElement => (
 );
 
 export const menuCircle = ({ width, height, fill }: ISvg): ReactElement => (
-  <Svg width={width} height={height} viewBox='0 0 39 39' fill={fill}>
+  <Svg width={width} height={height} viewBox='0 0 39 39' fill='none'>
     <G>
       <Rect x='2' y='1.3335' width='35' height='35' rx='17.5' fill='none' />
       <Rect
@@ -550,7 +550,7 @@ export const menuCircle = ({ width, height, fill }: ISvg): ReactElement => (
         width='34.125'
         height='34.125'
         rx='17.0625'
-        stroke='white'
+        stroke={fill}
         strokeWidth='0.875'
       />
       <Path
