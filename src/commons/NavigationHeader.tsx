@@ -283,14 +283,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
       >
         {!isHome ? backArrow : null}
 
-        <Animated.View
-          style={[
-            styles.titleRow,
-            {
-              opacity: headerOpacity,
-            },
-          ]}
-        >
+        <Animated.View style={[styles.titleRow, { opacity: headerOpacity }]}>
           <Animated.View style={[styles.titleContainer]}>
             <Animated.View style={[styles.titleIconsContainer]}>
               {!!thread?.locked &&
@@ -355,8 +348,8 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
 
   return (
     <View style={styles.absoluteContainer}>
-      {bigHeader}
       {!isHome ? smallHeader : null}
+      {bigHeader}
 
       {menuModal}
     </View>
