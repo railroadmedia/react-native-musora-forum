@@ -302,10 +302,7 @@ const Threads: FunctionComponent = props => {
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
-    <SafeAreaView
-      style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
-      edges={['top', 'bottom', 'left', 'right']}
-    >
+    <View style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
       <Animated.FlatList
         onScroll={handleScroll}
         scrollEventThrottle={16}
@@ -343,7 +340,7 @@ const Threads: FunctionComponent = props => {
           {addThread({ height: 25, width: 25, fill: 'white' })}
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -352,9 +349,8 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
     headerContainer: {
       paddingHorizontal: 15,
       flexDirection: 'row',
-      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
       flexWrap: 'wrap',
-      paddingTop: 100,
+      paddingTop: 160,
     },
     headerTOpacity: {
       paddingTop: 15,
