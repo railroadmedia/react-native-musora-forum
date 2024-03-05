@@ -3,6 +3,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   BackHandler,
   FlatList,
   RefreshControl,
@@ -28,7 +29,7 @@ import type { LayoutChangeEvent } from 'react-native';
 
 const Threads: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IThreadsParams & IForumParams }, 'params'> = useRoute();
-  const { bottomPadding, isDark, appColor, title, forumId } = params;
+  const { bottomPadding, isDark, appColor, title, forumId, prevScreen } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
   const { navigate, goBack, addListener, canGoBack } =
@@ -77,12 +78,12 @@ const Threads: FunctionComponent = props => {
     Promise.allSettled([threadRequest, followedThreadRequest])
       .then(([allRes, followedRes]) => {
         if (allRes.status === 'fulfilled') {
-          setAll(allRes.value.data?.results?.map(r => r.id));
+          setAll(allRes.value.data?.results?.map((r: { id: number }) => r.id));
           setAllResultsTotal(allRes.value?.data?.total_results);
           dispatch(setAllThreads(allRes.value?.data?.results));
         }
         if (followedRes.status === 'fulfilled') {
-          setFollowed(followedRes.value?.data?.results?.map(r => r.id));
+          setFollowed(followedRes.value?.data?.results?.map((r: { id: number }) => r.id));
           setFollowedResultsTotal(followedRes.value?.data?.total_results);
           dispatch(setFollowedThreads(followedRes.value?.data?.results));
         }
@@ -106,7 +107,7 @@ const Threads: FunctionComponent = props => {
         setFollowedLoadingMore(true);
         getFollowedThreads(forumId, page)
           .request.then(r => {
-            setFollowed(r.data?.results?.map(f => f.id));
+            setFollowed(r.data?.results?.map((f: { id: number }) => f.id));
             dispatch(setFollowedThreads(r.data?.results));
           })
           .finally(() => {
@@ -117,7 +118,7 @@ const Threads: FunctionComponent = props => {
         setAllLoadingMore(true);
         getAllThreads(forumId, page)
           .request.then(r => {
-            setAll(r.data?.results?.map(a => a.id));
+            setAll(r.data?.results?.map((a: { id: number }) => a.id));
             dispatch(setAllThreads(r.data?.results));
           })
           .finally(() => {
@@ -137,7 +138,7 @@ const Threads: FunctionComponent = props => {
       setFollowedRefreshing(true);
       getFollowedThreads(forumId, followedPage)
         .request.then(r => {
-          setFollowed(r?.data?.results?.map(f => f.id));
+          setFollowed(r?.data?.results?.map((f: { id: number }) => f.id));
           dispatch(setFollowedThreads(r.data?.results));
         })
         .finally(() => {
@@ -147,7 +148,7 @@ const Threads: FunctionComponent = props => {
       setAllRefreshing(true);
       getAllThreads(forumId, allPage)
         .request.then(r => {
-          setAll(r.data?.results?.map(a => a.id));
+          setAll(r.data?.results?.map((a: { id: number }) => a.id));
           dispatch(setAllThreads(r.data?.results));
         })
         .finally(() => {
@@ -222,6 +223,7 @@ const Threads: FunctionComponent = props => {
         isDark={isDark}
         id={item}
         reduxKey={tab ? 'followed' : 'all'}
+        prevScreen={title}
       />
     ),
     [appColor, isDark, tab]
@@ -291,15 +293,19 @@ const Threads: FunctionComponent = props => {
     [styles.emptyList, tab]
   );
 
+  const scrollOffsetY = useRef(new Animated.Value(0)).current;
+
+  const handleScroll = Animated.event([{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }], {
+    useNativeDriver: true,
+  });
+
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
-    <SafeAreaView
-      style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
-      edges={['left', 'right', 'bottom']}
-    >
-      <NavigationHeader title={title} {...props} />
-      <FlatList
+    <View style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
+      <Animated.FlatList
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         key={tab}
         overScrollMode='never'
         windowSize={10}
@@ -318,6 +324,13 @@ const Threads: FunctionComponent = props => {
         ListFooterComponent={flFooter}
         refreshControl={flRefreshControl}
       />
+      <NavigationHeader
+        title={title}
+        {...props}
+        prevScreen={prevScreen}
+        scrollOffset={scrollOffsetY}
+      />
+
       <View>
         <TouchableOpacity
           onLayout={onLayoutAddThread}
@@ -327,7 +340,7 @@ const Threads: FunctionComponent = props => {
           {addThread({ height: 25, width: 25, fill: 'white' })}
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -336,8 +349,8 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
     headerContainer: {
       paddingHorizontal: 15,
       flexDirection: 'row',
-      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
       flexWrap: 'wrap',
+      paddingTop: 160,
     },
     headerTOpacity: {
       paddingTop: 15,

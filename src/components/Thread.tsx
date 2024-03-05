@@ -13,9 +13,8 @@ import {
   BackHandler,
   StyleProp,
   LayoutChangeEvent,
+  Animated,
 } from 'react-native';
-
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { batch, useDispatch } from 'react-redux';
 import { post as PostSvg, lock, multiQuote, reportSvg, banSvg } from '../assets/svgs';
@@ -50,6 +49,7 @@ const Thread: FunctionComponent = () => {
     page: pageProp,
     postId: postIdProp,
     isForumRules,
+    prevScreen = '',
   } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
@@ -210,7 +210,10 @@ const Thread: FunctionComponent = () => {
       ) {
         let scrollPos = flHeaderHeight.current;
         thread?.posts
-          ?.slice(0, thread?.posts?.findIndex(p => p.id === postId.current))
+          ?.slice(
+            0,
+            thread?.posts?.findIndex(p => p.id === postId.current)
+          )
           .map(p => (scrollPos += postLayouts.current[p.id]));
         flatListRef.current?.scrollToOffset({
           offset: scrollPos,
@@ -436,6 +439,7 @@ const Thread: FunctionComponent = () => {
           borderColor: isDark ? '#9EC0DC' : 'lightgrey',
           marginHorizontal: 15,
           marginBottom,
+          paddingTop: 160,
         }}
       >
         <Pagination
@@ -473,19 +477,22 @@ const Thread: FunctionComponent = () => {
 
   const onScollBegin = (): void => (postId.current = undefined);
 
+  const scrollOffsetY = useRef(new Animated.Value(0)).current;
+
+  const handleScroll = Animated.event([{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }], {
+    useNativeDriver: true,
+  });
+
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
-    <SafeAreaView
-      style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
-      edges={['right', 'left', 'bottom']}
-    >
-      <NavigationHeader title={threadTitle || thread?.title || ''} />
-      <FlatList
+    <View style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
+      <Animated.FlatList
+        onScroll={handleScroll}
         overScrollMode='never'
         onScrollBeginDrag={onScollBegin}
         windowSize={10}
-        data={thread?.posts?.map(p => p.id)}
+        data={thread?.posts?.map(p => p.id) as number[]}
         style={styles.fList}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
@@ -494,11 +501,16 @@ const Thread: FunctionComponent = () => {
         keyboardShouldPersistTaps='handled'
         renderItem={renderFLItem}
         ListHeaderComponent={renderPagination(20, 0, 1)}
-        keyExtractor={id => id.toString()}
+        keyExtractor={(id: number) => id.toString()}
         ref={flatListRef}
         ListEmptyComponent={flEmpty}
         ListFooterComponent={renderPagination(postHeight, 1, 0)}
         refreshControl={flRefreshControl}
+      />
+      <NavigationHeader
+        title={threadTitle || thread?.title || ''}
+        prevScreen={prevScreen}
+        scrollOffset={scrollOffsetY}
       />
       <View>
         <TouchableOpacity
@@ -588,7 +600,7 @@ const Thread: FunctionComponent = () => {
           isDark={isDark}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>

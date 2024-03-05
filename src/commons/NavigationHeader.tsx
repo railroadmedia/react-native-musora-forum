@@ -6,11 +6,10 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { StyleSheet, TouchableOpacity, Text, View, Modal, StyleProp } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, View, StyleProp, Animated } from 'react-native';
 import { batch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
 import {
   hideSignSvg,
   showSignSvg,
@@ -25,9 +24,7 @@ import {
   lock,
   pin,
   arrowLeft,
-  moderate,
-  check,
-  unfollow,
+  menuCircle,
 } from '../assets/svgs';
 import { updateThreads, toggleSignShown } from '../redux/threads/ThreadActions';
 import {
@@ -45,15 +42,22 @@ import { useAppSelector } from '../redux/Store';
 import { selectThread } from '../redux/threads/ThreadSelectors';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
 import type { ISvg } from '../entity/ISvg';
+import { IS_TABLET } from '../services/helpers';
+import HeaderOptionsModal from './modals/HeaderOptionsModal';
 
 interface INavigationHeader {
   title: string;
   isForumRules?: boolean;
+  prevScreen?: string;
+  scrollOffset?: Animated.Value;
 }
 
+const RANGE_START = 0;
+const RANGE_END = 100;
+
 const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
-  const { title, isForumRules } = props;
-  const route: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
+  const { title, isForumRules, prevScreen = '', scrollOffset } = props;
+  const route: RouteProp<{ params: IForumParams }> = useRoute();
   const {
     name,
     params: { isDark, postId, user, threadId },
@@ -64,6 +68,8 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   const [optionsVisible, setOptionsVisible] = useState(false);
   const [followStateVisible, setFollowStateVisible] = useState(false);
   const [thread, setThread] = useState<IThread>();
+
+  const isHome = useMemo(() => name?.match(/^(Forums)$/), [name]);
 
   const signShown = useAppSelector(({ threadsState }) =>
     name.match(/^(Thread)$/) ? threadsState.signShown : undefined
@@ -214,178 +220,222 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     user?.permission_level,
   ]);
 
-  return (
-    <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
-      <View style={styles.subContainer}>
-        <View style={styles.titleContainer}>
-          {!!thread?.locked && (
-            <View style={styles.iconContainer}>
-              {lock({ width: 10, fill: isDark ? 'white' : 'black' })}
-            </View>
-          )}
-          {!!thread?.pinned && (
-            <View style={styles.iconContainer}>
-              {pin({ width: 10, fill: isDark ? 'white' : 'black' })}
-            </View>
-          )}
-          <Text style={styles.titleText} numberOfLines={2} ellipsizeMode='tail'>
-            {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.headerButton} onPress={goBack}>
-          {arrowLeft({
-            height: 20,
-            fill: isDark ? 'white' : 'black',
-          })}
-        </TouchableOpacity>
-        {name?.match(/^(Forums|Threads|Thread)$/) && !isForumRules && (
-          <>
-            <TouchableOpacity style={styles.headerButton} onPress={() => setOptionsVisible(true)}>
-              {moderate({ width: 20, fill: isDark ? 'white' : 'black' })}
-            </TouchableOpacity>
-            <Modal
-              animationType='slide'
-              onRequestClose={() => setOptionsVisible(false)}
-              supportedOrientations={['portrait', 'landscape']}
-              transparent={true}
-              visible={optionsVisible || followStateVisible}
+  const MenuButton = useMemo(
+    () => (
+      <TouchableOpacity onPress={() => setOptionsVisible(true)}>
+        {menuCircle({ width: 39, height: 39, fill: isDark ? 'white' : '#081825' })}
+      </TouchableOpacity>
+    ),
+    []
+  );
+
+  const menuModal = useMemo(
+    () => (
+      <HeaderOptionsModal
+        optionsVisible={optionsVisible}
+        setOptionsVisible={setOptionsVisible}
+        followStateVisible={followStateVisible}
+        isFollowed={thread?.is_followed || false}
+        menuOptions={menuOptions}
+        isDark={isDark}
+      />
+    ),
+    [
+      optionsVisible,
+      setOptionsVisible,
+      followStateVisible,
+      thread?.is_followed,
+      menuOptions,
+      isDark,
+    ]
+  );
+
+  const headerOpacity = scrollOffset?.interpolate({
+    inputRange: [RANGE_START, RANGE_END],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const negHeaderOpacity = scrollOffset?.interpolate({
+    inputRange: [RANGE_START, RANGE_END],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
+  const backArrow = (
+    <TouchableOpacity style={styles.backButton} onPress={goBack}>
+      {arrowLeft({
+        width: 20,
+        height: 16,
+        fill: isDark ? 'white' : 'black',
+      })}
+      <Animated.Text style={[styles.backText, { opacity: headerOpacity }]}>
+        {prevScreen.toUpperCase()}
+      </Animated.Text>
+    </TouchableOpacity>
+  );
+
+  const bigHeader = (
+    <Animated.View style={{ opacity: headerOpacity }}>
+      <SafeAreaView
+        style={[styles.subContainer, styles.bigHeaderSafeArea]}
+        edges={isHome ? ['right', 'left'] : ['top', 'right', 'left']}
+      >
+        {!isHome ? backArrow : null}
+
+        <Animated.View style={[styles.titleRow, { opacity: headerOpacity }]}>
+          <Animated.View style={[styles.titleContainer]}>
+            <Animated.View style={[styles.titleIconsContainer]}>
+              {!!thread?.locked &&
+                lock({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
+              {!!thread?.pinned && pin({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
+            </Animated.View>
+            <Text
+              style={isHome ? styles.forumTitle : styles.titleText}
+              numberOfLines={1}
+              ellipsizeMode='tail'
             >
-              <LinearGradient
-                style={styles.lgradient}
-                colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
-              />
-              <TouchableOpacity
-                activeOpacity={1}
-                style={styles.optionsContainer}
-                onPress={() => setOptionsVisible(false)}
-              >
-                {followStateVisible ? (
-                  <View
-                    style={{
-                      ...styles.followStateContainer,
-                      borderTopColor: thread?.is_followed ? '#34D399' : '#FFAE00',
-                    }}
-                  >
-                    {(thread?.is_followed ? check : unfollow)({
-                      height: 25,
-                      width: 25,
-                      fill: thread?.is_followed ? '#34D399' : '#FFAE00',
-                    })}
-                    <Text style={styles.followStateTitle}>
-                      {thread?.is_followed ? 'Follow' : 'Unfollow'} Thread{'\n'}
-                      <Text
-                        style={{
-                          color: isDark ? 'white' : '#000000',
-                          fontFamily: 'OpenSans',
-                        }}
-                      >
-                        {`You've ${
-                          thread?.is_followed ? 'started following' : 'unfollowed'
-                        } this thread.`}
-                      </Text>
-                    </Text>
-                  </View>
-                ) : (
-                  <SafeAreaView style={styles.options}>
-                    {Object.values(menuOptions).map(({ text, icon, action }) => (
-                      <TouchableOpacity key={text} onPress={action} style={styles.optionBtn}>
-                        {icon({ width: 20, fill: '#FFFFFF' })}
-                        <Text style={styles.optionText}>{text}</Text>
-                      </TouchableOpacity>
-                    ))}
-                    <TouchableOpacity onPress={() => setOptionsVisible(false)}>
-                      <Text style={styles.closeText}>{'Close'}</Text>
-                    </TouchableOpacity>
-                  </SafeAreaView>
-                )}
-              </TouchableOpacity>
-            </Modal>
-          </>
-        )}
+              {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
+            </Text>
+          </Animated.View>
+          {name?.match(/^(Forums|Threads|Thread)$/) && !isForumRules && MenuButton}
+        </Animated.View>
+
+        <View style={styles.divider} />
+      </SafeAreaView>
+    </Animated.View>
+  );
+
+  const smallHeader = (
+    <Animated.View
+      style={[
+        styles.absoluteContainer,
+        { opacity: negHeaderOpacity, width: '100%', paddingHorizontal: 10 },
+      ]}
+    >
+      <Animated.View style={[styles.absoluteContainer, styles.translucentBackground]}>
+        <SafeAreaView style={styles.subContainer} edges={['top', 'right', 'left']}>
+          <Text />
+        </SafeAreaView>
+      </Animated.View>
+
+      <View
+        style={[
+          styles.absoluteContainer,
+          {
+            paddingVertical: 15,
+            opacity: 1,
+          },
+        ]}
+      >
+        <SafeAreaView style={styles.subContainer} edges={['top', 'right', 'left']}>
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity style={styles.backButton} onPress={goBack}>
+              {arrowLeft({
+                width: 20,
+                height: 16,
+                fill: isDark ? 'white' : 'black',
+              })}
+            </TouchableOpacity>
+            <View style={styles.smallTitleContainer}>
+              <Text style={styles.smallTitle}>{title}</Text>
+            </View>
+          </View>
+        </SafeAreaView>
       </View>
-    </SafeAreaView>
+    </Animated.View>
+  );
+
+  return (
+    <View style={styles.absoluteContainer}>
+      {!isHome ? smallHeader : null}
+      {bigHeader}
+
+      {menuModal}
+    </View>
   );
 };
 
 const setStyles: StyleProp<any> = (isDark: boolean) =>
   StyleSheet.create({
-    container: {
-      backgroundColor: isDark ? '#081825' : 'white',
-    },
     subContainer: {
+      alignItems: 'flex-start',
+      paddingHorizontal: 10,
+    },
+    bigHeaderSafeArea: {
+      backgroundColor: isDark ? '#00101D' : '#f0f1f2',
+      paddingTop: 15,
+      paddingBottom: 0,
+    },
+    absoluteContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+    },
+    translucentBackground: {
+      paddingVertical: 15,
+      backgroundColor: isDark ? '#001A2F' : 'white',
+      opacity: 0.75,
+    },
+    titleRow: {
       flexDirection: 'row',
-      alignItems: 'center',
+      alignItems: 'flex-end',
       justifyContent: 'space-between',
+      marginVertical: 10,
     },
     titleContainer: {
       flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      position: 'absolute',
-      left: 50,
-      right: 50,
+      flex: 1,
     },
-    iconContainer: {
-      marginRight: 5,
+    titleIconsContainer: {
+      flexDirection: 'column',
+      justifyContent: 'center',
+    },
+    forumTitle: {
+      fontFamily: 'OpenSans-Bold',
+      fontSize: IS_TABLET ? 32 : 28,
+      color: isDark ? '#FFFFFF' : '#00101D',
     },
     titleText: {
       fontFamily: 'OpenSans-ExtraBold',
       fontSize: 20,
-      color: isDark ? 'white' : 'black',
-      textAlign: 'center',
+      color: isDark ? 'white' : '#00101D',
+      textAlign: 'left',
       textTransform: 'capitalize',
       marginBottom: 2,
+      marginHorizontal: 5,
     },
-    headerButton: {
-      padding: 15,
-    },
-    lgradient: {
-      width: '100%',
-      height: '100%',
+    smallTitleContainer: {
       position: 'absolute',
+      width: '100%',
+      left: 0,
       top: 0,
-      zIndex: 0,
-    },
-    optionsContainer: {
-      flex: 1,
+      right: 0,
+      bottom: 0,
       justifyContent: 'flex-end',
+      alignItems: 'center',
     },
-    options: {
-      padding: 20,
-      borderTopEndRadius: 20,
-      borderTopStartRadius: 20,
+    smallTitle: {
+      color: isDark ? 'white' : '#00101D',
+      fontFamily: 'OpenSans-SemiBold',
+      fontSize: IS_TABLET ? 18 : 14,
+      lineHeight: IS_TABLET ? 20 : 16,
     },
-    optionBtn: {
+    backButton: {
       flexDirection: 'row',
       alignItems: 'center',
     },
-    optionText: {
-      paddingVertical: 13,
-      color: 'white',
-      fontFamily: 'OpenSans',
-      fontSize: 16,
-      marginLeft: 15,
+    backText: {
+      color: isDark ? 'white' : '#00101D',
+      fontSize: 12,
+      paddingLeft: 4,
     },
-    followStateContainer: {
-      backgroundColor: isDark ? '#081825' : '#F7F9FC',
-      margin: 5,
-      padding: 15,
-      borderTopWidth: 6,
-      borderRadius: 8,
-      flexDirection: 'row',
-    },
-    followStateTitle: {
-      paddingLeft: 15,
-      color: isDark ? 'white' : '#000000',
-      fontFamily: 'OpenSans-Bold',
-    },
-    closeText: {
-      fontSize: 18,
-      color: '#FFFFFF',
-      padding: 10,
-      alignSelf: 'center',
-      textAlign: 'center',
-      fontFamily: 'OpenSans-Bold',
+    divider: {
+      backgroundColor: isDark ? '#223F57' : '#B2B2B5',
+      height: 1,
+      marginTop: 5,
+      width: '100%',
     },
   });
 
