@@ -25,6 +25,7 @@ import { setAllThreads, setFollowedThreads } from '../redux/threads/ThreadAction
 import { getAllThreads, getFollowedThreads, connection } from '../services/forum.service';
 import type { ForumRootStackParamList, IForumParams, IThreadsParams } from '../entity/IRouteParams';
 import type { LayoutChangeEvent } from 'react-native';
+import Sort from '../commons/Sort';
 
 const Threads: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IThreadsParams & IForumParams }, 'params'> = useRoute();
@@ -50,6 +51,7 @@ const Threads: FunctionComponent = props => {
   const [allRefreshing, setAllRefreshing] = useState<boolean>(false);
   const flatListRef = useRef<FlatList | null>(null);
   const reFocused = useRef<boolean>(false);
+  const selectedSort = useRef('-published_on');
 
   useEffect(() => {
     const refreshOnFocusListener = addListener('focus', () => {
@@ -104,7 +106,7 @@ const Threads: FunctionComponent = props => {
       if (tab) {
         setFollowedPage(page);
         setFollowedLoadingMore(true);
-        getFollowedThreads(forumId, page)
+        getFollowedThreads(forumId, page, selectedSort.current)
           .request.then(r => {
             setFollowed(r.data?.results?.map(f => f.id));
             dispatch(setFollowedThreads(r.data?.results));
@@ -115,7 +117,7 @@ const Threads: FunctionComponent = props => {
       } else {
         setAllPage(page);
         setAllLoadingMore(true);
-        getAllThreads(forumId, page)
+        getAllThreads(forumId, page, selectedSort.current)
           .request.then(r => {
             setAll(r.data?.results?.map(a => a.id));
             dispatch(setAllThreads(r.data?.results));
@@ -129,13 +131,11 @@ const Threads: FunctionComponent = props => {
     [dispatch, forumId, tab]
   );
 
-  const refresh = useCallback(() => {
-    if (!connection(true)) {
-      return;
-    }
+  const onSort = useCallback((sortBy: string)=> {
+    selectedSort.current = sortBy;
     if (tab) {
       setFollowedRefreshing(true);
-      getFollowedThreads(forumId, followedPage)
+      getFollowedThreads(forumId, followedPage, sortBy)
         .request.then(r => {
           setFollowed(r?.data?.results?.map(f => f.id));
           dispatch(setFollowedThreads(r.data?.results));
@@ -145,7 +145,34 @@ const Threads: FunctionComponent = props => {
         });
     } else {
       setAllRefreshing(true);
-      getAllThreads(forumId, allPage)
+      getAllThreads(forumId, allPage, sortBy)
+        .request.then(r => {
+          setAll(r.data?.results?.map(a => a.id));
+          dispatch(setAllThreads(r.data?.results));
+        })
+        .finally(() => {
+          setAllRefreshing(false);
+        });
+    }
+  },[dispatch, forumId, tab])
+
+  const refresh = useCallback(() => {
+    if (!connection(true)) {
+      return;
+    }
+    if (tab) {
+      setFollowedRefreshing(true);
+      getFollowedThreads(forumId, followedPage, selectedSort.current)
+        .request.then(r => {
+          setFollowed(r?.data?.results?.map(f => f.id));
+          dispatch(setFollowedThreads(r.data?.results));
+        })
+        .finally(() => {
+          setFollowedRefreshing(false);
+        });
+    } else {
+      setAllRefreshing(true);
+      getAllThreads(forumId, allPage, selectedSort.current)
         .request.then(r => {
           setAll(r.data?.results?.map(a => a.id));
           dispatch(setAllThreads(r.data?.results));
@@ -191,15 +218,20 @@ const Threads: FunctionComponent = props => {
     () => (
       <>
         <View style={styles.headerContainer}>
-          {['ALL THREADS', 'FOLLOWED THREADS'].map((t, i) => (
-            <TouchableOpacity key={t} onPress={() => onTabChange(i)} style={styles.headerTOpacity}>
-              <Text
-                style={[styles.headerText, tab === i ? { color: isDark ? 'white' : 'black' } : {}]}
+          <View style={styles.headerBtnContainer}>
+            {['ALL THREADS', 'FOLLOWED'].map((t, i) => (
+              <TouchableOpacity
+                key={t}
+                onPress={() => onTabChange(i)}
+                style={[styles.headerTOpacity, tab === i ? { backgroundColor: isDark ? '#445F74' : '#000C17' } : {}]}
               >
-                {t}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text style={[styles.headerText, tab === i ? { color: 'white' } : {}]}>
+                  {t}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Sort onSort={onSort} defaultSelectedSort='Newest First' />
         </View>
         <Search isDark={isDark} appColor={appColor} />
       </>
@@ -334,21 +366,34 @@ const Threads: FunctionComponent = props => {
 const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
   StyleSheet.create({
     headerContainer: {
-      paddingHorizontal: 15,
+      marginTop: 20,
+      paddingHorizontal: 10,
       flexDirection: 'row',
+      justifyContent: 'space-between',
       backgroundColor: isDark ? '#00101D' : '#f0f1f2',
       flexWrap: 'wrap',
     },
+    headerBtnContainer: {
+      flexDirection: 'row',
+      alignItems: 'center'
+    },
     headerTOpacity: {
-      paddingTop: 15,
-      marginRight: 15,
-      borderBottomWidth: 2,
-      borderColor: isDark ? '#00101D' : '#f0f1f2',
+      height: 35,
+      width: 95,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 7,
+      borderRadius: 55,
+      borderWidth: 1.5,
+      borderColor: isDark ? '#445F74' : '#CBCBCD',
+      backgroundColor: isDark ? '#00101D' : 'white'
     },
     headerText: {
       fontFamily: 'BebasNeue-Regular',
-      fontSize: IS_TABLET ? 24 : 20,
-      color: '#445F74',
+      fontSize: IS_TABLET ? 16 : 14,
+      letterSpacing: 1,
+      lineHeight: 20,
+      color: isDark ? 'white' : '#00101D',
     },
     fList: {
       flex: 1,

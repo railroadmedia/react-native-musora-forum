@@ -35,9 +35,9 @@ export const getForums = (): IResponse<IForumsRes> =>
 interface IThreadsRes extends IResponseBody {
   results: IThread[];
 }
-export const getAllThreads = (forumId: number, page = 1): IResponse<IThreadsRes> =>
+export const getAllThreads = (forumId: number, page = 1, sort?: string): IResponse<IThreadsRes> =>
   (this as any)?.tryCall.get(
-    `/forums/api/thread/index?amount=10&page=${page}&brand=${(this as any)?.brand}&category_id=${
+    `/forums/api/thread/index?amount=10&page=${page}&brand=${(this as any)?.brand}&sort=${sort || '-published_on'}&category_id=${
       forumId || ''
     }`
   );
@@ -47,11 +47,12 @@ interface IFollowedThreadsRes extends IResponseBody {
 }
 export const getFollowedThreads = (
   forumId?: number,
-  page?: number
+  page?: number,
+  sort?: string
 ): IResponse<IFollowedThreadsRes> =>
   (this as any)?.tryCall.get(
     `/forums/api/thread/index?amount=10&page=${page || 1}&brand=${(this as any)
-      ?.brand}&followed=1&category_id=${forumId || ''}`
+      ?.brand}&followed=1&sort=${sort || '-published_on'}&category_id=${forumId || ''}`
   );
 
 export const getThread = (
