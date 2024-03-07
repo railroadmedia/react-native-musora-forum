@@ -119,13 +119,6 @@ const Search: FunctionComponent<ISearch> = props => {
     () => (
       <View style={styles.searchInputContainer}>
         <View style={styles.inputContainer}>
-          <View style={styles.searchIcon}>
-            {searchSvg({
-              height: 15,
-              width: 15,
-              fill: '#000C17',
-            })}
-          </View>
           <TextInput
             ref={textInputRef}
             style={styles.searchInput}
@@ -133,10 +126,17 @@ const Search: FunctionComponent<ISearch> = props => {
             autoCorrect={false}
             spellCheck={false}
             placeholder='Search forums...'
-            placeholderTextColor='#000C17'
+            placeholderTextColor={isDark ? '#FFFFFF' : '#000C17'}
             returnKeyType='search'
             onSubmitEditing={onSubmitEditing}
           />
+          <View style={styles.searchIcon}>
+            {searchSvg({
+              height: 15,
+              width: 15,
+              fill: isDark ? '#FFFFFF' : '#000000',
+            })}
+          </View>
         </View>
         {searchText && showSearchResults && (
           <Text style={styles.resultText}>
@@ -296,11 +296,6 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       position: 'absolute',
       alignSelf: 'center',
     },
-    headerText: {
-      fontFamily: 'OpenSans-ExtraBold',
-      fontSize: 20,
-      color: 'black',
-    },
     resultText: {
       fontFamily: 'OpenSans-Italic',
       color: 'black',
@@ -314,20 +309,23 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       flexDirection: 'row',
       alignItems: 'center',
     },
-    searchIcon: {
-      position: 'absolute',
-      left: 15,
-      zIndex: 2,
+    searchIcon: { 
+      position: 'absolute', 
+      right: 15, 
+      zIndex: 2 
     },
     searchInput: {
-      fontSize: 14,
+      fontSize: 12,
       fontFamily: 'OpenSans',
       flex: 1,
-      height: 35,
+      height: 40,
       borderRadius: 25,
-      paddingLeft: 40,
-      color: '#000C17',
-      backgroundColor: '#F7F9FC',
+      paddingLeft: 10,
+      paddingRight: 40,
+      color: isDark ? '#FFFFFF': '#000C17',
+      backgroundColor: isDark ? '#000000' : '#FFFFFF',
+      borderWidth: 1,
+      borderColor: isDark ? '#445F74' : '#CBCBCD',
     },
     emptyList: {
       color: '#445F74',
