@@ -110,7 +110,9 @@
   },
   "eslintIgnore": [
     "node_modules/",
-    "lib/"
+    "lib/",
+    "babel.config.js",
+    ".eslintrc.js"
   ],
   "react-native-builder-bob": {
     "source": "src",

@@ -4,17 +4,25 @@ import LinearGradient from 'react-native-linear-gradient';
 import { IS_TABLET } from '../../services/helpers';
 
 interface IBlockModal {
-  onBlock: () => void;
+  onBlockUser: () => void;
+  onBlockPost: () => void;
 }
 
-const BlockModal = forwardRef<{ toggle: (user: string) => void }, IBlockModal>((props, ref) => {
-  const { onBlock } = props;
+const BlockModal = forwardRef<
+  { toggle: (mode: 'user' | 'post', user?: string) => void },
+  IBlockModal
+>((props, ref) => {
+  const { onBlockUser, onBlockPost } = props;
   const [visible, setVisible] = useState(false);
   const [username, setUsername] = useState('');
+  const [blockMode, setBlockMode] = useState<'post' | 'user'>();
 
   useImperativeHandle(ref, () => ({
-    toggle(user: string) {
-      setUsername(user);
+    toggle(mode: 'user' | 'post', user?: string) {
+      setBlockMode(mode);
+      if (mode === 'user' && user) {
+        setUsername(user);
+      }
       setVisible(!visible);
     },
   }));
@@ -24,9 +32,13 @@ const BlockModal = forwardRef<{ toggle: (user: string) => void }, IBlockModal>((
   }, []);
 
   const blockUser = useCallback(() => {
-    onBlock?.();
+    if (blockMode === 'user') {
+      onBlockUser?.();
+    } else if (blockMode === 'post') {
+      onBlockPost?.();
+    }
     closeModal();
-  }, [closeModal, onBlock]);
+  }, [closeModal, onBlockUser, onBlockPost, blockMode]);
 
   return (
     <Modal
@@ -43,12 +55,18 @@ const BlockModal = forwardRef<{ toggle: (user: string) => void }, IBlockModal>((
         <View style={styles.modalContent}>
           <View style={IS_TABLET && { height: '10%' }} />
           <View style={styles.contentContainer}>
-            <Text style={styles.header}>{`Are you sure you want to block ${username}`}</Text>
-            <Text style={styles.description}>
-              {`You will no longer see ${username}’s comments or forum posts.`}
+            <Text style={styles.header}>
+              {blockMode === 'user'
+                ? `Are you sure you want to block ${username}?`
+                : `Are you sure you want to block this post?`}
             </Text>
+            {blockMode === 'user' && (
+              <Text style={styles.description}>
+                {`You will no longer see ${username}’s comments or forum posts.`}
+              </Text>
+            )}
             <TouchableOpacity style={styles.blockButton} onPress={blockUser}>
-              <Text style={styles.blockText}>{'BLOCK'}</Text>
+              <Text style={styles.blockText}>{`BLOCK${blockMode === 'post' ? ' POST' : ''}`}</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity onPress={closeModal}>
