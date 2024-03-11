@@ -1,13 +1,14 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { TouchableOpacity, StyleSheet, View, Modal, Text } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { banSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
+import { BlockUserSvg, banSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
 import type { IPost, IUser } from '../../entity/IForum';
 import { IS_TABLET } from '../../services/helpers';
 
 interface IMenuModal {
   onReport?: (mode: 'user' | 'post') => void;
-  onBlock?: () => void;
+  onBlockUser?: () => void;
+  onBlockPost?: () => void;
   onEdit?: () => void;
   onMultiquote?: () => void;
   mode?: 'user' | 'post';
@@ -20,7 +21,7 @@ const MenuModal = forwardRef<
   { toggle: (mode: 'post' | 'user', selected: IPost) => void },
   IMenuModal
 >((props, ref) => {
-  const { onReport, onBlock, onEdit, onMultiquote, user, multiQuoteArr } = props;
+  const { onReport, onBlockUser, onBlockPost, onEdit, onMultiquote, user, multiQuoteArr } = props;
   const [visible, setVisible] = useState(false);
   const [reportMode, setReportMode] = useState<'post' | 'user'>();
   const [selectedPost, setSelectedPost] = useState<IPost | undefined>();
@@ -45,9 +46,14 @@ const MenuModal = forwardRef<
   }, [closeModal, onReport, reportMode]);
 
   const blockUser = useCallback(() => {
-    onBlock?.();
+    onBlockUser?.();
     closeModal();
-  }, [closeModal, onBlock]);
+  }, [closeModal, onBlockUser]);
+
+  const blockPost = useCallback(() => {
+    onBlockPost?.();
+    closeModal();
+  }, [closeModal, onBlockPost]);
 
   const editPost = useCallback(() => {
     onEdit?.();
@@ -116,7 +122,7 @@ const MenuModal = forwardRef<
               </TouchableOpacity>
               <TouchableOpacity onPress={blockUser} style={styles.actionContainer}>
                 <View style={styles.iconContainer}>
-                  {banSvg({
+                  {BlockUserSvg({
                     height: 24,
                     width: 24,
                     fill: 'white',
@@ -124,6 +130,18 @@ const MenuModal = forwardRef<
                 </View>
                 <Text style={styles.actionText}>{'Block User'}</Text>
               </TouchableOpacity>
+              {reportMode === 'post' && (
+                <TouchableOpacity onPress={blockPost} style={styles.actionContainer}>
+                  <View style={styles.iconContainer}>
+                    {banSvg({
+                      height: 24,
+                      width: 24,
+                      fill: 'white',
+                    })}
+                  </View>
+                  <Text style={styles.actionText}>{'Block Post'}</Text>
+                </TouchableOpacity>
+              )}
             </>
           )}
           <TouchableOpacity onPress={closeModal}>

@@ -18,7 +18,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { batch, useDispatch } from 'react-redux';
-import { post as PostSvg, lock, multiQuote, reportSvg, banSvg } from '../assets/svgs';
+import { post as PostSvg, lock, multiQuote, reportSvg, banSvg, BlockUserSvg } from '../assets/svgs';
 import NavigationHeader from '../commons/NavigationHeader';
 import Pagination from '../commons/Pagination';
 import Post from '../commons/Post';
@@ -311,10 +311,6 @@ const Thread: FunctionComponent = () => {
     blockRef.current?.toggle(mode, selectedP);
   }, []);
 
-  const showBlockWarning = (): void => {
-    warningRef.current?.toggle(selectedPost.current?.author?.display_name || '');
-  };
-
   const showReportModal = useCallback((mode: 'post' | 'user'): void => {
     if (mode === 'post' && !!selectedPost.current?.is_reported_by_viewer) {
       setShowToastAlert(true);
@@ -352,6 +348,10 @@ const Thread: FunctionComponent = () => {
     };
   };
 
+  const showBlockUserWarning = (): void => {
+    warningRef.current?.toggle('user', selectedPost.current?.author?.display_name || '');
+  };
+
   const onBlockUser = useCallback(() => {
     const { request, controller } = blockUser(selectedPost.current?.author?.id || 0);
     request.then((res: { data: { success: boolean } }) => {
@@ -367,6 +367,14 @@ const Thread: FunctionComponent = () => {
       controller.abort();
     };
   }, [refresh]);
+
+  const showBlockPostWarning = (): void => {
+    warningRef.current?.toggle('post');
+  };
+
+  const onBlockPost = useCallback(() => {
+    // TO-DO
+  }, []);
 
   const onLayoutAddPost = ({ nativeEvent: { layout } }: LayoutChangeEvent): void => {
     if (!postHeight) {
@@ -551,7 +559,8 @@ const Thread: FunctionComponent = () => {
       <MenuModal
         ref={blockRef}
         onReport={showReportModal}
-        onBlock={showBlockWarning}
+        onBlockUser={showBlockUserWarning}
+        onBlockPost={showBlockPostWarning}
         onEdit={editPost}
         onMultiquote={multiquote}
         user={user}
@@ -563,7 +572,7 @@ const Thread: FunctionComponent = () => {
         onReportPost={reportForumPost}
         isDark={isDark}
       />
-      <BlockWarningModal ref={warningRef} onBlock={onBlockUser} />
+      <BlockWarningModal ref={warningRef} onBlockUser={onBlockUser} onBlockPost={onBlockPost} />
       {showToastAlert && (
         <ToastAlert
           content={alertText}
@@ -593,7 +602,7 @@ const Thread: FunctionComponent = () => {
       {showBlockAlert && (
         <ToastAlert
           content={`${selectedPost.current?.author?.display_name || 'User'} was blocked.`}
-          icon={banSvg({
+          icon={BlockUserSvg({
             height: 21.6,
             width: 21.6,
             fill: isDark ? 'black' : 'white',

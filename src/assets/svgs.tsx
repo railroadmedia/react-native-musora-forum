@@ -609,3 +609,15 @@ export const CloseAltSvg = ({ height, width, fill }: ISvg): ReactElement => (
     />
   </Svg>
 );
+
+export const BlockUserSvg = ({ height, width, fill }: ISvg): ReactElement => (
+  <Svg width={width} height={height} viewBox='0 0 27 27' fill='none'>
+    <Path
+      d='M23.5967 15.7217C25.1344 14.184 25.1344 11.691 23.5967 10.1533C22.059 8.61558 19.566 8.61558 18.0283 10.1533M23.5967 15.7217C22.059 17.2594 19.566 17.2594 18.0283 15.7217C16.4906 14.184 16.4906 11.691 18.0283 10.1533M23.5967 15.7217L18.0283 10.1533M13.5 7.875C13.5 10.3603 11.4853 12.375 9 12.375C6.51472 12.375 4.5 10.3603 4.5 7.875C4.5 5.38972 6.51472 3.375 9 3.375C11.4853 3.375 13.5 5.38972 13.5 7.875ZM2.25 22.5C2.25 18.7721 5.27208 15.75 9 15.75C12.7279 15.75 15.75 18.7721 15.75 22.5V23.625H2.25V22.5Z'
+      stroke={fill}
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  </Svg>
+);
