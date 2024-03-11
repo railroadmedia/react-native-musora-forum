@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import Svg, { Circle, Path, Polygon, Rect } from 'react-native-svg';
+import Svg, { Circle, Path, Polygon } from 'react-native-svg';
 import type { ISvg } from '../entity/ISvg';
 
 export const arrowLeft = ({ width, height, fill }: ISvg): ReactElement => (
@@ -595,6 +595,17 @@ export const CompletedSvg = ({ height, width, fill }: ISvg): ReactElement => (
       strokeWidth='1.5'
       strokeLinecap='round'
       strokeLinejoin='round'
+    />
+  </Svg>
+);
+
+export const CloseAltSvg = ({ height, width, fill }: ISvg): ReactElement => (
+  <Svg viewBox='0 0 20 21' fill='none' width={width} height={height}>
+    <Path
+      fillRule='evenodd'
+      clipRule='evenodd'
+      d='M1.01256 0.512563C1.69598 -0.170854 2.80402 -0.170854 3.48744 0.512563L11 8.02513L18.5126 0.512563C19.196 -0.170854 20.304 -0.170854 20.9874 0.512563C21.6709 1.19598 21.6709 2.30402 20.9874 2.98744L13.4749 10.5L20.9874 18.0126C21.6709 18.696 21.6709 19.804 20.9874 20.4874C20.304 21.1709 19.196 21.1709 18.5126 20.4874L11 12.9749L3.48744 20.4874C2.80402 21.1709 1.69598 21.1709 1.01256 20.4874C0.329146 19.804 0.329146 18.696 1.01256 18.0126L8.52513 10.5L1.01256 2.98744C0.329146 2.30402 0.329146 1.19598 1.01256 0.512563Z'
+      fill={fill}
     />
   </Svg>
 );

@@ -6,8 +6,7 @@ import type { IPost, IUser } from '../../entity/IForum';
 import { IS_TABLET } from '../../services/helpers';
 
 interface IMenuModal {
-  onReportUser?: () => void;
-  onReportPost?: () => void;
+  onReport?: (mode: 'user' | 'post') => void;
   onBlock?: () => void;
   onEdit?: () => void;
   onMultiquote?: () => void;
@@ -21,7 +20,7 @@ const MenuModal = forwardRef<
   { toggle: (mode: 'post' | 'user', selected: IPost) => void },
   IMenuModal
 >((props, ref) => {
-  const { onReportUser, onReportPost, onBlock, onEdit, onMultiquote, user, multiQuoteArr } = props;
+  const { onReport, onBlock, onEdit, onMultiquote, user, multiQuoteArr } = props;
   const [visible, setVisible] = useState(false);
   const [reportMode, setReportMode] = useState<'post' | 'user'>();
   const [selectedPost, setSelectedPost] = useState<IPost | undefined>();
@@ -39,13 +38,11 @@ const MenuModal = forwardRef<
   }, []);
 
   const report = useCallback(() => {
-    if (reportMode === 'user') {
-      onReportUser?.();
-    } else {
-      onReportPost?.();
+    if (reportMode) {
+      onReport?.(reportMode);
     }
     closeModal();
-  }, [closeModal, onReportPost, onReportUser, reportMode]);
+  }, [closeModal, onReport, reportMode]);
 
   const blockUser = useCallback(() => {
     onBlock?.();
