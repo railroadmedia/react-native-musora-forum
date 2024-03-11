@@ -6,7 +6,15 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { StyleSheet, TouchableOpacity, Text, View, StyleProp, Animated } from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  View,
+  StyleProp,
+  Animated,
+  LayoutChangeEvent,
+} from 'react-native';
 import { batch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -50,13 +58,15 @@ interface INavigationHeader {
   isForumRules?: boolean;
   prevScreen?: string;
   scrollOffset?: Animated.Value;
+
+  onLayout?: (e: LayoutChangeEvent) => void;
 }
 
 const RANGE_START = 0;
 const RANGE_END = 100;
 
 const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
-  const { title, isForumRules, prevScreen = '', scrollOffset } = props;
+  const { title, isForumRules, prevScreen = '', scrollOffset, onLayout } = props;
   const route: RouteProp<{ params: IForumParams }> = useRoute();
   const {
     name,
@@ -276,7 +286,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   );
 
   const bigHeader = (
-    <Animated.View style={{ opacity: headerOpacity }}>
+    <Animated.View style={{ opacity: headerOpacity }} onLayout={onLayout}>
       <SafeAreaView
         style={[styles.subContainer, styles.bigHeaderSafeArea]}
         edges={isHome ? ['right', 'left'] : ['top', 'right', 'left']}
