@@ -36,6 +36,7 @@ import {
 import { useAppSelector } from '../redux/Store';
 import type { ForumRootStackParamList, IForumParams, IThreadParams } from '../entity/IRouteParams';
 import { IS_TABLET } from '../services/helpers';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Thread: FunctionComponent = () => {
   const { params }: RouteProp<{ params: IThreadParams & IForumParams }, 'params'> = useRoute();
@@ -92,6 +93,7 @@ const Thread: FunctionComponent = () => {
   const flatListRef = useRef<FlatList>(null);
   const blockRef = useRef<React.ElementRef<typeof MenuModal>>(null);
   const warningRef = useRef<React.ElementRef<typeof BlockWarningModal>>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   useEffect(() => {
     const refreshOnFocusListener = addListener('focus', () => {
@@ -439,7 +441,6 @@ const Thread: FunctionComponent = () => {
           borderColor: isDark ? '#9EC0DC' : 'lightgrey',
           marginHorizontal: 15,
           marginBottom,
-          paddingTop: 160,
         }}
       >
         <Pagination
@@ -483,11 +484,19 @@ const Thread: FunctionComponent = () => {
     useNativeDriver: true,
   });
 
+  const onLayout = (e: LayoutChangeEvent): void => {
+    setHeaderHeight(e.nativeEvent.layout.height);
+  };
+
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
-    <View style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}>
+    <SafeAreaView
+      edges={['left', 'right']}
+      style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
+    >
       <Animated.FlatList
+        contentContainerStyle={{ paddingTop: headerHeight + 15 }}
         onScroll={handleScroll}
         overScrollMode='never'
         onScrollBeginDrag={onScollBegin}
@@ -511,6 +520,7 @@ const Thread: FunctionComponent = () => {
         title={threadTitle || thread?.title || ''}
         prevScreen={prevScreen}
         scrollOffset={scrollOffsetY}
+        onLayout={onLayout}
       />
       <View>
         <TouchableOpacity
@@ -600,7 +610,7 @@ const Thread: FunctionComponent = () => {
           isDark={isDark}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
