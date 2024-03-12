@@ -236,7 +236,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
         {menuCircle({ width: 39, height: 39, fill: isDark ? 'white' : '#081825' })}
       </TouchableOpacity>
     ),
-    []
+    [isDark]
   );
 
   const menuModal = useMemo(
@@ -294,8 +294,8 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
         {!isHome ? backArrow : null}
 
         <Animated.View style={[styles.titleRow, { opacity: headerOpacity }]}>
-          <Animated.View style={[styles.titleContainer]}>
-            <Animated.View style={[styles.titleIconsContainer]}>
+          <Animated.View style={styles.titleContainer}>
+            <Animated.View style={styles.titleIconsContainer}>
               {!!thread?.locked &&
                 lock({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
               {!!thread?.pinned && pin({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}

@@ -22,7 +22,7 @@ import { setForumsThreads } from '../redux/threads/ThreadActions';
 import { connection, getForums, getFollowedThreads } from '../services/forum.service';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
-import type { IForum } from '../entity/IForum';
+import type { IForum, IThread } from '../entity/IForum';
 
 const Forums: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
@@ -76,9 +76,7 @@ const Forums: FunctionComponent = props => {
           setForums(forumsResponse.value.data?.results);
         }
         if (followedResponse.status === 'fulfilled') {
-          setFollowedThreads(
-            followedResponse.value.data?.results?.map((r: { id: string }) => r.id)
-          );
+          setFollowedThreads(followedResponse.value.data?.results?.map((r: IThread) => r.id));
           setFollowedThreadsTotal(followedResponse.value.data?.total_results);
           if (followedResponse.value.data) {
             dispatch(setForumsThreads(followedResponse.value.data?.results));
@@ -117,7 +115,7 @@ const Forums: FunctionComponent = props => {
       );
       followedRequest
         .then(response => {
-          setFollowedThreads(response.data?.results?.map((r: { id: string }) => r.id));
+          setFollowedThreads(response.data?.results?.map((r: IThread) => r.id));
           if (flatListRef.current) {
             flatListRef.current.scrollToOffset({ offset: 0, animated: false });
           }
@@ -193,7 +191,7 @@ const Forums: FunctionComponent = props => {
         <NavigationHeader title={title} {...props} />
       </>
     ),
-    [forums, appColor, isDark, renderForum, styles.sectionTitle]
+    [isDark, appColor, forums, styles.sectionTitle, props, renderForum]
   );
 
   const flFooter = useMemo(
