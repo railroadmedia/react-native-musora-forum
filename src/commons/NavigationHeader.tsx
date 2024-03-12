@@ -52,7 +52,6 @@ import type { ForumRootStackParamList, IForumParams } from '../entity/IRoutePara
 import type { ISvg } from '../entity/ISvg';
 import { IS_TABLET } from '../services/helpers';
 import HeaderOptionsModal from './modals/HeaderOptionsModal';
-import { BlurView } from '@react-native-community/blur';
 
 interface INavigationHeader {
   title: string;
@@ -325,12 +324,6 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
       ]}
     >
       <Animated.View style={[styles.absoluteContainer, styles.translucentBackground]}>
-        <BlurView
-          style={styles.blurView}
-          blurType={isDark ? 'dark' : 'light'}
-          blurAmount={10}
-          reducedTransparencyFallbackColor={isDark ? '#00101d' : 'white'}
-        />
         <SafeAreaView style={styles.subContainer} edges={['top', 'right', 'left']}>
           <Text />
         </SafeAreaView>
@@ -390,15 +383,10 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       left: 0,
       right: 0,
     },
-    blurView: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-    },
     translucentBackground: {
       paddingVertical: 15,
+      backgroundColor: isDark ? '#001A2F' : 'white',
+      opacity: 0.75,
     },
     titleRow: {
       flexDirection: 'row',
