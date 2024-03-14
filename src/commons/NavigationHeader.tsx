@@ -302,7 +302,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
             </Animated.View>
             <Text
               style={isHome ? styles.forumTitle : styles.titleText}
-              numberOfLines={1}
+              numberOfLines={2}
               ellipsizeMode='tail'
             >
               {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
@@ -348,7 +348,9 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
               })}
             </TouchableOpacity>
             <View style={styles.smallTitleContainer}>
-              <Text style={styles.smallTitle}>{title}</Text>
+              <Text style={styles.smallTitle}>
+                {title.length > 27 ? title.substring(0, 27) + '...' : title}
+              </Text>
             </View>
           </View>
         </SafeAreaView>
@@ -431,6 +433,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       fontFamily: 'OpenSans-SemiBold',
       fontSize: IS_TABLET ? 18 : 14,
       lineHeight: IS_TABLET ? 20 : 16,
+      height: IS_TABLET ? 20 : 16,
     },
     backButton: {
       flexDirection: 'row',
