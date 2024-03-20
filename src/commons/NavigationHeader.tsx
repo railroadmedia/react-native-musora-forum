@@ -50,7 +50,12 @@ import { useAppSelector } from '../redux/Store';
 import { selectThread } from '../redux/threads/ThreadSelectors';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
 import type { ISvg } from '../entity/ISvg';
-import { IS_TABLET } from '../services/helpers';
+import {
+  HEADER_RANGE_END,
+  HEADER_RANGE_START,
+  IS_TABLET,
+  SMALL_HEADER_LENGTH,
+} from '../services/helpers';
 import HeaderOptionsModal from './modals/HeaderOptionsModal';
 
 interface INavigationHeader {
@@ -61,9 +66,6 @@ interface INavigationHeader {
 
   onLayout?: (e: LayoutChangeEvent) => void;
 }
-
-const RANGE_START = 0;
-const RANGE_END = 100;
 
 const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   const { title, isForumRules, prevScreen = '', scrollOffset, onLayout } = props;
@@ -261,13 +263,13 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   );
 
   const headerOpacity = scrollOffset?.interpolate({
-    inputRange: [RANGE_START, RANGE_END],
+    inputRange: [HEADER_RANGE_START, HEADER_RANGE_END],
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
 
   const negHeaderOpacity = scrollOffset?.interpolate({
-    inputRange: [RANGE_START, RANGE_END],
+    inputRange: [HEADER_RANGE_START, HEADER_RANGE_END],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
@@ -349,7 +351,9 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
             </TouchableOpacity>
             <View style={styles.smallTitleContainer}>
               <Text style={styles.smallTitle}>
-                {title.length > 27 ? title.substring(0, 27) + '...' : title}
+                {title.length > SMALL_HEADER_LENGTH
+                  ? title.substring(0, SMALL_HEADER_LENGTH - 3) + '...'
+                  : title}
               </Text>
             </View>
           </View>
