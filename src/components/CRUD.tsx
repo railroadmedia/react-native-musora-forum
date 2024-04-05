@@ -43,6 +43,7 @@ import { useAppSelector } from '../redux/Store';
 import { selectPost, selectThread } from '../redux/threads/ThreadSelectors';
 import type { ForumRootStackParamList, ICRUDParams, IForumParams } from '../entity/IRouteParams';
 import type { IPost } from '../entity/IForum';
+import InsertImageModal from '../commons/modals/InsertImageModal';
 
 const CRUD: FunctionComponent = () => {
   const { params }: RouteProp<{ params: ICRUDParams & IForumParams }, 'params'> = useRoute();
@@ -70,6 +71,7 @@ const CRUD: FunctionComponent = () => {
   const scrollRef = useRef<ScrollView | null>(null);
   const richTextRef = useRef<RichEditor>(null);
   const linkModalRef = useRef<React.ElementRef<typeof InsertLinkModal>>(null);
+  const imageModalRef = useRef<React.ElementRef<typeof InsertImageModal>>(null);
   const customModalRef = useRef<React.ElementRef<typeof CustomModal>>(null);
 
   const post = useAppSelector(state => selectPost(state, postId));
@@ -92,6 +94,8 @@ const CRUD: FunctionComponent = () => {
 
   const onInsertLink = (insertType: 'Image' | 'Link' | 'Video'): void =>
     linkModalRef.current?.toggle(insertType);
+
+  const onInsertImage = (): void => imageModalRef.current?.toggle();
 
   const onLinkDone = useCallback(
     (titleValue: string, urlValue: string, typeValue: string): void => {
@@ -338,7 +342,7 @@ const CRUD: FunctionComponent = () => {
               selectedIconTint={'#2095F2'}
               disabledIconTint={'#bfbfbf'}
               iconTint={isDark ? '#80A0B9' : '#000000'}
-              onPressAddImage={() => onInsertLink('Image')}
+              onPressAddImage={onInsertImage}
               onInsertLink={() => onInsertLink('Link')}
               insertVideo={() => onInsertLink('Video')}
               actions={[
@@ -427,6 +431,12 @@ const CRUD: FunctionComponent = () => {
         isDark={isDark}
         onClose={onLinkDone}
         ref={linkModalRef}
+      />
+      <InsertImageModal
+        appColor={appColor}
+        isDark={isDark}
+        onClose={onLinkDone}
+        ref={imageModalRef}
       />
       <CustomModal ref={customModalRef} isDark={isDark} appColor={appColor} />
     </SafeAreaView>
