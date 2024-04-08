@@ -275,7 +275,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
   });
 
   const backArrow = (
-    <TouchableOpacity style={styles.backButton} onPress={goBack}>
+    <TouchableOpacity style={[styles.backButton, { marginBottom: 20 }]} onPress={goBack}>
       {arrowLeft({
         width: 20,
         height: 16,
