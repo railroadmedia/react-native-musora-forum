@@ -103,6 +103,9 @@ const CRUD: FunctionComponent = () => {
         if (typeValue === 'Link') {
           richTextRef.current?.insertLink(titleValue, urlValue);
         } else if (typeValue === 'Image') {
+          if (richHTML === '') {
+            richTextRef.current?.insertHTML(`<div><br></div>`);
+          }
           richTextRef.current?.insertImage(urlValue);
         } else {
           if (urlValue.includes('<iframe')) {

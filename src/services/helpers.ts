@@ -21,6 +21,7 @@ export const createFormData = (photo: { uri: string; type: string; fileName: str
       uri: IS_IOS ? photo.uri.replace('file://', '') : photo.uri,
     });
     data.append('target', `${photo.fileName.substring(photo.fileName.lastIndexOf('/') + 1)}`);
+    data.append('fieldKey', 'forum_post_photo');
   }
   return data;
 };
