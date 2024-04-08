@@ -67,7 +67,7 @@ const CRUD: FunctionComponent = () => {
 
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
-  const [richHTML, setRichHTML] = useState<string | undefined>();
+  const [richHTML, setRichHTML] = useState<string | undefined>('');
   const scrollRef = useRef<ScrollView | null>(null);
   const richTextRef = useRef<RichEditor>(null);
   const linkModalRef = useRef<React.ElementRef<typeof InsertLinkModal>>(null);
