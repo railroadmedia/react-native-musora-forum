@@ -468,6 +468,7 @@ const Thread: FunctionComponent = () => {
 
   const flRefreshControl = (
     <RefreshControl
+      progressViewOffset={headerHeight}
       colors={['white']}
       tintColor={appColor}
       progressBackgroundColor={appColor}

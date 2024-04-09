@@ -269,6 +269,7 @@ const Threads: FunctionComponent = props => {
   const flRefreshControl = useMemo(
     () => (
       <RefreshControl
+        progressViewOffset={headerHeight}
         colors={['white']}
         tintColor={appColor}
         progressBackgroundColor={appColor}
