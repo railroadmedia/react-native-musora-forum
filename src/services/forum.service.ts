@@ -1,3 +1,4 @@
+import { createFormData } from './helpers';
 import type { IForum, ISearchItem, IThread } from '../entity/IForum';
 import type { IResponse, IResponseBody } from '../entity/IResponse';
 import type { IBrand } from '../entity/IRouteParams';
@@ -137,3 +138,15 @@ export const reportUser = (id: number): IResponse<{ success: boolean }> =>
 
 export const blockUser = (id: number): IResponse<{ success: boolean }> =>
   (this as any)?.tryCall.put(`/user-management-system/user/block/${id}`);
+
+export const uploadPicture = (file: {
+  uri: string;
+  type: string;
+  fileName: string;
+}): IResponse<{ url: string }> =>
+  (this as any)?.tryCall.post(
+    `/musora-api/v5/picture/upload`,
+    createFormData(file),
+    { 'Content-Type': 'multipart/form-data' },
+    { transformRequest: (data: any) => data }
+  );
