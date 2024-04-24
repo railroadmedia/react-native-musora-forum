@@ -1,14 +1,13 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { TouchableOpacity, StyleSheet, View, Modal, Text } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { BlockUserSvg, banSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
+import { BlockUserSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
 import type { IPost, IUser } from '../../entity/IForum';
 import { IS_TABLET } from '../../services/helpers';
 
 interface IMenuModal {
   onReport?: (mode: 'user' | 'post') => void;
   onBlockUser?: () => void;
-  onBlockPost?: () => void;
   onEdit?: () => void;
   onMultiquote?: () => void;
   mode?: 'user' | 'post';
@@ -21,7 +20,7 @@ const MenuModal = forwardRef<
   { toggle: (mode: 'post' | 'user', selected: IPost) => void },
   IMenuModal
 >((props, ref) => {
-  const { onReport, onBlockUser, onBlockPost, onEdit, onMultiquote, user, multiQuoteArr } = props;
+  const { onReport, onBlockUser, onEdit, onMultiquote, user, multiQuoteArr } = props;
   const [visible, setVisible] = useState(false);
   const [reportMode, setReportMode] = useState<'post' | 'user'>();
   const [selectedPost, setSelectedPost] = useState<IPost | undefined>();
@@ -49,11 +48,6 @@ const MenuModal = forwardRef<
     onBlockUser?.();
     closeModal();
   }, [closeModal, onBlockUser]);
-
-  const blockPost = useCallback(() => {
-    onBlockPost?.();
-    closeModal();
-  }, [closeModal, onBlockPost]);
 
   const editPost = useCallback(() => {
     onEdit?.();
@@ -130,18 +124,6 @@ const MenuModal = forwardRef<
                 </View>
                 <Text style={styles.actionText}>{'Block User'}</Text>
               </TouchableOpacity>
-              {reportMode === 'post' && (
-                <TouchableOpacity onPress={blockPost} style={styles.actionContainer}>
-                  <View style={styles.iconContainer}>
-                    {banSvg({
-                      height: 24,
-                      width: 24,
-                      fill: 'white',
-                    })}
-                  </View>
-                  <Text style={styles.actionText}>{'Block Post'}</Text>
-                </TouchableOpacity>
-              )}
             </>
           )}
           <TouchableOpacity onPress={closeModal}>

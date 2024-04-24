@@ -118,9 +118,6 @@ export const reportPost = (id: number, issue: string): IResponse =>
     issue,
   });
 
-export const blockPost = (id: number): IResponse =>
-  (this as any)?.tryCall.put(`/forums/api/post/block/${id}?brand=${(this as any)?.brand}`);
-
 export const createPost = (body: {
   content: string;
   thread_id: number;

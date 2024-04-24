@@ -18,7 +18,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { batch, useDispatch } from 'react-redux';
-import { post as PostSvg, lock, multiQuote, reportSvg, banSvg, BlockUserSvg } from '../assets/svgs';
+import { post as PostSvg, lock, multiQuote, reportSvg, BlockUserSvg } from '../assets/svgs';
 import NavigationHeader from '../commons/NavigationHeader';
 import Pagination from '../commons/Pagination';
 import Post from '../commons/Post';
@@ -368,14 +368,6 @@ const Thread: FunctionComponent = () => {
     };
   }, [refresh]);
 
-  const showBlockPostWarning = (): void => {
-    warningRef.current?.toggle('post');
-  };
-
-  const onBlockPost = useCallback(() => {
-    // TO-DO
-  }, []);
-
   const onLayoutAddPost = ({ nativeEvent: { layout } }: LayoutChangeEvent): void => {
     if (!postHeight) {
       setPostHeight(layout.height + 15);
@@ -560,7 +552,6 @@ const Thread: FunctionComponent = () => {
         ref={blockRef}
         onReport={showReportModal}
         onBlockUser={showBlockUserWarning}
-        onBlockPost={showBlockPostWarning}
         onEdit={editPost}
         onMultiquote={multiquote}
         user={user}
@@ -572,7 +563,7 @@ const Thread: FunctionComponent = () => {
         onReportPost={reportForumPost}
         isDark={isDark}
       />
-      <BlockWarningModal ref={warningRef} onBlockUser={onBlockUser} onBlockPost={onBlockPost} />
+      <BlockWarningModal ref={warningRef} onBlockUser={onBlockUser} />
       {showToastAlert && (
         <ToastAlert
           content={alertText}

@@ -5,78 +5,70 @@ import { IS_TABLET } from '../../services/helpers';
 
 interface IBlockModal {
   onBlockUser: () => void;
-  onBlockPost: () => void;
 }
 
-const BlockModal = forwardRef<
-  { toggle: (mode: 'user' | 'post', user?: string) => void },
-  IBlockModal
->((props, ref) => {
-  const { onBlockUser, onBlockPost } = props;
-  const [visible, setVisible] = useState(false);
-  const [username, setUsername] = useState('');
-  const [blockMode, setBlockMode] = useState<'post' | 'user'>();
+const BlockModal = forwardRef<{ toggle: (mode: 'user', user?: string) => void }, IBlockModal>(
+  (props, ref) => {
+    const { onBlockUser } = props;
+    const [visible, setVisible] = useState(false);
+    const [username, setUsername] = useState('');
+    const [blockMode, setBlockMode] = useState<'user'>();
 
-  useImperativeHandle(ref, () => ({
-    toggle(mode: 'user' | 'post', user?: string) {
-      setBlockMode(mode);
-      if (mode === 'user' && user) {
-        setUsername(user);
+    useImperativeHandle(ref, () => ({
+      toggle(mode: 'user', user?: string) {
+        setBlockMode(mode);
+        if (mode === 'user' && user) {
+          setUsername(user);
+        }
+        setVisible(!visible);
+      },
+    }));
+
+    const closeModal = useCallback(() => {
+      setVisible(false);
+    }, []);
+
+    const blockUser = useCallback(() => {
+      if (blockMode === 'user') {
+        onBlockUser?.();
       }
-      setVisible(!visible);
-    },
-  }));
+      closeModal();
+    }, [closeModal, onBlockUser, blockMode]);
 
-  const closeModal = useCallback(() => {
-    setVisible(false);
-  }, []);
-
-  const blockUser = useCallback(() => {
-    if (blockMode === 'user') {
-      onBlockUser?.();
-    } else if (blockMode === 'post') {
-      onBlockPost?.();
-    }
-    closeModal();
-  }, [closeModal, onBlockUser, onBlockPost, blockMode]);
-
-  return (
-    <Modal
-      transparent={true}
-      visible={visible}
-      animationType={'slide'}
-      supportedOrientations={['portrait', 'landscape']}
-    >
-      <TouchableOpacity onPress={closeModal} style={{ flex: 1 }}>
-        <LinearGradient
-          style={styles.lgradient}
-          colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
-        />
-        <View style={styles.modalContent}>
-          <View style={IS_TABLET && { height: '10%' }} />
-          <View style={styles.contentContainer}>
-            <Text style={styles.header}>
-              {blockMode === 'user'
-                ? `Are you sure you want to block ${username}?`
-                : `Are you sure you want to block this post?`}
-            </Text>
-            {blockMode === 'user' && (
-              <Text style={styles.description}>
-                {`You will no longer see ${username}’s comments or forum posts.`}
-              </Text>
-            )}
-            <TouchableOpacity style={styles.blockButton} onPress={blockUser}>
-              <Text style={styles.blockText}>{`BLOCK${blockMode === 'post' ? ' POST' : ''}`}</Text>
+    return (
+      <Modal
+        transparent={true}
+        visible={visible}
+        animationType={'slide'}
+        supportedOrientations={['portrait', 'landscape']}
+      >
+        <TouchableOpacity onPress={closeModal} style={{ flex: 1 }}>
+          <LinearGradient
+            style={styles.lgradient}
+            colors={['rgba(0, 12, 23, 0.69)', 'rgba(0, 12, 23, 1)']}
+          />
+          <View style={styles.modalContent}>
+            <View style={IS_TABLET && { height: '10%' }} />
+            <View style={styles.contentContainer}>
+              <Text style={styles.header}>{`Are you sure you want to block ${username}?`}</Text>
+              {blockMode === 'user' && (
+                <Text style={styles.description}>
+                  {`You will no longer see ${username}’s comments or forum posts.`}
+                </Text>
+              )}
+              <TouchableOpacity style={styles.blockButton} onPress={blockUser}>
+                <Text style={styles.blockText}>{`BLOCK`}</Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity onPress={closeModal}>
+              <Text style={styles.close}>{'Close'}</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={closeModal}>
-            <Text style={styles.close}>{'Close'}</Text>
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  );
-});
+        </TouchableOpacity>
+      </Modal>
+    );
+  }
+);
 
 const styles: StyleProp<any> = StyleSheet.create({
   modalContent: {
