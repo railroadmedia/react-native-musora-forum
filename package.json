@@ -80,7 +80,8 @@
     "react-native-render-html": "^6.3.4",
     "react-native-webview": "git+https://github.com/railroadmedia/react-native-webview.git",
     "react-native-svg": "^13.13.0",
-    "react-native-linear-gradient": "^2.8.2"
+    "react-native-linear-gradient": "^2.8.2",
+    "react-native-image-crop-picker": "https://github.com/railroadmedia/react-native-image-crop-picker.git"
   },
   "resolutions": {
     "@types/react": "^18"

@@ -12,6 +12,21 @@ export const setTestID = (testID: string): string => {
   }
 };
 
+export const createFormData = (photo: { uri: string; type: string; fileName: string }): object => {
+  const data = new FormData();
+
+  if (photo) {
+    data.append('file', {
+      name: `${photo.fileName.substring(photo.fileName.lastIndexOf('/') + 1)}`,
+      type: photo.type,
+      uri: IS_IOS ? photo.uri.replace('file://', '') : photo.uri,
+    });
+    data.append('target', `${photo.fileName.substring(photo.fileName.lastIndexOf('/') + 1)}`);
+    data.append('fieldKey', 'forum_post_photo');
+  }
+  return data;
+};
+
 export const defaultIssues = (type: 'post' | 'user'): string[] => {
   switch (type) {
     case 'post': {

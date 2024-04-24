@@ -599,6 +599,37 @@ export const CompletedSvg = ({ height, width, fill }: ISvg): ReactElement => (
   </Svg>
 );
 
+export const TakePhotoSvg = ({ height, width, fill }: ISvg): ReactElement => (
+  <Svg width={width} height={height} viewBox='0 0 21 19' fill='none'>
+    <Path
+      d='M1.125 6.37496C1.125 5.22437 2.05774 4.29163 3.20833 4.29163H4.1767C4.87327 4.29163 5.52375 3.9435 5.91014 3.36392L6.75653 2.09433C7.14292 1.51475 7.7934 1.16663 8.48997 1.16663H12.51C13.2066 1.16663 13.8571 1.51475 14.2435 2.09433L15.0899 3.36392C15.4762 3.9435 16.1267 4.29163 16.8233 4.29163H17.7917C18.9423 4.29163 19.875 5.22437 19.875 6.37496V15.75C19.875 16.9006 18.9423 17.8333 17.7917 17.8333H3.20833C2.05774 17.8333 1.125 16.9006 1.125 15.75V6.37496Z'
+      stroke={fill}
+      strokeWidth='1.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+    <Path
+      d='M13.625 10.5416C13.625 12.2675 12.2259 13.6666 10.5 13.6666C8.77411 13.6666 7.375 12.2675 7.375 10.5416C7.375 8.81573 8.77411 7.41663 10.5 7.41663C12.2259 7.41663 13.625 8.81573 13.625 10.5416Z'
+      stroke={fill}
+      strokeWidth='1.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  </Svg>
+);
+
+export const LibrarySvg = ({ height, width, fill }: ISvg): ReactElement => (
+  <Svg width={width} height={height} viewBox='0 0 19 19' fill='none'>
+    <Path
+      d='M1.1665 13.6666L5.94336 8.88977C6.75696 8.07617 8.07605 8.07617 8.88964 8.88976L13.6665 13.6666M11.5832 11.5833L13.235 9.93143C14.0486 9.11784 15.3677 9.11784 16.1813 9.93143L17.8332 11.5833M11.5832 5.33329H11.5936M3.24984 17.8333H15.7498C16.9004 17.8333 17.8332 16.9006 17.8332 15.75V3.24996C17.8332 2.09937 16.9004 1.16663 15.7498 1.16663H3.24984C2.09924 1.16663 1.1665 2.09937 1.1665 3.24996V15.75C1.1665 16.9006 2.09924 17.8333 3.24984 17.8333Z'
+      stroke={fill}
+      strokeWidth='1.5'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  </Svg>
+);
+
 export const CloseAltSvg = ({ height, width, fill }: ISvg): ReactElement => (
   <Svg viewBox='0 0 20 21' fill='none' width={width} height={height}>
     <Path

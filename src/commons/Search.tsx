@@ -305,10 +305,10 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       flexDirection: 'row',
       alignItems: 'center',
     },
-    searchIcon: { 
-      position: 'absolute', 
-      right: 15, 
-      zIndex: 2 
+    searchIcon: {
+      position: 'absolute',
+      right: 15,
+      zIndex: 2,
     },
     searchInput: {
       fontSize: 12,
@@ -318,7 +318,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       borderRadius: 25,
       paddingLeft: 10,
       paddingRight: 40,
-      color: isDark ? '#FFFFFF': '#000C17',
+      color: isDark ? '#FFFFFF' : '#000C17',
       backgroundColor: isDark ? '#000000' : '#FFFFFF',
       borderWidth: 1,
       borderColor: isDark ? '#445F74' : '#CBCBCD',
