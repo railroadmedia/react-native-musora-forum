@@ -38,9 +38,9 @@ interface IThreadsRes extends IResponseBody {
 }
 export const getAllThreads = (forumId: number, page = 1, sort?: string): IResponse<IThreadsRes> =>
   (this as any)?.tryCall.get(
-    `/forums/api/thread/index?amount=10&page=${page}&brand=${(this as any)?.brand}&sort=${sort || '-published_on'}&category_id=${
-      forumId || ''
-    }`
+    `/forums/api/thread/index?amount=10&page=${page}&brand=${(this as any)?.brand}&sort=${
+      sort || '-published_on'
+    }&category_id=${forumId || ''}`
   );
 
 interface IFollowedThreadsRes extends IResponseBody {

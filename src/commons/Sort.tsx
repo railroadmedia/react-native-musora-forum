@@ -1,12 +1,12 @@
 import React, { FunctionComponent, ReactElement, useState } from 'react';
 import { StyleSheet, TouchableOpacity, StyleProp, Modal, SafeAreaView, Text } from 'react-native';
 import { NewestSortIcon, OldestSortIcon, CompletedSvg } from '../assets/svgs';
-import { ISvg } from '../entity/ISvg';
 import LinearGradient from 'react-native-linear-gradient';
 import { IS_IOS } from '../services/helpers';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import type { IForumParams, IThreadParams } from '../entity/IRouteParams';
 import { connection } from '../services/forum.service';
+import type { ISvg } from '../entity/ISvg';
 
 type SearchText = 'Newest First' | 'Oldest First' | 'Mine';
 
@@ -76,7 +76,7 @@ const Sort: FunctionComponent<ISort> = ({ onSort, defaultSelectedSort }) => {
       <TouchableOpacity onPress={toggleModal} style={styles.sortIcon}>
         {sortOptions
           .find(f => f.selected)
-          ?.icon?.({ width: 22, height: 22, fill: isDark ?'#FFFFFF':'#00101D' })}
+          ?.icon?.({ width: 22, height: 22, fill: isDark ? '#FFFFFF' : '#00101D' })}
       </TouchableOpacity>
 
       <Modal
@@ -129,7 +129,7 @@ const Sort: FunctionComponent<ISort> = ({ onSort, defaultSelectedSort }) => {
   );
 };
 
-const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
+const setStyles: StyleProp<any> = (isDark: boolean) =>
   StyleSheet.create({
     sortIcon: {
       alignItems: 'center',

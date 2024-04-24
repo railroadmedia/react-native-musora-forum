@@ -131,30 +131,33 @@ const Threads: FunctionComponent = props => {
     [dispatch, forumId, tab]
   );
 
-  const onSort = useCallback((sortBy: string)=> {
-    selectedSort.current = sortBy;
-    if (tab) {
-      setFollowedRefreshing(true);
-      getFollowedThreads(forumId, followedPage, sortBy)
-        .request.then(r => {
-          setFollowed(r?.data?.results?.map(f => f.id));
-          dispatch(setFollowedThreads(r.data?.results));
-        })
-        .finally(() => {
-          setFollowedRefreshing(false);
-        });
-    } else {
-      setAllRefreshing(true);
-      getAllThreads(forumId, allPage, sortBy)
-        .request.then(r => {
-          setAll(r.data?.results?.map(a => a.id));
-          dispatch(setAllThreads(r.data?.results));
-        })
-        .finally(() => {
-          setAllRefreshing(false);
-        });
-    }
-  },[dispatch, forumId, tab])
+  const onSort = useCallback(
+    (sortBy: string) => {
+      selectedSort.current = sortBy;
+      if (tab) {
+        setFollowedRefreshing(true);
+        getFollowedThreads(forumId, followedPage, sortBy)
+          .request.then(r => {
+            setFollowed(r?.data?.results?.map(f => f.id));
+            dispatch(setFollowedThreads(r.data?.results));
+          })
+          .finally(() => {
+            setFollowedRefreshing(false);
+          });
+      } else {
+        setAllRefreshing(true);
+        getAllThreads(forumId, allPage, sortBy)
+          .request.then(r => {
+            setAll(r.data?.results?.map(a => a.id));
+            dispatch(setAllThreads(r.data?.results));
+          })
+          .finally(() => {
+            setAllRefreshing(false);
+          });
+      }
+    },
+    [dispatch, forumId, tab, allPage, followedPage]
+  );
 
   const refresh = useCallback(() => {
     if (!connection(true)) {
@@ -223,11 +226,12 @@ const Threads: FunctionComponent = props => {
               <TouchableOpacity
                 key={t}
                 onPress={() => onTabChange(i)}
-                style={[styles.headerTOpacity, tab === i ? { backgroundColor: isDark ? '#445F74' : '#000C17' } : {}]}
+                style={[
+                  styles.headerTOpacity,
+                  tab === i ? { backgroundColor: isDark ? '#445F74' : '#000C17' } : {},
+                ]}
               >
-                <Text style={[styles.headerText, tab === i ? { color: 'white' } : {}]}>
-                  {t}
-                </Text>
+                <Text style={[styles.headerText, tab === i ? { color: 'white' } : {}]}>{t}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -244,6 +248,8 @@ const Threads: FunctionComponent = props => {
       styles.headerText,
       tab,
       onTabChange,
+      onSort,
+      styles.headerBtnContainer,
     ]
   );
 
@@ -375,7 +381,7 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
     },
     headerBtnContainer: {
       flexDirection: 'row',
-      alignItems: 'center'
+      alignItems: 'center',
     },
     headerTOpacity: {
       height: 35,
@@ -386,7 +392,7 @@ const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
       borderRadius: 55,
       borderWidth: 1.5,
       borderColor: isDark ? '#445F74' : '#CBCBCD',
-      backgroundColor: isDark ? '#00101D' : 'white'
+      backgroundColor: isDark ? '#00101D' : 'white',
     },
     headerText: {
       fontFamily: 'BebasNeue-Regular',
