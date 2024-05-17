@@ -13,9 +13,8 @@ import {
   BackHandler,
   StyleProp,
   LayoutChangeEvent,
+  Animated,
 } from 'react-native';
-
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { batch, useDispatch } from 'react-redux';
 import { post as PostSvg, lock, multiQuote, reportSvg, banSvg } from '../assets/svgs';
@@ -37,6 +36,7 @@ import {
 import { useAppSelector } from '../redux/Store';
 import type { ForumRootStackParamList, IForumParams, IThreadParams } from '../entity/IRouteParams';
 import { IS_TABLET } from '../services/helpers';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Thread: FunctionComponent = () => {
   const { params }: RouteProp<{ params: IThreadParams & IForumParams }, 'params'> = useRoute();
@@ -50,6 +50,7 @@ const Thread: FunctionComponent = () => {
     page: pageProp,
     postId: postIdProp,
     isForumRules,
+    prevScreen = '',
   } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
@@ -92,6 +93,7 @@ const Thread: FunctionComponent = () => {
   const flatListRef = useRef<FlatList>(null);
   const blockRef = useRef<React.ElementRef<typeof MenuModal>>(null);
   const warningRef = useRef<React.ElementRef<typeof BlockWarningModal>>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   useEffect(() => {
     const refreshOnFocusListener = addListener('focus', () => {
@@ -210,7 +212,10 @@ const Thread: FunctionComponent = () => {
       ) {
         let scrollPos = flHeaderHeight.current;
         thread?.posts
-          ?.slice(0, thread?.posts?.findIndex(p => p.id === postId.current))
+          ?.slice(
+            0,
+            thread?.posts?.findIndex(p => p.id === postId.current)
+          )
           .map(p => (scrollPos += postLayouts.current[p.id]));
         flatListRef.current?.scrollToOffset({
           offset: scrollPos,
@@ -463,6 +468,7 @@ const Thread: FunctionComponent = () => {
 
   const flRefreshControl = (
     <RefreshControl
+      progressViewOffset={headerHeight}
       colors={['white']}
       tintColor={appColor}
       progressBackgroundColor={appColor}
@@ -473,19 +479,30 @@ const Thread: FunctionComponent = () => {
 
   const onScollBegin = (): void => (postId.current = undefined);
 
+  const scrollOffsetY = useRef(new Animated.Value(0)).current;
+
+  const handleScroll = Animated.event([{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }], {
+    useNativeDriver: true,
+  });
+
+  const onLayout = (e: LayoutChangeEvent): void => {
+    setHeaderHeight(e.nativeEvent.layout.height);
+  };
+
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
     <SafeAreaView
+      edges={['left', 'right']}
       style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
-      edges={['right', 'left', 'bottom']}
     >
-      <NavigationHeader title={threadTitle || thread?.title || ''} />
-      <FlatList
+      <Animated.FlatList
+        contentContainerStyle={{ paddingTop: headerHeight + 15 }}
+        onScroll={handleScroll}
         overScrollMode='never'
         onScrollBeginDrag={onScollBegin}
         windowSize={10}
-        data={thread?.posts?.map(p => p.id)}
+        data={thread?.posts?.map(p => p.id) as number[]}
         style={styles.fList}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
@@ -494,11 +511,17 @@ const Thread: FunctionComponent = () => {
         keyboardShouldPersistTaps='handled'
         renderItem={renderFLItem}
         ListHeaderComponent={renderPagination(20, 0, 1)}
-        keyExtractor={id => id.toString()}
+        keyExtractor={(id: number) => id.toString()}
         ref={flatListRef}
         ListEmptyComponent={flEmpty}
         ListFooterComponent={renderPagination(postHeight, 1, 0)}
         refreshControl={flRefreshControl}
+      />
+      <NavigationHeader
+        title={threadTitle || thread?.title || ''}
+        prevScreen={prevScreen}
+        scrollOffset={scrollOffsetY}
+        onLayout={onLayout}
       />
       <View>
         <TouchableOpacity

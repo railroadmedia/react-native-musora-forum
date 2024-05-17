@@ -22,7 +22,7 @@ import { setForumsThreads } from '../redux/threads/ThreadActions';
 import { connection, getForums, getFollowedThreads } from '../services/forum.service';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
-import type { IForum } from '../entity/IForum';
+import type { IForum, IThread } from '../entity/IForum';
 
 const Forums: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
@@ -42,6 +42,8 @@ const Forums: FunctionComponent = props => {
   const reFocused = useRef<boolean>(false);
 
   const flatListRef = useRef<FlatList | null>(null);
+
+  const title = 'Forums';
 
   useEffect(() => {
     const refreshOnFocusListener = addListener('focus', () => {
@@ -74,7 +76,7 @@ const Forums: FunctionComponent = props => {
           setForums(forumsResponse.value.data?.results);
         }
         if (followedResponse.status === 'fulfilled') {
-          setFollowedThreads(followedResponse.value.data?.results?.map(r => r.id));
+          setFollowedThreads(followedResponse.value.data?.results?.map((r: IThread) => r.id));
           setFollowedThreadsTotal(followedResponse.value.data?.total_results);
           if (followedResponse.value.data) {
             dispatch(setForumsThreads(followedResponse.value.data?.results));
@@ -113,7 +115,7 @@ const Forums: FunctionComponent = props => {
       );
       followedRequest
         .then(response => {
-          setFollowedThreads(response.data?.results?.map(r => r.id));
+          setFollowedThreads(response.data?.results?.map((r: IThread) => r.id));
           if (flatListRef.current) {
             flatListRef.current.scrollToOffset({ offset: 0, animated: false });
           }
@@ -130,7 +132,13 @@ const Forums: FunctionComponent = props => {
 
   const renderFLItem = useCallback(
     ({ item }: { item: number }) => (
-      <ThreadCard appColor={appColor} isDark={isDark} id={item} reduxKey='forums' />
+      <ThreadCard
+        appColor={appColor}
+        isDark={isDark}
+        id={item}
+        reduxKey='forums'
+        prevScreen={title}
+      />
     ),
     [appColor, isDark]
   );
@@ -142,7 +150,9 @@ const Forums: FunctionComponent = props => {
         data={item}
         appColor={appColor}
         isDark={isDark}
-        onNavigate={() => navigate('Threads', { title: item.title, forumId: item.id })}
+        onNavigate={() =>
+          navigate('Threads', { title: item.title, forumId: item.id, prevScreen: title })
+        }
       />
     ),
     [appColor, isDark, navigate]
@@ -174,12 +184,14 @@ const Forums: FunctionComponent = props => {
   const flHeader = useMemo(
     () => (
       <>
+        <View style={{ marginTop: 70 }} />
         <Search isDark={isDark} appColor={appColor} />
         {forums?.map(item => renderForum(item))}
         <Text style={styles.sectionTitle}>{'Followed Threads'}</Text>
+        <NavigationHeader title={title} {...props} />
       </>
     ),
-    [forums, appColor, isDark, renderForum, styles.sectionTitle]
+    [isDark, appColor, forums, styles.sectionTitle, props, renderForum]
   );
 
   const flFooter = useMemo(
@@ -217,11 +229,10 @@ const Forums: FunctionComponent = props => {
 
   return (
     <SafeAreaView
-      style={[styles.fList, { paddingBottom: bottomPadding / 2 }]}
-      edges={['left', 'right', 'bottom']}
+      style={[styles.container, { paddingBottom: bottomPadding / 2 }]}
       testID={setTestID(`${brand}ForumsScreen`)}
+      edges={['bottom']}
     >
-      <NavigationHeader title={'Forums'} {...props} />
       {loading ? (
         <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
       ) : (
@@ -248,9 +259,12 @@ const Forums: FunctionComponent = props => {
 
 const setStyles: StyleProp<any> = (isDark: boolean, appColor: string) =>
   StyleSheet.create({
-    fList: {
+    container: {
       flex: 1,
       backgroundColor: isDark ? '#00101D' : '#f0f1f2',
+    },
+    fList: {
+      flex: 1,
     },
     loading: {
       flex: 1,

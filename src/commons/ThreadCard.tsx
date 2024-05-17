@@ -13,10 +13,11 @@ interface IThreadCard {
   reduxKey: 'followed' | 'all' | 'forums';
   appColor: string;
   isDark: boolean;
+  prevScreen?: string;
 }
 
 const ThreadCard: FunctionComponent<IThreadCard> = props => {
-  const { id, reduxKey, appColor, isDark } = props;
+  const { id, reduxKey, appColor, isDark, prevScreen } = props;
   const { navigate } = useNavigation<StackNavigationProp<ForumRootStackParamList>>();
 
   const styles = useStyles(isDark);
@@ -25,6 +26,7 @@ const ThreadCard: FunctionComponent<IThreadCard> = props => {
   const onNavigate = (): void => {
     navigate('Thread', {
       threadId: id,
+      prevScreen: prevScreen,
     });
   };
 
