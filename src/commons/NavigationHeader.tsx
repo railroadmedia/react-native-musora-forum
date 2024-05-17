@@ -392,7 +392,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
     translucentBackground: {
       paddingVertical: 15,
       backgroundColor: isDark ? '#001A2F' : 'white',
-      opacity: 0.75,
+      opacity: 0.90,
     },
     titleRow: {
       flexDirection: 'row',

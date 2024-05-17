@@ -231,6 +231,7 @@ const Forums: FunctionComponent = props => {
     <SafeAreaView
       style={[styles.container, { paddingBottom: bottomPadding / 2 }]}
       testID={setTestID(`${brand}ForumsScreen`)}
+      edges={['bottom']}
     >
       {loading ? (
         <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
