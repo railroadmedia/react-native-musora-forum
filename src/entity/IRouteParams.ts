@@ -22,11 +22,13 @@ export interface IForumParams {
   threadId?: number;
   postId?: number;
   categoryId?: string;
+  prevScreen?: string;
 }
 
 export interface IThreadsParams {
   title: string;
   forumId: number;
+  prevScreen?: string;
 }
 
 export interface ICRUDParams {
@@ -46,6 +48,7 @@ export interface IThreadParams {
   threadId?: number;
   postId?: number;
   page?: number;
+  prevScreen?: string;
 }
 
 export type ForumRootStackParamList = {
