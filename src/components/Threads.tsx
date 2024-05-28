@@ -3,6 +3,7 @@ import type { StackNavigationProp } from '@react-navigation/stack';
 import React, { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   BackHandler,
   FlatList,
   RefreshControl,
@@ -29,7 +30,7 @@ import Sort from '../commons/Sort';
 
 const Threads: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IThreadsParams & IForumParams }, 'params'> = useRoute();
-  const { bottomPadding, isDark, appColor, title, forumId } = params;
+  const { bottomPadding, isDark, appColor, title, forumId, prevScreen } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
   const { navigate, goBack, addListener, canGoBack } =
@@ -52,6 +53,7 @@ const Threads: FunctionComponent = props => {
   const flatListRef = useRef<FlatList | null>(null);
   const reFocused = useRef<boolean>(false);
   const selectedSort = useRef('-published_on');
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   useEffect(() => {
     const refreshOnFocusListener = addListener('focus', () => {
@@ -79,12 +81,12 @@ const Threads: FunctionComponent = props => {
     Promise.allSettled([threadRequest, followedThreadRequest])
       .then(([allRes, followedRes]) => {
         if (allRes.status === 'fulfilled') {
-          setAll(allRes.value.data?.results?.map(r => r.id));
+          setAll(allRes.value.data?.results?.map((r: { id: number }) => r.id));
           setAllResultsTotal(allRes.value?.data?.total_results);
           dispatch(setAllThreads(allRes.value?.data?.results));
         }
         if (followedRes.status === 'fulfilled') {
-          setFollowed(followedRes.value?.data?.results?.map(r => r.id));
+          setFollowed(followedRes.value?.data?.results?.map((r: { id: number }) => r.id));
           setFollowedResultsTotal(followedRes.value?.data?.total_results);
           dispatch(setFollowedThreads(followedRes.value?.data?.results));
         }
@@ -108,7 +110,7 @@ const Threads: FunctionComponent = props => {
         setFollowedLoadingMore(true);
         getFollowedThreads(forumId, page, selectedSort.current)
           .request.then(r => {
-            setFollowed(r.data?.results?.map(f => f.id));
+            setFollowed(r.data?.results?.map((f: { id: number }) => f.id));
             dispatch(setFollowedThreads(r.data?.results));
           })
           .finally(() => {
@@ -119,7 +121,7 @@ const Threads: FunctionComponent = props => {
         setAllLoadingMore(true);
         getAllThreads(forumId, page, selectedSort.current)
           .request.then(r => {
-            setAll(r.data?.results?.map(a => a.id));
+            setAll(r.data?.results?.map((a: { id: number }) => a.id));
             dispatch(setAllThreads(r.data?.results));
           })
           .finally(() => {
@@ -167,7 +169,7 @@ const Threads: FunctionComponent = props => {
       setFollowedRefreshing(true);
       getFollowedThreads(forumId, followedPage, selectedSort.current)
         .request.then(r => {
-          setFollowed(r?.data?.results?.map(f => f.id));
+          setFollowed(r?.data?.results?.map((f: { id: number }) => f.id));
           dispatch(setFollowedThreads(r.data?.results));
         })
         .finally(() => {
@@ -177,7 +179,7 @@ const Threads: FunctionComponent = props => {
       setAllRefreshing(true);
       getAllThreads(forumId, allPage, selectedSort.current)
         .request.then(r => {
-          setAll(r.data?.results?.map(a => a.id));
+          setAll(r.data?.results?.map((a: { id: number }) => a.id));
           dispatch(setAllThreads(r.data?.results));
         })
         .finally(() => {
@@ -260,6 +262,7 @@ const Threads: FunctionComponent = props => {
         isDark={isDark}
         id={item}
         reduxKey={tab ? 'followed' : 'all'}
+        prevScreen={title}
       />
     ),
     [appColor, isDark, tab]
@@ -268,6 +271,7 @@ const Threads: FunctionComponent = props => {
   const flRefreshControl = useMemo(
     () => (
       <RefreshControl
+        progressViewOffset={headerHeight}
         colors={['white']}
         tintColor={appColor}
         progressBackgroundColor={appColor}
@@ -329,15 +333,27 @@ const Threads: FunctionComponent = props => {
     [styles.emptyList, tab]
   );
 
+  const scrollOffsetY = useRef(new Animated.Value(0)).current;
+
+  const handleScroll = Animated.event([{ nativeEvent: { contentOffset: { y: scrollOffsetY } } }], {
+    useNativeDriver: true,
+  });
+
+  const onLayout = (e: LayoutChangeEvent): void => {
+    setHeaderHeight(e.nativeEvent.layout.height);
+  };
+
   return loading ? (
     <ActivityIndicator size='large' color={appColor} animating={true} style={styles.loading} />
   ) : (
     <SafeAreaView
+      edges={['left', 'right']}
       style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
-      edges={['left', 'right', 'bottom']}
     >
-      <NavigationHeader title={title} {...props} />
-      <FlatList
+      <Animated.FlatList
+        contentContainerStyle={{ paddingTop: headerHeight + 15 }}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         key={tab}
         overScrollMode='never'
         windowSize={10}
@@ -356,6 +372,14 @@ const Threads: FunctionComponent = props => {
         ListFooterComponent={flFooter}
         refreshControl={flRefreshControl}
       />
+      <NavigationHeader
+        title={title}
+        {...props}
+        prevScreen={prevScreen}
+        scrollOffset={scrollOffsetY}
+        onLayout={onLayout}
+      />
+
       <View>
         <TouchableOpacity
           onLayout={onLayoutAddThread}

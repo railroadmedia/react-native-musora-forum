@@ -62,7 +62,7 @@ const Search: FunctionComponent<ISearch> = props => {
           setSearchResults(searchResult.data?.results);
           setSearchText(text);
           setSearchTotal(searchResult.data?.total_results);
-          dispatch(setSearchThreads(searchResult.data?.results?.map(r => r.thread)));
+          dispatch(setSearchThreads(searchResult.data?.results?.map((r: ISearchItem) => r.thread)));
         })
         .finally(() => {
           setLoading(false);
@@ -239,10 +239,12 @@ const Search: FunctionComponent<ISearch> = props => {
           transparent={false}
         >
           <SafeAreaView style={styles.safeArea}>
-            <TouchableOpacity style={styles.navHeader} onPress={closeModal}>
-              {arrowLeft({ height: 20, fill: isDark ? 'white' : 'black' })}
+            <View style={styles.navHeader}>
+              <TouchableOpacity style={{ width: '100%' }} onPress={closeModal}>
+                {arrowLeft({ height: 20, width: 20, fill: isDark ? 'white' : 'black' })}
+              </TouchableOpacity>
               <Text style={styles.navHeaderTitle}>{'All Forums'}</Text>
-            </TouchableOpacity>
+            </View>
             {loading ? (
               <ActivityIndicator
                 size='large'
@@ -283,12 +285,14 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
     navHeader: {
       paddingHorizontal: 15,
       paddingVertical: 20,
+      flexDirection: 'row',
       justifyContent: 'center',
+      alignItems: 'flex-start',
     },
     navHeaderTitle: {
       fontFamily: 'OpenSans-ExtraBold',
       fontSize: 20,
-      color: 'black',
+      color: isDark ? 'white' : 'black',
       textAlign: 'center',
       position: 'absolute',
       alignSelf: 'center',
