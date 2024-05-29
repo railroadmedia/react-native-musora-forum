@@ -1,5 +1,16 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
-import { TouchableOpacity, StyleSheet, StyleProp, View, Text, Modal } from 'react-native';
+import {
+  TouchableOpacity,
+  StyleSheet,
+  StyleProp,
+  View,
+  Text,
+  Modal,
+  KeyboardAvoidingView,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 import { IS_IOS, defaultIssues, setTestID } from '../../services/helpers';
 import CustomCheckBox from '../CustomCheckBox';
 import CustomTextinput from '../CustomTextInput';
@@ -64,78 +75,90 @@ const ReportModal = forwardRef<{ toggle: (mode: 'post' | 'user') => void }, IRep
 
     return (
       <Modal visible={visible} onRequestClose={closeModal}>
-        <TouchableOpacity style={{ flex: 1 }} onPress={closeModal}>
-          <View style={styles.modalContent}>
-            <View />
-            <View>
-              <View>
-                <Text style={styles.titleStyle}>{`Report This ${reportMode}`}</Text>
-                <Text
-                  style={styles.subtitleStyle}
-                >{`Please tell us why you're reporting this comment.`}</Text>
-              </View>
-              <View>
-                {issues?.map(({ text, selected }) => (
+        <KeyboardAvoidingView behavior={IS_IOS ? 'padding' : undefined} style={styles.container}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps={'handled'}
+            showsVerticalScrollIndicator={false}
+          >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View style={styles.modalContent}>
+                <View />
+                <View>
+                  <View>
+                    <Text style={styles.titleStyle}>{`Report This ${reportMode}`}</Text>
+                    <Text
+                      style={styles.subtitleStyle}
+                    >{`Please tell us why you're reporting this ${reportMode}.`}</Text>
+                  </View>
+                  <View>
+                    {issues?.map(({ text, selected }) => (
+                      <TouchableOpacity
+                        key={text}
+                        onPress={() => onIssueChanged(selected ? undefined : text)}
+                        style={styles.issueBtn}
+                        testID={setTestID('issueRadioBtn')}
+                        accessible={IS_IOS ? false : true}
+                      >
+                        <CustomCheckBox
+                          isOn={selected}
+                          onValueChange={() => onIssueChanged(selected ? undefined : text)}
+                          style={{
+                            ...styles.checkBoxStyle,
+                            backgroundColor: selected ? '#FFAE00' : isDark ? '#002039' : '#FFFFFF',
+                          }}
+                          icon={<View style={styles.checkBoxActive} />}
+                        />
+                        <Text style={styles.issueTextStyle} testID={setTestID('filterOptionText')}>
+                          {text}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  {showReportForm && (
+                    <CustomTextinput
+                      multiline={true}
+                      placeholder={`Start sharing your feedback...`}
+                      placeholderTextColor={isDark ? '#9EC0DC' : '#8C8C90'}
+                      value={issueText}
+                      onChangeText={onIssueTextChanged}
+                      containerStyle={styles.textAreaContainer}
+                      inputStyle={styles.textArea}
+                      textinputStyle={styles.textAreaInput}
+                      clearIcon={{
+                        fill: isDark ? '#9EC0DC' : '#8C8C90',
+                        size: 10,
+                        style: { top: 10 },
+                      }}
+                    />
+                  )}
+                </View>
+
+                <View>
                   <TouchableOpacity
-                    key={text}
-                    onPress={() => onIssueChanged(selected ? undefined : text)}
-                    style={styles.issueBtn}
-                    testID={setTestID('issueRadioBtn')}
+                    onPress={onSubmitReport}
+                    style={[styles.submitBtn, issueText === '' && [styles.disabledBtn]]}
+                    disabled={issueText === ''}
+                    testID={setTestID(`submitBtn`)}
                     accessible={IS_IOS ? false : true}
                   >
-                    <CustomCheckBox
-                      isOn={selected}
-                      onValueChange={() => onIssueChanged(selected ? undefined : text)}
-                      style={{
-                        ...styles.checkBoxStyle,
-                        backgroundColor: selected ? '#FFAE00' : isDark ? '#002039' : '#FFFFFF',
-                      }}
-                      icon={<View style={styles.checkBoxActive} />}
-                    />
-                    <Text style={styles.issueTextStyle} testID={setTestID('filterOptionText')}>
-                      {text}
+                    <Text
+                      style={[styles.submitBtnText, issueText === '' && styles.disabledBtnText]}
+                      testID={setTestID(`SubmitBtnText`)}
+                      numberOfLines={1}
+                    >
+                      {'SUBMIT REPORT'}
                     </Text>
                   </TouchableOpacity>
-                ))}
+
+                  <TouchableOpacity onPress={closeModal} style={styles.closeBtn}>
+                    <Text style={styles.close}>{'Close'}</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              {showReportForm && (
-                <CustomTextinput
-                  multiline={true}
-                  placeholder={`Start sharing your feedback...`}
-                  placeholderTextColor={isDark ? '#9EC0DC' : '#8C8C90'}
-                  value={issueText}
-                  onChangeText={onIssueTextChanged}
-                  containerStyle={styles.textAreaContainer}
-                  inputStyle={styles.textArea}
-                  textinputStyle={styles.textAreaInput}
-                  clearIcon={{ fill: isDark ? '#9EC0DC' : '#8C8C90', size: 10, style: { top: 10 } }}
-                />
-              )}
-            </View>
-
-            <View>
-              <TouchableOpacity
-                onPress={onSubmitReport}
-                style={[styles.submitBtn, issueText === '' && [styles.disabledBtn]]}
-                disabled={issueText === ''}
-                testID={setTestID(`submitBtn`)}
-                accessible={IS_IOS ? false : true}
-              >
-                <Text
-                  style={[styles.submitBtnText, issueText === '' && styles.disabledBtnText]}
-                  testID={setTestID(`SubmitBtnText`)}
-                  numberOfLines={1}
-                >
-                  {'SUBMIT REPORT'}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={closeModal}>
-                <Text style={styles.close}>{'Close'}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableOpacity>
+            </TouchableWithoutFeedback>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </Modal>
     );
   }
@@ -143,6 +166,13 @@ const ReportModal = forwardRef<{ toggle: (mode: 'post' | 'user') => void }, IRep
 
 const localStyles: StyleProp<any> = (isDark: boolean) =>
   StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: isDark ? '#00101D' : '#F7F9FC',
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
     modalContent: {
       flex: 1,
       padding: 10,
@@ -233,11 +263,14 @@ const localStyles: StyleProp<any> = (isDark: boolean) =>
     disabledBtnText: {
       color: '#000000',
     },
+    closeBtn: {
+      alignSelf: 'center',
+      marginTop: 15,
+    },
     close: {
       fontFamily: 'OpenSans-Bold',
       fontSize: 18,
       color: isDark ? '#FFFFFF' : '#00101D',
-      marginTop: 15,
       padding: 10,
       alignSelf: 'center',
     },

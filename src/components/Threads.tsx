@@ -265,7 +265,7 @@ const Threads: FunctionComponent = props => {
         prevScreen={title}
       />
     ),
-    [appColor, isDark, tab]
+    [appColor, isDark, tab, title]
   );
 
   const flRefreshControl = useMemo(
@@ -279,7 +279,7 @@ const Threads: FunctionComponent = props => {
         refreshing={followedRefreshing || allRefreshing}
       />
     ),
-    [followedRefreshing, allRefreshing, appColor, refresh]
+    [followedRefreshing, allRefreshing, appColor, refresh, headerHeight]
   );
 
   const flFooter = useMemo(

@@ -214,10 +214,7 @@ const Thread: FunctionComponent = () => {
       ) {
         let scrollPos = flHeaderHeight.current;
         thread?.posts
-          ?.slice(
-            0,
-            thread?.posts?.findIndex(p => p.id === postId.current)
-          )
+          ?.slice(0, thread?.posts?.findIndex(p => p.id === postId.current))
           .map(p => (scrollPos += postLayouts.current[p.id]));
         flatListRef.current?.scrollToOffset({
           offset: scrollPos,
