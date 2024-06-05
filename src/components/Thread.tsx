@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 
 import { batch, useDispatch } from 'react-redux';
-import { post as PostSvg, lock, multiQuote, reportSvg, banSvg } from '../assets/svgs';
+import { post as PostSvg, lock, multiQuote, reportSvg, BlockUserSvg } from '../assets/svgs';
 import NavigationHeader from '../commons/NavigationHeader';
 import Pagination from '../commons/Pagination';
 import Post from '../commons/Post';
@@ -36,6 +36,7 @@ import {
 import { useAppSelector } from '../redux/Store';
 import type { ForumRootStackParamList, IForumParams, IThreadParams } from '../entity/IRouteParams';
 import { IS_TABLET } from '../services/helpers';
+import ReportModal from '../commons/modals/ReportModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Thread: FunctionComponent = () => {
@@ -93,6 +94,7 @@ const Thread: FunctionComponent = () => {
   const flatListRef = useRef<FlatList>(null);
   const blockRef = useRef<React.ElementRef<typeof MenuModal>>(null);
   const warningRef = useRef<React.ElementRef<typeof BlockWarningModal>>(null);
+  const reportRef = useRef<React.ElementRef<typeof ReportModal>>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
 
   useEffect(() => {
@@ -212,10 +214,7 @@ const Thread: FunctionComponent = () => {
       ) {
         let scrollPos = flHeaderHeight.current;
         thread?.posts
-          ?.slice(
-            0,
-            thread?.posts?.findIndex(p => p.id === postId.current)
-          )
+          ?.slice(0, thread?.posts?.findIndex(p => p.id === postId.current))
           .map(p => (scrollPos += postLayouts.current[p.id]));
         flatListRef.current?.scrollToOffset({
           offset: scrollPos,
@@ -290,16 +289,9 @@ const Thread: FunctionComponent = () => {
     }
   }, [multiQuotesArr]);
 
-  const reportForumPost = useCallback(() => {
-    if (!!selectedPost.current?.is_reported_by_viewer) {
-      setShowToastAlert(true);
-      setAlertText('You have already reported this post.');
-      setTimeout(() => {
-        setShowToastAlert(false);
-        setAlertText('');
-      }, 2000);
-    } else {
-      const { request, controller } = reportPost(selectedPost.current?.id || 0);
+  const reportForumPost = useCallback(
+    (issue: string) => {
+      const { request, controller } = reportPost(selectedPost.current?.id || 0, issue);
       request.then(() => {
         setShowToastAlert(true);
         setAlertText('The forum post was reported.');
@@ -312,41 +304,54 @@ const Thread: FunctionComponent = () => {
       return () => {
         controller.abort();
       };
-    }
-  }, [refresh]);
+    },
+    [refresh]
+  );
 
   const showBlockModal = useCallback((selectedP: IPost, mode: 'post' | 'user'): void => {
     selectedPost.current = selectedP;
     blockRef.current?.toggle(mode, selectedP);
   }, []);
 
-  const showBlockWarning = (): void => {
-    warningRef.current?.toggle(selectedPost.current?.author?.display_name || '');
-  };
-
-  const onReportUser = (): any => {
-    if (!selectedPost.current) {
+  const showReportModal = useCallback((mode: 'post' | 'user'): void => {
+    if (mode === 'post' && !!selectedPost.current?.is_reported_by_viewer) {
+      setShowToastAlert(true);
+      setAlertText('You have already reported this post.');
+      setTimeout(() => {
+        setShowToastAlert(false);
+        setAlertText('');
+      }, 2000);
       return;
-    }
-    if (selectedPost.current?.author?.is_reported_by_viewer) {
+    } else if (mode === 'user' && selectedPost.current?.author?.is_reported_by_viewer) {
       setShowReportAlert(true);
       setTimeout(() => {
         setShowReportAlert(false);
       }, 2000);
-    } else {
-      const { request, controller } = reportUser(selectedPost.current?.author?.id || 0);
-      request.then(res => {
-        if (res.data?.success) {
-          setShowReportAlert(true);
-          setTimeout(() => {
-            setShowReportAlert(false);
-          }, 2000);
-        }
-      });
-      return () => {
-        controller.abort();
-      };
+      return;
     }
+    reportRef.current?.toggle(mode);
+  }, []);
+
+  const onReportUser = (issue: string): any => {
+    if (!selectedPost.current) {
+      return;
+    }
+    const { request, controller } = reportUser(selectedPost.current?.author?.id || 0, issue);
+    request.then(res => {
+      if (res.data?.success) {
+        setShowReportAlert(true);
+        setTimeout(() => {
+          setShowReportAlert(false);
+        }, 2000);
+      }
+    });
+    return () => {
+      controller.abort();
+    };
+  };
+
+  const showBlockUserWarning = (): void => {
+    warningRef.current?.toggle('user', selectedPost.current?.author?.display_name || '');
   };
 
   const onBlockUser = useCallback(() => {
@@ -565,15 +570,20 @@ const Thread: FunctionComponent = () => {
 
       <MenuModal
         ref={blockRef}
-        onReportUser={onReportUser}
-        onReportPost={reportForumPost}
-        onBlock={showBlockWarning}
+        onReport={showReportModal}
+        onBlockUser={showBlockUserWarning}
         onEdit={editPost}
         onMultiquote={multiquote}
         user={user}
         multiQuoteArr={multiQuotesArr}
       />
-      <BlockWarningModal ref={warningRef} onBlock={onBlockUser} />
+      <ReportModal
+        ref={reportRef}
+        onReportUser={onReportUser}
+        onReportPost={reportForumPost}
+        isDark={isDark}
+      />
+      <BlockWarningModal ref={warningRef} onBlockUser={onBlockUser} />
       {showToastAlert && (
         <ToastAlert
           content={alertText}
@@ -603,7 +613,7 @@ const Thread: FunctionComponent = () => {
       {showBlockAlert && (
         <ToastAlert
           content={`${selectedPost.current?.author?.display_name || 'User'} was blocked.`}
-          icon={banSvg({
+          icon={BlockUserSvg({
             height: 21.6,
             width: 21.6,
             fill: isDark ? 'black' : 'white',

@@ -1,14 +1,13 @@
 import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { TouchableOpacity, StyleSheet, View, Modal, Text } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { banSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
+import { BlockUserSvg, edit, multiQuoteSvg, reportSvg } from '../../assets/svgs';
 import type { IPost, IUser } from '../../entity/IForum';
 import { IS_TABLET } from '../../services/helpers';
 
 interface IMenuModal {
-  onReportUser?: () => void;
-  onReportPost?: () => void;
-  onBlock?: () => void;
+  onReport?: (mode: 'user' | 'post') => void;
+  onBlockUser?: () => void;
   onEdit?: () => void;
   onMultiquote?: () => void;
   mode?: 'user' | 'post';
@@ -21,7 +20,7 @@ const MenuModal = forwardRef<
   { toggle: (mode: 'post' | 'user', selected: IPost) => void },
   IMenuModal
 >((props, ref) => {
-  const { onReportUser, onReportPost, onBlock, onEdit, onMultiquote, user, multiQuoteArr } = props;
+  const { onReport, onBlockUser, onEdit, onMultiquote, user, multiQuoteArr } = props;
   const [visible, setVisible] = useState(false);
   const [reportMode, setReportMode] = useState<'post' | 'user'>();
   const [selectedPost, setSelectedPost] = useState<IPost | undefined>();
@@ -39,18 +38,16 @@ const MenuModal = forwardRef<
   }, []);
 
   const report = useCallback(() => {
-    if (reportMode === 'user') {
-      onReportUser?.();
-    } else {
-      onReportPost?.();
+    if (reportMode) {
+      onReport?.(reportMode);
     }
     closeModal();
-  }, [closeModal, onReportPost, onReportUser, reportMode]);
+  }, [closeModal, onReport, reportMode]);
 
   const blockUser = useCallback(() => {
-    onBlock?.();
+    onBlockUser?.();
     closeModal();
-  }, [closeModal, onBlock]);
+  }, [closeModal, onBlockUser]);
 
   const editPost = useCallback(() => {
     onEdit?.();
@@ -119,7 +116,7 @@ const MenuModal = forwardRef<
               </TouchableOpacity>
               <TouchableOpacity onPress={blockUser} style={styles.actionContainer}>
                 <View style={styles.iconContainer}>
-                  {banSvg({
+                  {BlockUserSvg({
                     height: 24,
                     width: 24,
                     fill: 'white',

@@ -139,7 +139,7 @@ const CRUD: FunctionComponent = () => {
         }
       }
     },
-    []
+    [richHTML]
   );
 
   const save = useCallback(async (): Promise<void> => {

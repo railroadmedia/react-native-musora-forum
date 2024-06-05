@@ -158,7 +158,7 @@ const Threads: FunctionComponent = props => {
           });
       }
     },
-    [dispatch, forumId, tab]
+    [dispatch, forumId, tab, allPage, followedPage]
   );
 
   const refresh = useCallback(() => {
@@ -250,6 +250,8 @@ const Threads: FunctionComponent = props => {
       styles.headerText,
       tab,
       onTabChange,
+      onSort,
+      styles.headerBtnContainer,
     ]
   );
 
@@ -263,7 +265,7 @@ const Threads: FunctionComponent = props => {
         prevScreen={title}
       />
     ),
-    [appColor, isDark, tab]
+    [appColor, isDark, tab, title]
   );
 
   const flRefreshControl = useMemo(
@@ -277,7 +279,7 @@ const Threads: FunctionComponent = props => {
         refreshing={followedRefreshing || allRefreshing}
       />
     ),
-    [followedRefreshing, allRefreshing, appColor, refresh]
+    [followedRefreshing, allRefreshing, appColor, refresh, headerHeight]
   );
 
   const flFooter = useMemo(

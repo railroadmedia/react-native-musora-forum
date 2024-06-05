@@ -38,9 +38,9 @@ interface IThreadsRes extends IResponseBody {
 }
 export const getAllThreads = (forumId: number, page = 1, sort?: string): IResponse<IThreadsRes> =>
   (this as any)?.tryCall.get(
-    `/forums/api/thread/index?amount=10&page=${page}&brand=${(this as any)?.brand}&sort=${sort || '-published_on'}&category_id=${
-      forumId || ''
-    }`
+    `/forums/api/thread/index?amount=10&page=${page}&brand=${(this as any)?.brand}&sort=${
+      sort || '-published_on'
+    }&category_id=${forumId || ''}`
   );
 
 interface IFollowedThreadsRes extends IResponseBody {
@@ -113,8 +113,10 @@ export const likePost = (id: number): IResponse =>
 export const disLikePost = (id: number): IResponse =>
   (this as any)?.tryCall.delete(`/forums/api/post/unlike/${id}?brand=${(this as any)?.brand}`);
 
-export const reportPost = (id: number): IResponse =>
-  (this as any)?.tryCall.put(`/forums/api/post/report/${id}?brand=${(this as any)?.brand}`);
+export const reportPost = (id: number, issue: string): IResponse =>
+  (this as any)?.tryCall.put(`/forums/api/post/report/${id}?brand=${(this as any)?.brand}`, {
+    issue,
+  });
 
 export const createPost = (body: {
   content: string;
@@ -131,9 +133,10 @@ export const editPost = (id: number, content: string): IResponse<{ id: number }>
 export const deletePost = (id: number): IResponse =>
   (this as any)?.tryCall.delete(`/forums/api/post/delete/${id}?brand=${(this as any)?.brand}`);
 
-export const reportUser = (id: number): IResponse<{ success: boolean }> =>
+export const reportUser = (id: number, issue: string): IResponse<{ success: boolean }> =>
   (this as any)?.tryCall.put(
-    `/user-management-system/user/report/${id}?brand=${(this as any)?.brand}`
+    `/user-management-system/user/report/${id}?brand=${(this as any)?.brand}`,
+    { issue }
   );
 
 export const blockUser = (id: number): IResponse<{ success: boolean }> =>

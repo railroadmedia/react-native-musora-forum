@@ -156,6 +156,7 @@ const Search: FunctionComponent<ISearch> = props => {
       styles.searchIcon,
       styles.searchInput,
       styles.searchInputContainer,
+      isDark,
     ]
   );
 
