@@ -218,7 +218,7 @@ const Thread: FunctionComponent = () => {
             ?.slice(
               0,
               // eslint-disable-next-line eqeqeq
-              thread?.posts?.findIndex(p => p.id == 352745)
+              thread?.posts?.findIndex(p => p.id == postId.current)
             )
             ?.map(p => (scrollPos += postLayouts.current[p.id]));
           return flatListRef.current?.scrollToOffset({
