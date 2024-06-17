@@ -208,19 +208,25 @@ const Thread: FunctionComponent = () => {
     (id: number, height: number) => {
       postLayouts.current[id] = height;
 
-      if (
-        postId.current &&
-        thread?.posts?.every(p => Object.keys(postLayouts.current).includes(`${p?.id}`))
-      ) {
-        let scrollPos = flHeaderHeight.current;
-        thread?.posts
-          ?.slice(0, thread?.posts?.findIndex(p => p.id === postId.current))
-          .map(p => (scrollPos += postLayouts.current[p.id]));
-        flatListRef.current?.scrollToOffset({
-          offset: scrollPos,
-          animated: false,
-        });
-      }
+      setTimeout(() => {
+        if (
+          postId.current &&
+          thread?.posts?.every(p => Object.keys(postLayouts.current).includes(`${p?.id}`))
+        ) {
+          let scrollPos = 0;
+          thread?.posts
+            ?.slice(
+              0,
+              // eslint-disable-next-line eqeqeq
+              thread?.posts?.findIndex(p => p.id == postId.current)
+            )
+            ?.map(p => (scrollPos += postLayouts.current[p.id]));
+          return flatListRef.current?.scrollToOffset({
+            offset: scrollPos,
+            animated: false,
+          });
+        }
+      }, 1000);
     },
     [thread?.posts]
   );
