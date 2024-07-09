@@ -378,6 +378,7 @@ const Threads: FunctionComponent = props => {
         prevScreen={prevScreen}
         scrollOffset={scrollOffsetY}
         onLayout={onLayout}
+        isDark={isDark}
       />
 
       <View>

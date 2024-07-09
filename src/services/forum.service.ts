@@ -52,8 +52,9 @@ export const getFollowedThreads = (
   sort?: string
 ): IResponse<IFollowedThreadsRes> =>
   (this as any)?.tryCall.get(
-    `/forums/api/thread/index?amount=10&page=${page || 1}&brand=${(this as any)
-      ?.brand}&followed=1&sort=${sort || '-published_on'}&category_id=${forumId || ''}`
+    `/forums/api/thread/index?amount=10&page=${page || 1}&brand=${
+      (this as any)?.brand
+    }&followed=1&sort=${sort || '-published_on'}&category_id=${forumId || ''}`
   );
 
 export const getThread = (

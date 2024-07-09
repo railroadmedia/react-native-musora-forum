@@ -533,6 +533,7 @@ const Thread: FunctionComponent = () => {
         prevScreen={prevScreen}
         scrollOffset={scrollOffsetY}
         onLayout={onLayout}
+        isDark={isDark}
       />
       <View>
         <TouchableOpacity
