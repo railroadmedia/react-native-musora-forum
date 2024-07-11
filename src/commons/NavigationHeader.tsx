@@ -14,6 +14,7 @@ import {
   StyleProp,
   Animated,
   LayoutChangeEvent,
+  ViewStyle,
 } from 'react-native';
 import { batch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -287,34 +288,47 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
     </TouchableOpacity>
   );
 
+  const SafeArea: FunctionComponent<{ children: ReactElement; style?: StyleProp<ViewStyle> }> =
+    useCallback(
+      ({ children, style }) =>
+        isHome ? (
+          <View style={style}>{children}</View>
+        ) : (
+          <SafeAreaView style={style} edges={isHome ? ['right', 'left'] : ['top', 'right', 'left']}>
+            {children}
+          </SafeAreaView>
+        ),
+      [isHome]
+    );
+
   const bigHeader = (
     <Animated.View style={{ opacity: headerOpacity }} onLayout={onLayout}>
-      <SafeAreaView
-        style={[styles.subContainer, styles.bigHeaderSafeArea]}
-        edges={isHome ? ['right', 'left'] : ['top', 'right', 'left']}
-      >
-        {!isHome ? backArrow : null}
+      <SafeArea style={[styles.subContainer, styles.bigHeaderSafeArea]}>
+        <>
+          {!isHome ? backArrow : null}
 
-        <Animated.View style={[styles.titleRow, { opacity: headerOpacity }]}>
-          <Animated.View style={styles.titleContainer}>
-            <Animated.View style={styles.titleIconsContainer}>
-              {!!thread?.locked &&
-                lock({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
-              {!!thread?.pinned && pin({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
+          <Animated.View style={[styles.titleRow, { opacity: headerOpacity }]}>
+            <Animated.View style={styles.titleContainer}>
+              <Animated.View style={styles.titleIconsContainer}>
+                {!!thread?.locked &&
+                  lock({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
+                {!!thread?.pinned &&
+                  pin({ height: 10, width: 10, fill: isDark ? 'white' : 'black' })}
+              </Animated.View>
+              <Text
+                style={isHome ? styles.forumTitle : styles.titleText}
+                numberOfLines={2}
+                ellipsizeMode='tail'
+              >
+                {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
+              </Text>
             </Animated.View>
-            <Text
-              style={isHome ? styles.forumTitle : styles.titleText}
-              numberOfLines={2}
-              ellipsizeMode='tail'
-            >
-              {(!!title ? title : thread?.title)?.replace(/-/g, ' ')}
-            </Text>
+            {name?.match(/^(Forums|Threads|Thread)$/) && !isForumRules && MenuButton}
           </Animated.View>
-          {name?.match(/^(Forums|Threads|Thread)$/) && !isForumRules && MenuButton}
-        </Animated.View>
 
-        <View style={styles.divider} />
-      </SafeAreaView>
+          <View style={styles.divider} />
+        </>
+      </SafeArea>
     </Animated.View>
   );
 
