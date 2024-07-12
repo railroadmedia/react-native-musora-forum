@@ -64,16 +64,16 @@ interface INavigationHeader {
   isForumRules?: boolean;
   prevScreen?: string;
   scrollOffset?: Animated.Value;
-
+  isDark: boolean;
   onLayout?: (e: LayoutChangeEvent) => void;
 }
 
 const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
-  const { title, isForumRules, prevScreen = '', scrollOffset, onLayout } = props;
+  const { title, isForumRules, prevScreen = '', scrollOffset, onLayout, isDark } = props;
   const route: RouteProp<{ params: IForumParams }> = useRoute();
   const {
     name,
-    params: { isDark, postId, user, threadId },
+    params: { postId, user, threadId },
   } = route;
   const styles = setStyles(isDark);
   const { navigate, goBack, push } = useNavigation<StackNavigationProp<ForumRootStackParamList>>();

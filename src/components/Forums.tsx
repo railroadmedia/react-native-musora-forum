@@ -24,10 +24,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
 import type { IForum, IThread } from '../entity/IForum';
 
-const Forums: FunctionComponent = props => {
+const Forums: FunctionComponent<{ isDark: boolean }> = props => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
-  const { bottomPadding, brand, isDark, appColor } = params;
-
+  const { bottomPadding, brand, appColor } = params;
+  const { isDark } = props;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
   const { navigate, goBack, addListener, canGoBack } =
