@@ -54,7 +54,9 @@ const HeaderOptionsModal: FunctionComponent<IHeaderOptionsModal> = props => {
             style={{
               ...styles.followStateContainer,
               borderTopColor: isFollowed ? '#34D399' : '#FFAE00',
+              backgroundColor: isDark ? '#081825' : 'white',
             }}
+            testID={'followStateToast'}
           >
             {(isFollowed ? check : unfollow)({
               height: 25,
