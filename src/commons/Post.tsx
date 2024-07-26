@@ -137,6 +137,7 @@ const Post: FunctionComponent<IPostProps> = props => {
             marginBottom: 40,
             backgroundColor: selected ? selectedColor : baseColor,
           }}
+          testID={'PostCard'}
         >
           <View style={styles.header}>
             <Text style={styles.headerText}>#{index}</Text>
