@@ -235,7 +235,7 @@ const NavigationHeader: FunctionComponent<INavigationHeader> = props => {
 
   const MenuButton = useMemo(
     () => (
-      <TouchableOpacity onPress={() => setOptionsVisible(true)}>
+      <TouchableOpacity onPress={() => setOptionsVisible(true)} testID={'menuBtn'}>
         {menuCircle({ width: 39, height: 39, fill: isDark ? 'white' : '#081825' })}
       </TouchableOpacity>
     ),

@@ -137,12 +137,13 @@ const Post: FunctionComponent<IPostProps> = props => {
             marginBottom: 40,
             backgroundColor: selected ? selectedColor : baseColor,
           }}
+          testID={'PostCard'}
         >
           <View style={styles.header}>
             <Text style={styles.headerText}>#{index}</Text>
             <Text style={styles.headerText}>{post?.published_on_formatted}</Text>
           </View>
-          <View style={styles.header}>
+          <View style={styles.header} testID={'PostTitle'}>
             <View style={styles.userDetails}>
               <AccessLevelAvatar
                 author={post?.author || ({} as IAuthor)}

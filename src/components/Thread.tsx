@@ -506,6 +506,7 @@ const Thread: FunctionComponent = () => {
     <SafeAreaView
       edges={['left', 'right']}
       style={[styles.fList, { paddingBottom: bottomPadding / 2 + 10 }]}
+      testID={'ThreadScreen'}
     >
       <Animated.FlatList
         contentContainerStyle={{ paddingTop: headerHeight + 15 }}

@@ -31,7 +31,7 @@ const ThreadCard: FunctionComponent<IThreadCard> = props => {
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onNavigate}>
+    <TouchableOpacity style={styles.container} onPress={onNavigate} testID={'threadCard'}>
       <AccessLevelAvatar
         author={{
           id: thread?.author_id || -1,
