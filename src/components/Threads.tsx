@@ -386,6 +386,7 @@ const Threads: FunctionComponent = props => {
           onLayout={onLayoutAddThread}
           onPress={onPressAddTread}
           style={styles.bottomTOpacity}
+          accessibilityLabel='Create a thread'
         >
           {addThread({ height: 25, width: 25, fill: 'white' })}
         </TouchableOpacity>

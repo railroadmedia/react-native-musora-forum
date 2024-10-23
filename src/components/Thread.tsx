@@ -541,6 +541,7 @@ const Thread: FunctionComponent = () => {
           onLayout={onLayoutAddPost}
           onPress={onPressPost}
           style={styles.bottomTOpacity}
+          accessibilityLabel='Reply to thread'
         >
           {(locked ? lock : multiQuotesArr?.length > 0 ? multiQuote : PostSvg)({
             height: 25,

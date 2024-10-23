@@ -16,7 +16,7 @@ const ForumCard: FunctionComponent<IForumCard> = props => {
   const styles = setStyles(isDark);
 
   return (
-    <TouchableOpacity onPress={onNavigate} style={styles.container}>
+    <TouchableOpacity onPress={onNavigate} style={styles.container} accessibilityLabel={data?.title}>
       <View style={styles.titleContainer}>
         <View style={styles.icon}>
           {data?.icon_path ? (
