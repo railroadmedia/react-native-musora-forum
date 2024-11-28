@@ -23,10 +23,11 @@ import { connection, getForums, getFollowedThreads } from '../services/forum.ser
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
 import type { IForum, IThread } from '../entity/IForum';
+import CustomTooltip from '../commons/CustomTooltip';
 
 const Forums: FunctionComponent<{ isDark: boolean }> = props => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
-  const { bottomPadding, brand, appColor } = params;
+  const { bottomPadding, brand, appColor, guideStep, changeStep } = params;
   const { isDark } = props;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
@@ -144,18 +145,49 @@ const Forums: FunctionComponent<{ isDark: boolean }> = props => {
   );
 
   const renderForum = useCallback(
-    (item: IForum) => (
-      <ForumCard
-        key={item.id}
-        data={item}
-        appColor={appColor}
-        isDark={isDark}
-        onNavigate={() =>
-          navigate('Threads', { title: item.title, forumId: item.id, prevScreen: title })
-        }
-      />
-    ),
-    [appColor, isDark, navigate]
+    (item: IForum) => {
+      if (
+        [
+          'general drum discussion',
+          'general piano discussion',
+          'general guitar discussion',
+          'general singing discussion',
+        ].includes(item.title.toLowerCase())
+      ) {
+        return (
+          <CustomTooltip
+            isVisible={guideStep === 12}
+            text={`Go to the ${item.title} board.`}
+            placement='top'
+            onClose={() => {
+              changeStep?.(13);
+            }}
+          >
+            <ForumCard
+              key={item.id}
+              data={item}
+              appColor={appColor}
+              isDark={isDark}
+              onNavigate={() =>
+                navigate('Threads', { title: item.title, forumId: item.id, prevScreen: title })
+              }
+            />
+          </CustomTooltip>
+        );
+      }
+      return (
+        <ForumCard
+          key={item.id}
+          data={item}
+          appColor={appColor}
+          isDark={isDark}
+          onNavigate={() =>
+            navigate('Threads', { title: item.title, forumId: item.id, prevScreen: title })
+          }
+        />
+      );
+    },
+    [appColor, isDark, guideStep, navigate, changeStep]
   );
 
   const onAndroidBack = useCallback(() => {

@@ -31,10 +31,10 @@ const ThreadCard: FunctionComponent<IThreadCard> = props => {
   };
 
   return (
-    <TouchableOpacity 
-      style={styles.container} 
-      onPress={onNavigate} 
-      testID={'threadCard'} 
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onNavigate}
+      testID={'threadCard'}
       accessibilityLabel={`${thread?.pinned ? 'Pinned thread - ' : ''}${thread?.title}`}
     >
       <AccessLevelAvatar
