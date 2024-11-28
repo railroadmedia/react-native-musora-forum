@@ -1,6 +1,14 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import React, { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useContext,
+} from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -27,10 +35,11 @@ import { getAllThreads, getFollowedThreads, connection } from '../services/forum
 import type { ForumRootStackParamList, IForumParams, IThreadsParams } from '../entity/IRouteParams';
 import type { LayoutChangeEvent } from 'react-native';
 import Sort from '../commons/Sort';
+import CustomTooltip from '../commons/CustomTooltip';
 
 const Threads: FunctionComponent = props => {
   const { params }: RouteProp<{ params: IThreadsParams & IForumParams }, 'params'> = useRoute();
-  const { bottomPadding, isDark, appColor, title, forumId, prevScreen } = params;
+  const { bottomPadding, isDark, appColor, title, forumId, prevScreen, tooltipContext } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
   const { navigate, goBack, addListener, canGoBack } =
@@ -54,6 +63,8 @@ const Threads: FunctionComponent = props => {
   const reFocused = useRef<boolean>(false);
   const selectedSort = useRef('-published_on');
   const [headerHeight, setHeaderHeight] = useState(0);
+  const [showGuide, setShowGuide] = useState(false);
+  const tooltips: any = useContext(tooltipContext);
 
   useEffect(() => {
     const refreshOnFocusListener = addListener('focus', () => {
@@ -93,12 +104,19 @@ const Threads: FunctionComponent = props => {
       })
       .finally(() => {
         setLoading(false);
+        if (tooltips?.step === 13) {
+          // Timeout to allow screen to finish rendering so tooltip
+          // appears in correct spot.
+          setTimeout(() => {
+            setShowGuide(true);
+          }, 500);
+        }
       });
     return () => {
       threadController.abort();
       followedThreadController.abort();
     };
-  }, [dispatch, forumId]);
+  }, [dispatch, forumId, tooltips, setShowGuide]);
 
   const changePage = useCallback(
     (page: number) => {
@@ -256,16 +274,40 @@ const Threads: FunctionComponent = props => {
   );
 
   const renderFLItem = useCallback(
-    ({ item }: { item: number }) => (
-      <ThreadCard
-        appColor={appColor}
-        isDark={isDark}
-        id={item}
-        reduxKey={tab ? 'followed' : 'all'}
-        prevScreen={title}
-      />
-    ),
-    [appColor, isDark, tab, title]
+    ({ item }: { item: number }) => {
+      if ([2, 4, 5].includes(item)) {
+        return (
+          <CustomTooltip
+            key={item}
+            isVisible={showGuide && tooltips?.step === 13}
+            text={'Now go to this board.'}
+            onClose={() => {
+              tooltips?.changeStep(14);
+              setShowGuide(false);
+            }}
+            placement='top'
+          >
+            <ThreadCard
+              appColor={appColor}
+              isDark={isDark}
+              id={item}
+              reduxKey={tab ? 'followed' : 'all'}
+              prevScreen={title}
+            />
+          </CustomTooltip>
+        );
+      }
+      return (
+        <ThreadCard
+          appColor={appColor}
+          isDark={isDark}
+          id={item}
+          reduxKey={tab ? 'followed' : 'all'}
+          prevScreen={title}
+        />
+      );
+    },
+    [appColor, isDark, tab, title, showGuide, tooltips, setShowGuide]
   );
 
   const flRefreshControl = useMemo(

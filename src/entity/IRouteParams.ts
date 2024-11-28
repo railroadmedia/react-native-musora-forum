@@ -23,7 +23,7 @@ export interface IForumParams {
   postId?: number;
   categoryId?: string;
   prevScreen?: string;
-  tooltips?: any;
+  tooltipContext?: any;
 }
 
 export interface IThreadsParams {

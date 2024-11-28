@@ -1,6 +1,14 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import React, { useRef, useState, FunctionComponent, useEffect, useCallback, useMemo } from 'react';
+import React, {
+  useRef,
+  useState,
+  FunctionComponent,
+  useEffect,
+  useCallback,
+  useMemo,
+  useContext,
+} from 'react';
 import {
   ActivityIndicator,
   BackHandler,
@@ -27,7 +35,7 @@ import CustomTooltip from '../commons/CustomTooltip';
 
 const Forums: FunctionComponent<{ isDark: boolean }> = props => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
-  const { bottomPadding, brand, appColor, tooltips } = params;
+  const { bottomPadding, brand, appColor, tooltipContext } = params;
   const { isDark } = props;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
@@ -42,6 +50,7 @@ const Forums: FunctionComponent<{ isDark: boolean }> = props => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const reFocused = useRef<boolean>(false);
   const [showGuide, setShowGuide] = useState<boolean>(false);
+  const tooltips: any = useContext(tooltipContext);
 
   const flatListRef = useRef<FlatList | null>(null);
 
@@ -161,11 +170,11 @@ const Forums: FunctionComponent<{ isDark: boolean }> = props => {
         return (
           <CustomTooltip
             key={item.id}
-            isVisible={showGuide && tooltips?.step === 12}
+            isVisible={showGuide && tooltips.step === 12}
             text={`Go to the <b>${item.title}</b> board.`}
             placement='top'
             onClose={() => {
-              tooltips?.goToNextStep();
+              tooltips?.changeStep(13);
               setShowGuide(false);
             }}
           >

@@ -65,6 +65,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       backgroundColor: isDark ? '#002039' : '#FFFFFF',
       padding: 10,
       marginBottom: 15,
+      width: '100%',
     },
     titleContainer: {
       flexDirection: 'row',
