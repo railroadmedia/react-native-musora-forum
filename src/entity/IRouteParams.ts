@@ -23,8 +23,7 @@ export interface IForumParams {
   postId?: number;
   categoryId?: string;
   prevScreen?: string;
-  guideStep?: number;
-  changeStep?: (step: number) => void;
+  tooltips?: any;
 }
 
 export interface IThreadsParams {

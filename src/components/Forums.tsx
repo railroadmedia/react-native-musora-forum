@@ -27,7 +27,7 @@ import CustomTooltip from '../commons/CustomTooltip';
 
 const Forums: FunctionComponent<{ isDark: boolean }> = props => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
-  const { bottomPadding, brand, appColor, guideStep, changeStep } = params;
+  const { bottomPadding, brand, appColor, tooltips } = params;
   const { isDark } = props;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
@@ -41,6 +41,7 @@ const Forums: FunctionComponent<{ isDark: boolean }> = props => {
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const reFocused = useRef<boolean>(false);
+  const [showGuide, setShowGuide] = useState<boolean>(false);
 
   const flatListRef = useRef<FlatList | null>(null);
 
@@ -87,13 +88,16 @@ const Forums: FunctionComponent<{ isDark: boolean }> = props => {
       .finally(() => {
         setLoading(false);
         setRefreshing(false);
+        if (tooltips?.step === 12) {
+          setShowGuide(true);
+        }
       });
 
     return () => {
       forumsController.abort();
       followedController.abort();
     };
-  }, [dispatch]);
+  }, [dispatch, tooltips]);
 
   const refresh = useCallback(() => {
     if (!connection(true)) {
@@ -156,15 +160,16 @@ const Forums: FunctionComponent<{ isDark: boolean }> = props => {
       ) {
         return (
           <CustomTooltip
-            isVisible={guideStep === 12}
-            text={`Go to the ${item.title} board.`}
+            key={item.id}
+            isVisible={showGuide && tooltips?.step === 12}
+            text={`Go to the <b>${item.title}</b> board.`}
             placement='top'
             onClose={() => {
-              changeStep?.(13);
+              tooltips?.goToNextStep();
+              setShowGuide(false);
             }}
           >
             <ForumCard
-              key={item.id}
               data={item}
               appColor={appColor}
               isDark={isDark}
@@ -187,7 +192,7 @@ const Forums: FunctionComponent<{ isDark: boolean }> = props => {
         />
       );
     },
-    [appColor, isDark, guideStep, navigate, changeStep]
+    [appColor, isDark, showGuide, tooltips, navigate, setShowGuide]
   );
 
   const onAndroidBack = useCallback(() => {

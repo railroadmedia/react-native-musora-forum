@@ -8,13 +8,41 @@ interface ICustomTooltip extends TooltipProps {
   text: string;
 }
 
+const addBoldText = (text: any): any => {
+  if (typeof text !== 'string') {
+    return text;
+  }
+  if (text?.includes('<b>')) {
+    const firstSplit = text?.split(/(?=<b>)/);
+    const secondSplit = firstSplit.map(s => s.split(/<\/b>/));
+    const newStrArray = secondSplit.flat().map((s, i) => {
+      if (s.includes('<b>')) {
+        return (
+          <Text
+            key={`${s.substring(s.indexOf('<b>') + 3)}${i}`}
+            style={{ fontFamily: 'OpenSans-Bold' }}
+          >
+            {s.substring(s.indexOf('<b>') + 3)}
+          </Text>
+        );
+      } else {
+        return s;
+      }
+    });
+    return newStrArray;
+  }
+  return text;
+};
+
 const CustomTooltip: FunctionComponent<ICustomTooltip> = props => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
   const { appColor } = params;
 
   return (
     <Tooltip
-      content={<Text style={styles.tooltipText}>{props.text}</Text>}
+      content={
+        <Text style={[styles.tooltipText, { color: '#FFF' }]}>{addBoldText(props.text)}</Text>
+      }
       contentStyle={[styles.tooltipContainer, { backgroundColor: appColor }]}
       closeOnContentInteraction={false}
       closeOnBackgroundInteraction={false}
@@ -31,7 +59,6 @@ export default CustomTooltip;
 const styles: StyleProp<any> = () =>
   StyleSheet.create({
     tooltipText: {
-      color: '#FFF',
       fontFamily: 'OpenSans-Regular',
       fontSize: 13,
     },

@@ -30,10 +30,14 @@ const screenOptions: StackNavigationOptions = {
   headerShown: false,
 };
 
-const ForumRouter: FunctionComponent<{ isDark: boolean }> = ({ isDark }) => {
+const ForumRouter: FunctionComponent<{ isDark: boolean; useTooltips?: () => any }> = ({
+  isDark,
+  useTooltips,
+}) => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
   const { tryCall, NetworkContext, reduxStore, postId, threadId, categoryId, brand } = params;
   const networkContext = useContext(NetworkContext);
+  const tooltips = useTooltips?.();
 
   setForumService({
     tryCall,
@@ -55,7 +59,7 @@ const ForumRouter: FunctionComponent<{ isDark: boolean }> = ({ isDark }) => {
           initialRouteName={categoryId ? 'Threads' : postId || threadId ? 'Thread' : 'Forums'}
           screenOptions={screenOptions}
         >
-          <Stack.Screen name='Forums' initialParams={params as any}>
+          <Stack.Screen name='Forums' initialParams={{ ...params, tooltips } as any}>
             {screenProps => <Forums {...screenProps} isDark={isDark} />}
           </Stack.Screen>
           <Stack.Screen
