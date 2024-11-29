@@ -3,6 +3,7 @@ import { StyleSheet, StyleProp, Text } from 'react-native';
 import Tooltip, { TooltipProps } from 'react-native-walkthrough-tooltip';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { IForumParams } from '../entity/IRouteParams';
+import { IS_TABLET } from '../services/helpers';
 
 interface ICustomTooltip extends TooltipProps {
   text: string;
@@ -60,7 +61,7 @@ const styles: StyleProp<any> = () =>
   StyleSheet.create({
     tooltipText: {
       fontFamily: 'OpenSans-Regular',
-      fontSize: 13,
+      fontSize: IS_TABLET ? 16 : 13,
     },
     tooltipContainer: {
       paddingTop: 8,
