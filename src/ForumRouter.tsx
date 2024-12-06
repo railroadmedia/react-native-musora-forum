@@ -30,7 +30,10 @@ const screenOptions: StackNavigationOptions = {
   headerShown: false,
 };
 
-const ForumRouter: FunctionComponent<{ isDark: boolean }> = ({ isDark }) => {
+const ForumRouter: FunctionComponent<{ isDark: boolean; tooltipContext: React.Context<any> }> = ({
+  isDark,
+  tooltipContext,
+}) => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
   const { tryCall, NetworkContext, reduxStore, postId, threadId, categoryId, brand } = params;
   const networkContext = useContext(NetworkContext);
@@ -55,13 +58,13 @@ const ForumRouter: FunctionComponent<{ isDark: boolean }> = ({ isDark }) => {
           initialRouteName={categoryId ? 'Threads' : postId || threadId ? 'Thread' : 'Forums'}
           screenOptions={screenOptions}
         >
-          <Stack.Screen name='Forums' initialParams={params as any}>
+          <Stack.Screen name='Forums' initialParams={{ ...params, tooltipContext } as any}>
             {screenProps => <Forums {...screenProps} isDark={isDark} />}
           </Stack.Screen>
           <Stack.Screen
             name='Threads'
             component={Threads}
-            initialParams={{ ...params, isDark: isDark } as any}
+            initialParams={{ ...params, isDark: isDark, tooltipContext } as any}
           />
           <Stack.Screen
             name='CRUD'
@@ -71,7 +74,7 @@ const ForumRouter: FunctionComponent<{ isDark: boolean }> = ({ isDark }) => {
           <Stack.Screen
             name='Thread'
             component={Thread}
-            initialParams={{ ...params, isDark: isDark } as any}
+            initialParams={{ ...params, isDark: isDark, tooltipContext } as any}
           />
         </Stack.Navigator>
       </KeyboardAvoidingView>

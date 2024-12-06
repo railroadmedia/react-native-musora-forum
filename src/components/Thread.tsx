@@ -1,6 +1,13 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import React, { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useContext,
+} from 'react';
 import {
   FlatList,
   RefreshControl,
@@ -38,6 +45,7 @@ import type { ForumRootStackParamList, IForumParams, IThreadParams } from '../en
 import { IS_TABLET } from '../services/helpers';
 import ReportModal from '../commons/modals/ReportModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import CustomTooltip from '../commons/CustomTooltip';
 
 const Thread: FunctionComponent = () => {
   const { params }: RouteProp<{ params: IThreadParams & IForumParams }, 'params'> = useRoute();
@@ -52,6 +60,7 @@ const Thread: FunctionComponent = () => {
     postId: postIdProp,
     isForumRules,
     prevScreen = '',
+    tooltipContext,
   } = params;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
@@ -72,6 +81,8 @@ const Thread: FunctionComponent = () => {
   const selectedPost = useRef<IPost | undefined>();
   const [page, setPage] = useState<number>(pageProp || 1);
   const [thread, setThread] = useState<IThread>({ id: threadId || 0, title: threadTitle || '' });
+  const tooltips: any = useContext(tooltipContext);
+  const [showGuide, setShowGuide] = useState(false);
 
   const locked = useAppSelector(
     ({ threadsState }) =>
@@ -141,6 +152,9 @@ const Thread: FunctionComponent = () => {
         .finally(() => {
           setLoading(false);
           setRefreshing(false);
+          if (tooltips?.step === 14) {
+            setTimeout(() => setShowGuide(true), 500);
+          }
         });
       return () => {
         controller.abort();
@@ -149,7 +163,7 @@ const Thread: FunctionComponent = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [dispatch, isForumRules, page, thread?.id]);
+  }, [dispatch, isForumRules, page, thread?.id, tooltips]);
 
   const changePage = useCallback(
     (pageValue: number) => {
@@ -543,16 +557,36 @@ const Thread: FunctionComponent = () => {
           style={styles.bottomTOpacity}
           accessibilityLabel='Reply to thread'
         >
-          {(locked ? lock : multiQuotesArr?.length > 0 ? multiQuote : PostSvg)({
-            height: 25,
-            width: 25,
-            fill: 'white',
-          })}
-          {multiQuotesArr?.length > 0 && (
-            <View style={styles.multiQuoteBadge}>
-              <Text style={styles.multiQuote}>+{multiQuotesArr?.length}</Text>
-            </View>
-          )}
+          <CustomTooltip
+            isVisible={showGuide && tooltips?.step === 14}
+            text={'Tap here to leave a post.'}
+            placement='top'
+            onClose={() => {
+              tooltips?.changeStep(0);
+              setShowGuide(false);
+            }}
+            closeOnBackgroundInteraction
+            childContentSpacing={10}
+            childrenWrapperStyle={{
+              width: 55,
+              height: 55,
+              borderRadius: 99,
+              backgroundColor: appColor,
+            }}
+            topAdjustment={-15}
+            horizontalAdjustment={-15}
+          >
+            {(locked ? lock : multiQuotesArr?.length > 0 ? multiQuote : PostSvg)({
+              height: 25,
+              width: 25,
+              fill: 'white',
+            })}
+            {multiQuotesArr?.length > 0 && (
+              <View style={styles.multiQuoteBadge}>
+                <Text style={styles.multiQuote}>+{multiQuotesArr?.length}</Text>
+              </View>
+            )}
+          </CustomTooltip>
         </TouchableOpacity>
       </View>
       <Modal

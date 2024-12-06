@@ -16,7 +16,11 @@ const ForumCard: FunctionComponent<IForumCard> = props => {
   const styles = setStyles(isDark);
 
   return (
-    <TouchableOpacity onPress={onNavigate} style={styles.container} accessibilityLabel={data?.title}>
+    <TouchableOpacity
+      onPress={onNavigate}
+      style={styles.container}
+      accessibilityLabel={data?.title}
+    >
       <View style={styles.titleContainer}>
         <View style={styles.icon}>
           {data?.icon_path ? (
@@ -61,6 +65,7 @@ const setStyles: StyleProp<any> = (isDark: boolean) =>
       backgroundColor: isDark ? '#002039' : '#FFFFFF',
       padding: 10,
       marginBottom: 15,
+      width: '100%',
     },
     titleContainer: {
       flexDirection: 'row',

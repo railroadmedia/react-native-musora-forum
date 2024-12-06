@@ -1,6 +1,14 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import type { StackNavigationProp } from '@react-navigation/stack';
-import React, { useRef, useState, FunctionComponent, useEffect, useCallback, useMemo } from 'react';
+import React, {
+  useRef,
+  useState,
+  FunctionComponent,
+  useEffect,
+  useCallback,
+  useMemo,
+  useContext,
+} from 'react';
 import {
   ActivityIndicator,
   BackHandler,
@@ -23,10 +31,11 @@ import { connection, getForums, getFollowedThreads } from '../services/forum.ser
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { ForumRootStackParamList, IForumParams } from '../entity/IRouteParams';
 import type { IForum, IThread } from '../entity/IForum';
+import CustomTooltip from '../commons/CustomTooltip';
 
 const Forums: FunctionComponent<{ isDark: boolean }> = props => {
   const { params }: RouteProp<{ params: IForumParams }, 'params'> = useRoute();
-  const { bottomPadding, brand, appColor } = params;
+  const { bottomPadding, brand, appColor, tooltipContext } = params;
   const { isDark } = props;
   const styles = setStyles(isDark, appColor);
   const dispatch = useDispatch();
@@ -40,6 +49,8 @@ const Forums: FunctionComponent<{ isDark: boolean }> = props => {
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const reFocused = useRef<boolean>(false);
+  const [showGuide, setShowGuide] = useState<boolean>(false);
+  const tooltips: any = useContext(tooltipContext);
 
   const flatListRef = useRef<FlatList | null>(null);
 
@@ -86,13 +97,16 @@ const Forums: FunctionComponent<{ isDark: boolean }> = props => {
       .finally(() => {
         setLoading(false);
         setRefreshing(false);
+        if (tooltips?.step === 12) {
+          setShowGuide(true);
+        }
       });
 
     return () => {
       forumsController.abort();
       followedController.abort();
     };
-  }, [dispatch]);
+  }, [dispatch, tooltips]);
 
   const refresh = useCallback(() => {
     if (!connection(true)) {
@@ -144,18 +158,50 @@ const Forums: FunctionComponent<{ isDark: boolean }> = props => {
   );
 
   const renderForum = useCallback(
-    (item: IForum) => (
-      <ForumCard
-        key={item.id}
-        data={item}
-        appColor={appColor}
-        isDark={isDark}
-        onNavigate={() =>
-          navigate('Threads', { title: item.title, forumId: item.id, prevScreen: title })
-        }
-      />
-    ),
-    [appColor, isDark, navigate]
+    (item: IForum) => {
+      if (
+        [
+          'general drum discussion',
+          'general piano discussion',
+          'general guitar discussion',
+          'general singing discussion',
+        ].includes(item.title.toLowerCase())
+      ) {
+        return (
+          <CustomTooltip
+            key={item.id}
+            isVisible={showGuide && tooltips.step === 12}
+            text={`Go to the <b>${item.title}</b> board.`}
+            placement='top'
+            onClose={() => {
+              tooltips?.changeStep(13);
+              setShowGuide(false);
+            }}
+          >
+            <ForumCard
+              data={item}
+              appColor={appColor}
+              isDark={isDark}
+              onNavigate={() =>
+                navigate('Threads', { title: item.title, forumId: item.id, prevScreen: title })
+              }
+            />
+          </CustomTooltip>
+        );
+      }
+      return (
+        <ForumCard
+          key={item.id}
+          data={item}
+          appColor={appColor}
+          isDark={isDark}
+          onNavigate={() =>
+            navigate('Threads', { title: item.title, forumId: item.id, prevScreen: title })
+          }
+        />
+      );
+    },
+    [appColor, isDark, showGuide, tooltips, navigate, setShowGuide]
   );
 
   const onAndroidBack = useCallback(() => {
