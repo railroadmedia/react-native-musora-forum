@@ -59,10 +59,13 @@ const Search: FunctionComponent<ISearch> = props => {
 
       request
         .then(searchResult => {
-          setSearchResults(searchResult.data?.results);
+          const normalizedSearchRes: ISearchItem[] = Array.isArray(searchResult.data.results)
+            ? searchResult.data.results
+            : Object.values(searchResult.data.results);
+          setSearchResults(normalizedSearchRes);
           setSearchText(text);
           setSearchTotal(searchResult.data?.total_results);
-          dispatch(setSearchThreads(searchResult.data?.results?.map((r: ISearchItem) => r.thread)));
+          dispatch(setSearchThreads(normalizedSearchRes?.map((r: ISearchItem) => r.thread)));
         })
         .finally(() => {
           setLoading(false);
